@@ -1,0 +1,13 @@
+# Old Squarespace addresses -> new site (301 = permanent)
+/home                     /                  301
+/welcome                  /                  301
+/about                    /history           301
+/news                     /recognition       301
+/news/*                   /recognition       301
+/2022-qdvdp-white         /wine-white-2022   301
+/2022-qdvdp-red           /wine-red-2022     301
+/2023-qdvdp3m3m-white     /wine-white-2023   301
+/2023-qdvdp3m3m4m-red     /wine-red-2023     301
+/faqs                     /contact           301
+/return-policy            /contact           301
+/wineinfo                 /wines             302
