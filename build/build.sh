@@ -5,6 +5,7 @@ python3 ptjs.py >/dev/null
 python3 mkindexpt.py >/dev/null
 python3 urls.py >/dev/null
 python3 ldpt.py >/dev/null
+python3 mkwineinfo.py >/dev/null
 python3 legal.py >/dev/null
 python3 urls.py >/dev/null
 python3 - <<'PY'

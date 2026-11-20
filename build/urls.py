@@ -6,7 +6,7 @@ def url(name,pt):
     return f'{SITE}/{name}{"-pt" if pt else ""}'
 SLUG={'quinta-da-vinha-dos-padres-2022-white-3m12m':'qdvdp-3m12m-2022-white','quinta-da-vinha-dos-padres-2022-red-3m12m':'qdvdp-3m12m-2022-red',
       'quinta-da-vinha-dos-padres-2023-white-3m3m':'qdvdp-3m3m-2023-white','quinta-da-vinha-dos-padres-2023-red-3m3m4m':'qdvdp-3m3m4m-2023-red'}
-for f in glob.glob(S+'*.html'):
+for f in [g for g in glob.glob(S+'*.html') if not g.endswith('wineinfo.html')]:
     fn=os.path.basename(f)[:-5]
     if fn=='404': continue
     pt=fn.endswith('-pt'); name=fn[:-3] if pt else fn

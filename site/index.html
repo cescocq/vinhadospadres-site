@@ -1682,7 +1682,7 @@ document.addEventListener('click',function(e){var a=e.target.closest&&e.target.c
 function go(){setL(forcePT?'pt':(pref==='pt'?'pt':'en'));}
 if(document.readyState==='complete')go();else addEventListener('load',go);
 })();</script><script id="agjs">(function(){var G=document.getElementById('ageGate'),ok=false;try{ok=localStorage.getItem('vdpAge')==='1'}catch(_){}
-if(/privacy|404/.test(location.pathname)||ok)return;G.hidden=false;document.getElementById('agY').focus();
+if(/privacy|404|wineinfo/.test(location.pathname)||ok)return;G.hidden=false;document.getElementById('agY').focus();
 document.getElementById('agY').onclick=function(){try{localStorage.setItem('vdpAge','1')}catch(_){}G.hidden=true;};
 document.getElementById('agN').onclick=function(){G.classList.add('denied');};})();</script></body>
 </html>

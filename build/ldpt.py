@@ -20,7 +20,7 @@ for f in glob.glob('/home/claude/vdp/s65/*-pt.html'):
     open(f,'w').write(h)
 print('ld ok')
 # pt number format on wine pages
-for f in glob.glob('/home/claude/vdp/s65/wine-*-pt.html'):
+for f in glob.glob('/home/claude/vdp/s65/qdvdp-*-pt.html'):
     h=open(f).read()
     def dd(m):
         v=re.sub(r'(\d),(\d{3})',r'\1\2',m.group(1)); v=re.sub(r'(\d)\.(\d)',r'\1,\2',v)

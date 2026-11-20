@@ -62,14 +62,14 @@ def ag_html(pt,logo):
     else: t=('Welcome to Vinha dos Padres','Are you of legal drinking age (18 or over)?','Yes, I am 18+','No','Sorry, this site is for adults of legal drinking age.','We use no tracking cookies; only your preferences are stored in your browser.','Privacy policy','privacy.html')
     return f'''<div id="ageGate" role="dialog" aria-modal="true" aria-labelledby="agt" hidden><div class="b"><h2 id="agt" class="lg" aria-label="{t[0]}">{logo}</h2><p>{t[1]}</p><div class="a"><button class="y" id="agY">{t[2]}</button><button id="agN">{t[3]}</button></div><div class="no">{t[4]}</div></div></div>'''
 AG_JS='''<script id="agjs">(function(){var G=document.getElementById('ageGate'),ok=false;try{ok=localStorage.getItem('vdpAge')==='1'}catch(_){}
-if(/privacy|404/.test(location.pathname)||ok)return;G.hidden=false;document.getElementById('agY').focus();
+if(/privacy|404|wineinfo/.test(location.pathname)||ok)return;G.hidden=false;document.getElementById('agY').focus();
 document.getElementById('agY').onclick=function(){try{localStorage.setItem('vdpAge','1')}catch(_){}G.hidden=true;};
 document.getElementById('agN').onclick=function(){G.classList.add('denied');};})();</script>'''
 def foot(pt):
     if pt: return '<footer class="sfoot"><span>© Vinha dos Padres, Lda. 2026</span><a href="privacy-pt.html">Política de privacidade</a><span>Beba com moderação · 18+</span><a href="contact-pt.html">Contacto</a></footer>'
     return '<footer class="sfoot"><span>© Vinha dos Padres, Lda. 2026</span><a href="privacy.html">Privacy policy</a><span>Please drink responsibly · 18+</span><a href="contact.html">Contact</a></footer>'
 FAVL='<link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon-32.png" sizes="32x32"><link rel="apple-touch-icon" href="apple-touch-icon.png">'
-for f in glob.glob(S+'*.html'):
+for f in [g for g in glob.glob(S+'*.html') if not g.endswith('wineinfo.html')]:
     fn=os.path.basename(f); pt=fn.endswith('-pt.html'); h=open(f).read()
     h=re.sub(r'<link rel="(icon|apple-touch-icon|shortcut icon)"[^>]*>','',h)
     h=h.replace('</title>','</title>'+FAVL,1)

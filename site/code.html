@@ -416,7 +416,7 @@ var base=me.replace(/\.html$/,'').replace(/-pt$/,''),en=base+'.html',ptp=base+'-
 document.querySelectorAll('.seg button').forEach(function(b){var l=b.textContent.trim();if(l!=='EN'&&l!=='PT')return;b.setAttribute('aria-pressed',String((l==='PT')===pt));
 b.addEventListener('click',function(){try{localStorage.setItem('vdpLang',l.toLowerCase())}catch(_){}if((l==='PT')!==pt)location.href=(l==='PT'?ptp:en)+location.search+location.hash;});});
 try{localStorage.setItem('vdpLang',pt?'pt':'en')}catch(_){}})();</script><script id="agjs">(function(){var G=document.getElementById('ageGate'),ok=false;try{ok=localStorage.getItem('vdpAge')==='1'}catch(_){}
-if(/privacy|404/.test(location.pathname)||ok)return;G.hidden=false;document.getElementById('agY').focus();
+if(/privacy|404|wineinfo/.test(location.pathname)||ok)return;G.hidden=false;document.getElementById('agY').focus();
 document.getElementById('agY').onclick=function(){try{localStorage.setItem('vdpAge','1')}catch(_){}G.hidden=true;};
 document.getElementById('agN').onclick=function(){G.classList.add('denied');};})();</script></body>
 </html>
