@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>69 – VdP Website (prototype)</title><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon-32.png" sizes="32x32"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="description" content="Vinha dos Padres: six vineyard properties of centenary bush vines around Reguengo, Portalegre, in the Serra de São Mamede. Explore the estate map and 3D parcels, with harvest and climate data."><link rel="alternate" hreflang="en" href="https://www.vinhadospadres.com/"><link rel="alternate" hreflang="pt-PT" href="https://www.vinhadospadres.com/index-pt"><link rel="alternate" hreflang="x-default" href="https://www.vinhadospadres.com/"><link rel="canonical" href="https://www.vinhadospadres.com/"><meta property="og:type" content="website"><meta property="og:site_name" content="Vinha dos Padres"><meta property="og:locale" content="en_GB"><meta property="og:title" content="Vinha dos Padres"><meta property="og:description" content="Vinha dos Padres: six vineyard properties of centenary bush vines around Reguengo, Portalegre, in the Serra de São Mamede. Explore the estate map and 3D parcels, with harvest and climate data."><meta property="og:url" content="https://www.vinhadospadres.com/"><link rel="preload" href="fonts/arno-pro-italic-bold.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/arno-pro-italic-regular.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'Arno Pro';font-style:italic;font-weight:300 500;font-display:swap;src:url(fonts/arno-pro-italic-regular.woff2) format('woff2')}
+
+@font-face{font-family:'Arno Pro';font-style:italic;font-weight:600 900;font-display:swap;src:url(fonts/arno-pro-italic-bold.woff2) format('woff2')}
+
+:root{
+  --sea:#D6CDBD; --land:#E6DED0; --other:#C8BEAD; --ink:#231F20; --muted:#5A5450; --dim:#857D76;
+  --gold:#C76653; --acc-rgb:199,102,83; --gold-hi:#275FAC; --acc-ink:#A84E3D; --on-acc:#FFFFFF; --halo:rgba(230,222,208,.92); --panel:rgba(234,227,214,.96); --hair:rgba(35,31,32,.14);
+  --blend:#C9A24A; --red:#9E3A4C; --white:#E4D79C; --pink:#E39CB0;
+  --serif:'Arno Pro', Georgia, 'Times New Roman', serif;
+  --serif-i:'Arno Pro', Georgia, 'Times New Roman', serif;
+  --sans:'Arno Pro', Georgia, 'Times New Roman', serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+body.wine-white{--gold:#275FAC;--acc-rgb:39,95,172;--acc-ink:#1F4E8F}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0;background:var(--sea);color:var(--ink);font-family:var(--sans);font-style:italic;font-variant-numeric:lining-nums;overflow:hidden;-webkit-font-smoothing:antialiased}
+*{font-style:italic}
+body{font-size-adjust:0.46}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#app{position:relative;width:100%;height:100%;overflow:hidden}
+#map{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+#map:active{cursor:grabbing}
+#map path{vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.n-land{fill:#C9BFAD;fill-opacity:1;stroke:rgba(35,31,32,.22);stroke-width:.6}
+.pt-under{fill:var(--land)}
+.pt{fill:var(--land);stroke:#231F20;stroke-width:1.4}
+.pt-line{fill:none;stroke:#231F20;stroke-width:1.4;pointer-events:none}
+.al-fill{fill:var(--land);stroke:none;pointer-events:none}
+.al{fill:rgba(35,31,32,0);stroke:#231F20;stroke-width:1.15;pointer-events:none;transition:fill .25s}
+.al.live{pointer-events:all;cursor:pointer}
+.al.live:hover{fill:rgba(39,95,172,.10);stroke:var(--gold-hi);stroke-opacity:1!important}
+.park{fill:rgba(35,31,32,.035);stroke:#231F20;stroke-width:1.05;pointer-events:none}
+.doc{fill:rgba(35,31,32,0);stroke:#231F20;stroke-width:1.05;stroke-dasharray:5 4;pointer-events:none;transition:fill .25s}
+.park.live,.doc.live{pointer-events:all;cursor:pointer}
+.park.live:hover,.doc.live:hover{fill:rgba(39,95,172,.10);stroke:var(--gold-hi)}
+.lis{fill:#231F20;stroke:#231F20;stroke-width:.8;pointer-events:none}
+.prop{fill:rgba(35,31,32,.05);stroke:#231F20;stroke-width:1;stroke-dasharray:4 3;cursor:pointer;transition:fill .2s}
+.prop:hover,.prop.sel{fill:rgba(var(--acc-rgb),.12)}
+.prop.hl{fill:rgba(var(--acc-rgb),.12);stroke-dasharray:none;stroke-width:4.8;stroke:var(--gold)}
+.prop:hover{stroke-dasharray:none;stroke-width:4.8;stroke:var(--gold)}
+.parcel{stroke:#231F20;stroke-width:.9;fill-opacity:.72;cursor:pointer;transition:fill-opacity .15s}
+.parcel:hover{fill-opacity:.95;stroke:var(--gold);stroke-width:2}
+.t-blend{fill:var(--blend)} .t-red{fill:var(--red)} .t-white{fill:var(--white)} .t-pink{fill:var(--pink)}
+.t-young-white{fill:url(#hatch-white)} .t-young-red{fill:url(#hatch-red)}
+
+/* map labels */
+#labels{position:absolute;inset:0;pointer-events:none}
+.lbl{position:absolute;transform:translate(-50%,-50%);font-family:var(--serif-i);font-style:italic;font-weight:400;color:#231F20;
+  letter-spacing:.06em;white-space:nowrap;text-shadow:0 0 4px var(--halo),0 0 8px var(--halo);transition:opacity .25s}
+.lbl.big{font-size:18px} .lbl.mid{font-size:18px} .lbl.sm{font-size:18px}
+.lbl.sea{color:rgba(35,31,32,.45);letter-spacing:.32em;font-size:15px}
+.lbl.city::before{content:"";position:absolute;left:-12px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:#231F20}
+.lbl.city{transform:translate(0,-50%)}
+.lbl.lblR{transform:translate(-100%,-50%)}
+.lbl.drive{transform:translate(-50%,6px);font-size:18px}
+.lbl.lblL{transform:translate(0,-50%)}
+.lbl.cityR{transform:translate(-5.25px,-50%);padding-left:19px}
+.lbl.cityR::before{content:"";position:absolute;left:0;top:50%;width:10.5px;height:10.5px;margin-top:-5.25px;border-radius:50%;background:#231F20;box-shadow:0 0 0 1.5px var(--halo)}
+.lbl.cityL{transform:translate(calc(-100% + 5.25px),-50%);padding-right:19px}
+.lbl.cityL::after{content:"";position:absolute;right:0;top:50%;width:10.5px;height:10.5px;margin-top:-5.25px;border-radius:50%;background:#231F20;box-shadow:0 0 0 1.5px var(--halo)}
+.lbl.prop-l{font-size:15px}
+.road-case{display:none;fill:none;stroke:var(--halo);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.road{fill:none;stroke:#3A3433;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.lbl.prov{font-family:var(--sans);font-style:italic;font-size:10.5px;letter-spacing:.03em;color:rgba(35,31,32,.6)}
+
+/* VdP marker */
+#marker{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;
+  background:none;border:0;padding:0;cursor:pointer;transition:opacity .25s}
+#marker .logo{width:180px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6));transition:transform .2s}
+#marker .logo svg{display:block;width:100%;height:auto}
+#marker .stem{width:1.5px;height:18px;background:var(--gold-hi)}
+#marker .dot{width:13px;height:13px;border-radius:50%;background:var(--gold);border:2.5px solid #231F20;box-shadow:0 0 0 5px rgba(var(--acc-rgb),.28)}
+#marker:hover .logo,#marker:focus-visible .logo{transform:translateY(-3px) scale(1.05)}
+#marker .hint{position:absolute;bottom:-30px;font-size:12px;font-weight:600;white-space:nowrap;padding:3px 9px;border-radius:999px;
+  background:var(--gold);color:var(--on-acc);opacity:0;transition:opacity .2s}
+#marker:hover .hint,#marker:focus-visible .hint{opacity:1}
+
+/* chrome */
+#top{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:18px;right:18px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none}
+#top>*{pointer-events:auto}
+#top{z-index:10}
+body.axo-on #top>div:first-child{visibility:hidden}
+.title{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1;margin:0;letter-spacing:.01em}
+.title em{font-family:var(--serif-i);font-weight:400}
+.title em{font-weight:500}
+#crumbs{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;font-size:13px}
+#crumbs button{background:none;border:0;padding:2px 2px;cursor:pointer;color:var(--muted)}
+#crumbs button:hover{color:var(--ink)}
+#crumbs button[aria-current]{color:var(--gold);font-weight:600;cursor:default}
+#crumbs .sep{color:var(--dim)}
+.seg{display:flex;background:var(--panel);border:1px solid var(--hair);border-radius:999px;padding:3px}
+.seg button{border:0;background:none;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--gold);color:var(--on-acc)}
+
+#tip{z-index:20!important;position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--hair);border-radius:10px;padding:10px 12px;
+  font-size:12.5px;line-height:1.45;max-width:270px;opacity:0;transition:opacity .12s;backdrop-filter:blur(6px);z-index:5}
+#tip h4{margin:0 0 2px;font-family:var(--serif);font-size:19px;font-weight:600}
+#tip .sub{color:var(--muted);margin-bottom:6px}
+#tip dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:0}
+#tip dt{color:var(--muted)} #tip dd{margin:0;font-weight:600;text-align:right}
+#tip .flag{margin-top:6px;color:var(--gold-hi);font-size:11.5px}
+#tip .cta{margin-top:8px;padding-top:7px;border-top:1px solid var(--hair);font-weight:700;color:var(--ink)}
+#loader{position:absolute;inset:0;display:grid;place-items:center;background:rgba(214,205,189,.6);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s;z-index:30}
+#loader.on{opacity:1;pointer-events:auto}
+#loader .box{display:grid;justify-items:center;gap:18px}
+#loader .lg{width:300px}
+#loader .lg svg{display:block;width:100%;height:auto;filter:drop-shadow(0 2px 10px rgba(0,0,0,.6))}
+#loader .ld{width:200px}
+#loader .ld svg{display:block;width:100%;height:auto;overflow:visible}
+#loader .ld path,#loader .ld rect{fill:#C56552;opacity:.18;transform-box:fill-box;transform-origin:center;animation:vdpWave 1.5s ease-in-out infinite}
+@keyframes vdpWave{0%,100%{opacity:.18;transform:scale(.82)}35%,55%{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){#loader .ld path,#loader .ld rect{animation:none;opacity:1;transform:none}}
+#loader .msg{font-size:12.5px;color:var(--muted)}
+
+#legend{position:absolute;left:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--panel);border:1px solid var(--hair);
+  border-radius:12px;padding:10px 12px;font-size:12px;display:grid;gap:6px;min-width:170px}
+.lg{display:flex;align-items:center;gap:8px;color:var(--muted)}
+.sw{width:22px;height:12px;border-radius:3px;flex:none;border:1px solid rgba(35,31,32,.55)}
+.ln{width:22px;height:0;border-top:1.5px solid #231F20;flex:none}
+.ln.d{border-top-style:dashed}
+#scale{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11.5px;margin-top:2px}
+#scale .bar{height:6px;border:1.5px solid #231F20;border-top:0}
+#credit{position:absolute;right:18px;bottom:calc(10px + env(safe-area-inset-bottom,0px));font-size:10.5px;color:rgba(35,31,32,.55);text-align:right;line-height:1.5;max-width:520px}
+
+/* side panel */
+#panel{position:absolute;top:96px;right:18px;width:420px;max-width:calc(100% - 36px);max-height:calc(100% - 150px);overflow:auto;
+  background:var(--panel);border:1px solid var(--hair);border-radius:14px;padding:18px 18px 16px;backdrop-filter:blur(8px);
+  transform:translateX(24px);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
+#panel.on{opacity:1;transform:none;pointer-events:auto}
+.p-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.p-h h2{font-family:var(--serif);font-weight:600;font-size:28px;line-height:1.05;margin:0}
+.p-h .sub{color:var(--muted);font-size:12.5px;margin-top:4px}
+.x{border:1px solid var(--hair);background:none;border-radius:50%;width:30px;height:30px;cursor:pointer;flex:none;display:grid;place-items:center}
+.x:hover{border-color:var(--gold-hi)}
+.stats{display:grid;grid-template-columns:repeat(4,auto);gap:10px 16px;margin:14px 0 6px;justify-content:start}
+.stat .k{font-size:11px;color:var(--muted)} .stat .v{font-size:17px;font-weight:700;white-space:nowrap} .stat .s{font-size:11px;color:var(--muted)}
+h3{font-family:var(--serif);font-weight:600;font-size:19px;margin:16px 0 8px}
+.plist{display:grid;gap:4px}
+.plist button{display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:10px;text-align:left;background:rgba(35,31,32,.04);
+  border:1px solid transparent;border-radius:8px;padding:7px 9px;cursor:pointer;font-size:12.5px}
+.plist button:hover{border-color:var(--hair);background:rgba(35,31,32,.07)}
+.plist .dotc{width:12px;height:12px;border-radius:3px}
+.plist .meta{color:var(--muted)}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--hair);border-radius:10px}
+table{border-collapse:collapse;font-size:11.5px;min-width:100%}
+th,td{padding:6px 7px;text-align:left;white-space:nowrap;border-bottom:1px solid rgba(35,31,32,.09)}
+th{font-weight:600;color:var(--muted);background:rgba(35,31,32,.04)}
+th.grp{text-align:center;border-bottom:1px solid var(--hair);color:var(--ink)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.ystart td{border-top:1px solid var(--hair)}
+.badge{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:999px;border:1px solid var(--gold);color:var(--gold-hi);margin-left:4px}
+.tbc{color:var(--gold-hi)}
+.notes{margin:0;padding-left:16px;font-size:12.5px;line-height:1.55;color:#3A3433}
+.notes li{margin-bottom:5px}
+.foot{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5}
+.totals{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.totals>div{background:rgba(35,31,32,.05);border-radius:8px;padding:7px 8px}
+.tchart{display:block;margin-top:4px}
+.hvhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 9px;height:24px}
+.hvhead h3{margin:0!important}
+#axo .side .chips{margin-bottom:2px}
+#axo .side h3{margin-bottom:10px}
+.seg.sm{padding:2px}.seg.sm button{padding:4px 10px;font-size:11.5px}
+.tmr{display:inline-flex;margin:0 0 2px}
+.tmtitle{font-family:var(--serif);font-size:16px;font-weight:600;margin:0 0 2px}
+.wxbtns{display:flex;flex-wrap:wrap;gap:4px 10px;margin:6px 0 8px}
+.wxb{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:2px 0;font-size:11.5px;color:var(--muted);cursor:pointer}
+.wxb:hover{color:var(--ink)}
+.wxb .dotb{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--muted);display:inline-block;box-sizing:border-box}
+.wxb[aria-pressed="true"]{color:var(--gold)}
+.wxb[aria-pressed="true"] .dotb{border-color:var(--gold);background:radial-gradient(circle,var(--gold) 0 3px,transparent 3.5px)}
+.gbar{display:inline-block;width:40px;height:8px;border-radius:2px;margin:0 4px}
+.tmleg+.tmleg{margin-top:3px}
+.tmleg.below{margin-top:6px}
+details.ndet summary{list-style:none;cursor:pointer}
+details.ndet summary::-webkit-details-marker{display:none}
+details.ndet summary h3::before{content:'▸';display:inline-block;width:14px;font-size:13px;color:var(--gold-hi);transition:transform .15s}
+details.ndet[open] summary h3::before{transform:rotate(90deg)}
+.ncount{font-family:var(--sans);font-size:11px;color:var(--muted);font-weight:600;margin-left:4px}
+.tpk{cursor:default}
+.tchart g.mk.on{stroke:var(--gold);stroke-width:2.6}
+.tmhead{font-size:12.5px;color:var(--ink);margin:-2px 0 6px}
+.tmleg{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+.tleg{display:inline-flex;align-items:center;gap:6px}
+.p-h h2{white-space:nowrap}
+.gmaps{display:inline-flex;align-items:center;gap:6px;flex:none;border:1px solid var(--gold);color:var(--gold);text-decoration:none;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;margin-top:4px}
+.gmaps:hover{background:var(--gold);color:var(--on-acc)}
+.wines{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.wbtl{display:grid;justify-items:center;gap:4px;background:rgba(35,31,32,.04);border:1px solid transparent;border-radius:10px;padding:8px 4px 7px;cursor:pointer}
+.wbtl:hover,.wbtl:focus-visible{border-color:var(--gold);background:rgba(var(--acc-rgb),.08)}
+.wbtl img{height:84px;width:auto;display:block}
+.wbtl .wy{font-size:12px;font-weight:600;line-height:1.1}
+.wbtl .wc{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.wdot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}
+.wcard{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;margin-top:8px}
+.wcard img{height:210px;width:auto;display:block}
+.wcard h2{font-family:var(--serif);font-weight:600;font-size:23px;line-height:1.1;margin:0 0 4px}
+.wsub{display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:10px}
+.wcode{font-family:var(--serif-i);font-style:italic;color:var(--muted);font-size:13px;margin-left:4px}
+.wstats{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+.wstats .k{font-size:11px;color:var(--muted)} .wstats .v{font-size:17px;font-weight:600}
+
+.wrow .wico{width:22px;height:22px;display:grid;place-items:center;overflow:hidden}.wrow .wico img{height:22px;width:auto}
+.h3btn{display:flex;align-items:center;gap:10px;width:100%;margin:22px 0 0;padding:10px 12px;background:rgba(35,31,32,.04);border:1px solid transparent;border-radius:10px;cursor:pointer;font-family:var(--serif);font-weight:600;font-size:20px;color:inherit;text-align:left}.h3btn:hover{border-color:var(--hair);background:rgba(35,31,32,.07)}.h3btn .arr{margin-left:auto;font-size:22px}
+.wyears{display:grid;gap:6px;margin-top:12px}
+.wyh{width:100%;display:grid;grid-template-columns:1fr auto 18px;align-items:center;gap:10px;background:rgba(35,31,32,.04);border:1px solid transparent;border-radius:8px;padding:9px 10px;cursor:pointer;font:inherit;font-size:15px;font-weight:600;text-align:left;color:inherit}
+.wyh:hover{border-color:var(--hair);background:rgba(35,31,32,.07)}.wyh .meta{font-size:12px;font-weight:400;color:var(--muted)}
+.wyh .arr{font-size:18px;transition:transform .2s;justify-self:center}.wyr.op .wyh .arr{transform:rotate(90deg)}
+.wyr .wines{grid-template-columns:repeat(2,1fr);margin:6px 0 4px}
+.gowines{display:block;text-align:center;margin-top:12px;border:1.5px solid #231F20;border-radius:999px;padding:8px 14px;font-size:13.5px;font-weight:600;color:#231F20;text-decoration:none}
+.gowines:hover{background:rgba(35,31,32,.06)}
+.wso{margin:4px 0 10px!important}
+.wstats .v .wdot{display:inline-block;vertical-align:middle;margin-right:2px}
+.wsrc{display:grid;gap:4px}
+.wsrc .row{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:6px 8px;border-radius:8px;background:rgba(35,31,32,.04);border:1px solid transparent;cursor:default;font-size:12.5px}
+.wsrc .row:hover{border-color:var(--gold)}
+.wsrc .row .d{font-size:11px;color:var(--muted)}
+.wsrc .bar{grid-column:1/-1;height:4px;border-radius:2px;background:rgba(35,31,32,.08);overflow:hidden}
+.wsrc .bar i{display:block;height:100%}
+.wseason{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.wseason>div{background:rgba(35,31,32,.05);border-radius:8px;padding:7px 8px}
+.wseason .k{font-size:10.5px;color:var(--muted)} .wseason .v{font-size:15px;font-weight:600}
+.sold{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--on-acc);background:#231F20;border-radius:999px;padding:2px 8px}
+.wsub{display:grid!important;grid-template-columns:1fr 1fr;gap:0 12px}
+.wsub .wl{display:flex;align-items:center;gap:6px}
+.wsub .sold{margin:0;justify-self:start}
+.wlink{display:inline-flex;align-items:center;gap:6px;margin-top:12px;color:var(--gold);font-size:12.5px;font-weight:600;text-decoration:none}
+.wlink:hover{text-decoration:underline}
+.hrow{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:16px 0 10px;min-height:24px}
+.hrow h3{margin:0!important;line-height:24px}
+.hrow{position:relative}
+.wmini{display:flex;align-items:flex-end;gap:4px;margin:0;position:absolute;right:0;bottom:0}
+#axo .side .sh-c>.hrow:first-child,#axo .side>.hrow:first-child{margin-top:26px}
+.wpage{display:inline-block;margin-top:10px;border:1.5px solid currentColor;border-radius:999px;padding:5px 14px;font-size:13px;color:var(--ink);text-decoration:none}.wpage:hover{background:rgba(255,255,255,.4)}
+.wsoon{font-size:11.5px;color:var(--muted);font-style:italic;line-height:24px}
+.wmini button{background:none;border:1px solid transparent;border-radius:6px;padding:2px 3px;cursor:pointer;display:grid;justify-items:center;gap:1px}
+.wmini button:hover,.wmini button:focus-visible{border-color:var(--gold);background:rgba(var(--acc-rgb),.08)}
+.wmini img{height:34px;width:auto;display:block}
+.wmini span{font-size:9.5px;color:var(--muted);line-height:1}
+.wmini .lbl-w{font-size:11px;color:var(--muted);margin-right:4px;align-self:center}
+.totals sup{font-size:9px;color:var(--gold-hi);margin-left:1px}
+.foot.fn{margin-top:6px;line-height:1.6}
+tr.yr{cursor:pointer}
+tr.yr:hover td{background:rgba(39,95,172,.07)}
+tr.yr td:first-child::before{content:'▸';display:inline-block;width:12px;color:var(--gold-hi);transition:transform .15s}
+tr.yr.open td:first-child::before{transform:rotate(90deg)}
+tr.yr.open td{color:var(--gold-hi)}
+tr.det td{white-space:nowrap!important;font-size:11px;color:#4A4442;background:rgba(35,31,32,.03)}
+tr.det td:first-child{padding-left:20px}
+.ptable td:nth-child(2),.ptable td:nth-child(3),.ptable td:nth-child(4){white-space:normal;min-width:64px}
+.ptable{table-layout:auto;width:100%}
+.totals .u{font-size:11px;color:var(--muted)}
+.totals .y{font-size:11px;color:var(--muted)} .totals .v{font-weight:700;font-size:13.5px}
+
+/* axo view */
+#axo{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;
+  background:radial-gradient(120% 90% at 50% 40%,#EAE3D6 0%,#D6CDBD 60%,#C6BBA7 100%)}
+#axo.on{opacity:1;pointer-events:auto}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+#axo .back{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));left:18px;display:flex;align-items:center;gap:8px;background:var(--panel);
+  border:1px solid var(--hair);border-radius:999px;padding:8px 14px 8px 10px;cursor:pointer;font-size:13px;font-weight:600}
+#axo .back:hover{border-color:var(--gold-hi)}
+#axo .pill{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);text-align:center;background:var(--panel);
+  border:1px solid var(--hair);border-radius:16px;padding:8px 20px}
+#axo .pill h2{margin:0;font-family:var(--serif);font-weight:600;font-size:26px;line-height:1.1}
+#axo .pill .sub:empty{display:none}
+#axo .pill .sub{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;justify-content:center}
+#axo .pill .sub i{width:8px;height:8px;border-radius:50%;display:inline-block}
+body:not(.phone) #axo .pill{left:18px;top:calc(70px + env(safe-area-inset-top,0px));transform:none;text-align:left;max-width:calc(100% - 640px)}body:not(.phone) #axo .pill .sub{justify-content:flex-start}
+#axo .grid-note{display:none;position:absolute;top:96px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(35,31,32,.5)}
+#axo .statbar{position:absolute;left:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--panel);border:1px solid var(--hair);
+  border-radius:14px;padding:14px 18px;display:grid;grid-template-columns:repeat(4,auto);gap:4px 26px}
+#axo .statbar .k{font-size:11px;color:var(--muted)}
+#axo .statbar .v{font-size:21px;font-weight:700;white-space:nowrap}
+#axo .statbar .s{font-size:11.5px;color:var(--muted);max-width:120px}
+#axo .statbar .src{grid-column:1/-1;font-size:10.5px;color:var(--dim);margin-top:6px}
+#axo .side{position:absolute;top:84px;right:84px;width:660px;max-width:calc(100% - 120px);max-height:calc(100% - 120px);overflow:auto;
+  background:var(--panel);border:1px solid var(--hair);border-radius:14px;padding:14px 16px;transition:transform .3s,opacity .3s}
+#axo .side.min{transform:translateX(calc(100% + 90px));opacity:0;pointer-events:none}
+#axo .side h3:first-child{margin-top:2px}
+#axo .ctrl{position:absolute;right:18px;top:50%;transform:translateY(-50%);display:grid;gap:10px;justify-items:center}
+.cbtn{width:46px;height:46px;border-radius:50%;background:var(--panel);border:1px solid var(--hair);display:grid;place-items:center;cursor:pointer;padding:0}
+.cbtn:hover{border-color:var(--gold-hi)}
+.cbtn[aria-pressed="true"]{background:var(--gold);color:var(--on-acc)}
+#compass{width:56px;height:56px}
+#compass svg{transition:none}
+.cstack{display:grid;gap:4px;background:var(--panel);border:1px solid var(--hair);border-radius:24px;padding:5px}
+.cstack .cbtn{border:0;width:40px;height:40px;background:none;font-size:11px;font-weight:700}
+.cstack .cbtn[aria-pressed="true"]{background:var(--gold);color:var(--on-acc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{display:flex;align-items:center;gap:6px;border:1px solid var(--hair);background:rgba(35,31,32,.04);border-radius:999px;padding:5px 10px;font-size:12px;cursor:pointer}
+.chips button:hover{border-color:var(--gold-hi)}
+.chips button[aria-pressed="true"]{border-color:var(--gold);background:rgba(var(--acc-rgb),.14);color:var(--acc-ink)}
+.chips .dotc{width:11px;height:11px;border-radius:3px;display:inline-block}
+.agereg{display:flex;gap:28px;padding-bottom:4px}
+.agereg .k{font-size:11px;color:var(--muted)} .agereg .v{font-size:17px;font-weight:700}
+.selhead{margin-top:14px;display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.link{background:none;border:0;color:var(--gold);cursor:pointer;font-size:12.5px;font-weight:600;padding:0}
+.link:hover{text-decoration:underline}
+.ctip{font-size:10px;color:var(--muted);text-align:center;max-width:64px;line-height:1.25}
+.help{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom,0px));right:18px;font-size:11px;color:rgba(35,31,32,.55);text-align:right;line-height:1.5}
+
+/* ---------- responsive: tablets (landscape mid layout) ---------- */
+body.tablet #panel{width:360px}
+body.tablet #axo .side{width:min(520px,calc(100% - 120px))}
+/* ---------- bottom sheets (phones + portrait tablets) ---------- */
+.sh-h{display:none}
+body.sheet #panel,body.sheet #axo .side{position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;max-width:none;max-height:none;height:var(--sh,150px);
+  border-radius:18px 18px 0 0;border-bottom:0;padding:0 14px;overflow:hidden;display:flex;flex-direction:column;
+  transform:translateY(0);transition:height .28s ease,transform .3s ease,opacity .25s;z-index:12;box-shadow:0 -6px 24px rgba(35,31,32,.12)}
+body.sheet #panel:not(.on){transform:translateY(105%);opacity:1}
+body.sheet #axo .side.min{transform:translateY(105%);opacity:1}
+body.sheet .sh-h{display:grid;place-items:center;flex:none;height:28px;margin:0 -14px;cursor:grab;touch-action:none}
+body.sheet .sh-h::before{content:"";width:42px;height:5px;border-radius:3px;background:rgba(35,31,32,.28)}
+body.sheet .sh-c{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+body.sheet #axo .statbar{display:none}
+.statm{display:none}
+body.sheet .statm{display:grid;grid-template-columns:repeat(4,auto);justify-content:space-between;gap:2px 10px;padding:2px 0 10px;border-bottom:1px solid var(--hair);margin-bottom:6px}
+body.sheet .statm .k{font-size:10.5px;color:var(--muted)} body.sheet .statm .v{font-size:15px;font-weight:700;white-space:nowrap} body.sheet .statm .s{display:none}
+body.sheet .statm .src{display:none}
+body.sheet #axo .help{display:none}
+body.sheet #axo .ctrl{top:calc(110px + env(safe-area-inset-top,0px));transform:none}
+body.sheet .wxbtns{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding-bottom:4px;scrollbar-width:none}
+body.sheet .wxbtns::-webkit-scrollbar{display:none}
+body.sheet .wxb{flex:none;border:1px solid var(--hair);border-radius:999px;padding:6px 11px;font-size:12px;background:rgba(35,31,32,.04)}
+body.sheet .wxb .dotb{display:none}
+body.sheet .wxb[aria-pressed="true"]{border-color:var(--gold);background:rgba(var(--acc-rgb),.14);color:var(--acc-ink)}
+body.sheet .tmr{display:flex;flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
+body.sheet .tmr::-webkit-scrollbar{display:none}
+body.sheet .tmr button{flex:none}
+body.sheet svg.tchart{touch-action:pan-y}
+/* legend: collapsible on sheet layouts */
+.lgrow{display:contents} .lgbtn{display:none}
+body.sheet #legend{left:12px;bottom:calc(var(--sheet-h,0px) + 12px + env(safe-area-inset-bottom,0px));padding:6px 8px;min-width:0;transition:bottom .28s ease}
+body.sheet #legend .lgi{display:none}
+body.sheet #legend.open .lgi{display:grid;gap:6px;padding:4px 2px 8px}
+body.sheet .lgrow{display:flex;align-items:center;gap:10px}
+body.sheet .lgbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--hair);background:rgba(35,31,32,.04);border-radius:999px;padding:5px 10px;font-size:12px;color:var(--ink);cursor:pointer}
+body.sheet #legend.open .lgbtn{border-color:var(--gold);color:var(--acc-ink)}
+body.sheet #scale{margin:0}
+body.sheet-up #legend{opacity:0;pointer-events:none}
+/* ---------- phones ---------- */
+body.phone #top{left:12px;right:12px;top:calc(10px + env(safe-area-inset-top,0px))}
+body.phone .title{font-size:26px;transition:font-size .25s}
+body.phone.zoomed .title{font-size:18px;white-space:nowrap}
+body.phone.zoomed .title em{font-size:18px}
+body.phone #crumbs{flex-wrap:nowrap;overflow-x:auto;max-width:calc(100vw - 110px);font-size:12px;margin-top:4px;scrollbar-width:none}
+body.phone #crumbs button{white-space:nowrap}
+body.phone .seg button{padding:6px 11px}
+body.phone #marker .logo{width:150px}
+body.phone #marker.armed .hint{opacity:1}
+body.phone #tip{max-width:min(280px,calc(100vw - 24px))}
+body.phone #axo .back{left:12px;top:calc(10px + env(safe-area-inset-top,0px));padding:8px 10px}
+body.phone #axo .back span{display:none}
+body.phone #axo .pill{top:calc(60px + env(safe-area-inset-top,0px));max-width:calc(100% - 24px);padding:6px 14px}
+body.phone #axo .pill h2{font-size:18px}
+body.phone #axo .ctrl{top:calc(112px + env(safe-area-inset-top,0px));right:10px;transform:none;gap:6px}
+body.phone #axo .ctrl .ctip{display:none}
+body.phone #axo .cbtn{width:40px;height:40px}
+body.phone #compass{width:44px;height:44px}
+body.phone #compass svg{width:36px;height:36px}
+body.phone .cstack{padding:3px;border-radius:22px}
+body.phone .cstack .cbtn{width:36px;height:36px}
+body.phone .wines{gap:4px}
+body.phone .wbtl img{height:72px}
+body.phone .wcard img{height:170px}
+body.phone .wcard h2{font-size:20px}
+body.phone .wsrc .row{font-size:12px}
+body.phone .p-h h2{font-size:24px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---- site navigation (v37) ---- */
+#top .navr{display:flex;align-items:center;gap:22px}
+#sitenav .menu{display:flex;gap:24px;list-style:none;margin:0;padding:0;font-size:14px;font-weight:600}
+#sitenav a{text-decoration:none;color:var(--muted);padding:6px 0;border-bottom:2px solid transparent}
+#sitenav a:hover{color:var(--ink)} #sitenav a[aria-current]{color:var(--gold);border-bottom-color:var(--gold)}
+.soon{color:var(--dim,#857D76);opacity:.55;cursor:default}
+#top .burger{display:none;border:1px solid var(--hair);background:var(--panel);border-radius:999px;width:38px;height:38px;place-items:center;cursor:pointer;color:var(--ink);padding:0}
+.sitesheet{position:fixed;inset:0;z-index:60;background:rgba(230,222,208,.98);display:none;flex-direction:column;padding:calc(14px + env(safe-area-inset-top,0px)) 20px 22px}
+.sitesheet.open{display:flex}
+.sitesheet .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+.sitesheet .title{font-size:24px}
+.sitesheet .burger{border:1px solid var(--hair);background:none;border-radius:999px;width:38px;height:38px;place-items:center;cursor:pointer;color:var(--ink);padding:0}
+.sitesheet ul{list-style:none;margin:0;padding:0}
+.sitesheet li>a,.sitesheet li>span{display:flex;justify-content:space-between;align-items:baseline;text-decoration:none;color:var(--ink);font-family:var(--serif);font-size:32px;font-weight:600;padding:12px 0;border-bottom:1px solid var(--hair)}
+.sitesheet li>a[aria-current]{color:var(--gold)}
+.sitesheet li span span,.sitesheet li a span{font-size:12px;font-weight:600;color:var(--muted)}
+.sitesheet .foot{margin-top:auto;font-size:12.5px;color:var(--muted);line-height:1.6}
+@media (max-width:1180px){ #sitenav{display:none} #top .burger{display:grid} #top .navr{gap:10px} }
+@media (max-width:699px){ #top .navr>.seg{display:none} body.phone .title{white-space:nowrap} }
+#sitenav a,#sitenav span,.sitesheet li b{text-transform:lowercase}
+.est{display:block;text-align:center;font-family:var(--serif);font-style:italic;font-weight:400;font-size:10.5px;letter-spacing:.2em;color:#231F20;margin-top:0;line-height:1}
+#marker .logo .est{font-size:12px;margin:0 0 9px}
+#marker .logo{filter:none!important} #marker .logo svg{filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))}
+.tlogo{display:block;text-decoration:none;width:220px} .tlogo svg{display:block;width:100%;height:auto}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+body.phone .tlogo{width:170px} body.phone.zoomed .tlogo{width:135px} .sitesheet .top .tlogo{width:180px}
+.pgrp tr.yg td{background:rgba(35,31,32,.06);font-size:12px;color:var(--ink);border-top:1px solid rgba(35,31,32,.18);white-space:nowrap}.pgrp tr.yg td b{font-weight:700;font-size:13px}.pgrp tr.yg .yn{color:#6A6260;font-size:11px}.pgrp .det td:first-child{padding-left:8px}.pgrp .det td{white-space:normal!important}.tdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.seew{font-size:13px;position:absolute;right:0;bottom:0}
+.wbtl .wfn{font-size:10.5px;color:var(--muted);line-height:1.15;text-align:center}.wbtl .wy{text-align:center}
+.pgrp .det td:first-child{min-width:104px}
+</style>
+<style id="wlcss">#welcome{position:fixed;left:24px;top:calc(96px + env(safe-area-inset-top,0px));z-index:60;max-width:380px;background:#EDE6DA;border:1px solid rgba(35,31,32,.18);border-radius:18px;padding:20px 22px 18px;box-shadow:0 14px 40px rgba(0,0,0,.16);font-family:var(--serif);color:#231F20}
+#welcome[hidden]{display:none}#welcome h2{font-family:var(--serif);font-weight:600;font-style:italic;font-size:26px;margin:0 0 6px;line-height:1.1}#welcome p{margin:0 0 12px;font-size:15.5px;line-height:1.4;color:#4a433f}
+#welcome .proof{display:block;margin:0 0 14px;font-size:14.5px;color:#231F20;text-decoration:none;border-left:3px solid #C76653;padding-left:10px}#welcome .proof b{color:#C76653;white-space:nowrap}
+#welcome .acts{display:flex;gap:8px;flex-wrap:wrap}#welcome .acts a,#welcome .acts button{font:inherit;font-size:14.5px;font-weight:600;padding:7px 15px;border-radius:999px;border:1.5px solid #231F20;background:none;color:#231F20;cursor:pointer;text-decoration:none}
+#welcome .acts .solid{background:#231F20;color:#E6DED0}#welcome .x2{position:absolute;top:10px;right:12px;border:0;background:none;font-size:20px;cursor:pointer;color:#6b625b;line-height:1}
+#proofTag{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));white-space:nowrap;z-index:40;font-family:var(--serif);font-size:14px;color:#231F20;text-decoration:none;background:rgba(237,230,218,.94);border:1px solid rgba(35,31,32,.15);border-radius:999px;padding:6px 14px}
+#proofTag b{color:#C76653}#proofTag:hover{border-color:#C76653}body.in-axo #proofTag,body.in-axo #welcome{display:none}
+body.phone #welcome{left:12px;right:12px;max-width:none;bottom:auto;top:calc(70px + env(safe-area-inset-top,0px))}body.phone #proofTag{display:none}.pgrp .det td:first-child{min-width:104px}
+</style><style id="ldcss">#vdpLoad{position:fixed;inset:0;z-index:999;display:grid;place-items:center;background:#E6DED0;transition:opacity .5s}
+#vdpLoad.out{opacity:0;pointer-events:none}#vdpLoad svg{width:min(260px,60vw);height:auto;fill:#C56552}
+#vdpLoad path,#vdpLoad rect{animation:ldp 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes ldp{0%,100%{opacity:.25;transform:scaleY(.7)}50%{opacity:1;transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){#vdpLoad path,#vdpLoad rect{animation:none}}.pgrp .det td:first-child{min-width:104px}
+</style><style id="agcss">#ageGate{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:rgba(230,222,208,.97);font-family:var(--serif);color:#231F20;padding:20px}
+#ageGate[hidden]{display:none}#ageGate .b{max-width:440px;text-align:center}#ageGate h2{font-family:var(--serif);font-weight:600;font-style:italic;font-size:30px;margin:14px 0 8px}
+#ageGate p{font-size:17px;margin:0 0 18px;color:#4a433f}#ageGate .a{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#ageGate button{font:inherit;font-size:17px;font-weight:600;padding:9px 24px;border-radius:999px;border:1.5px solid #231F20;background:none;color:#231F20;cursor:pointer}#ageGate button.y{background:#231F20;color:#E6DED0}
+#ageGate small{display:block;margin-top:18px;font-size:13px;color:#6b625b}#ageGate small a{color:inherit}#ageGate .no{display:none;margin-top:14px;font-size:16px}#ageGate.denied .no{display:block}#ageGate.denied .a{display:none}
+#ageGate h2.lg{margin:0 0 26px}#ageGate .lg svg{width:min(420px,82vw);height:auto;display:block;margin:0 auto}
+.sfoot{max-width:1180px;margin:0 auto;padding:26px 48px 34px;border-top:1px solid rgba(35,31,32,.15);display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;font-family:var(--serif);font-size:13.5px;color:#6b625b}
+.sfoot a{color:inherit}@media(max-width:760px){.sfoot{padding:22px 20px 30px}}</style></head>
+<body><div id="ageGate" role="dialog" aria-modal="true" aria-labelledby="agt" hidden><div class="b"><h2 id="agt" class="lg" aria-label="Welcome to Vinha dos Padres"><svg  data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 327.75 47.65">
+  <defs>
+    <style>
+      .vdp-l {
+        fill: #fff;
+      }
+    .pgrp .det td:first-child{min-width:104px}
+</style>
+  </defs>
+  <g>
+    <path class="vdp-l" d="M13.88,38.01L3.81,24.25l-2.98.97,12.79,17.48,3.33-1.08-.48-21.46-2.95.96.37,16.9Z"/>
+    <path class="vdp-l" d="M27.63,17.18l-2.88.78,5.27,19.49,2.88-.78-5.27-19.49Z"/>
+    <path class="vdp-l" d="M37.45,14.5l4.32,19.79,2.94-.64-3.32-15.19,14.36,12.78,2.94-.64-4.32-19.79-2.94.64,3.23,14.78-13.98-12.44-3.24.71Z"/>
+    <path class="vdp-l" d="M67.27,8.47l-2.95.47,3.19,19.98,2.95-.47-1.37-8.57,9.85-1.57,1.37,8.57,2.98-.48-3.19-19.98-2.98.48,1.35,8.43-9.85,1.57-1.35-8.43Z"/>
+    <path class="vdp-l" d="M96.21,4.27l-5.49,21.06,3.21-.35,1.15-4.46,8.54-.93,1.97,4.12,3.18-.35-9.34-19.44-3.21.35ZM102.32,16.91l-6.5.71,2.42-9.18,4.08,8.47Z"/>
+    <path class="vdp-l" d="M126.85,1.74l.85,20.18,7.56-.32c2.56-.11,3.49-.33,4.61-.89,3.93-2.04,5.38-6.26,5.23-9.88-.18-4.31-2.66-8.07-6.51-9.08-1.19-.34-2.85-.39-4.72-.31l-7.02.3ZM134.42,4.29c1.87-.08,2.72.1,3.09.17,3.5.73,4.5,4.46,4.59,6.57.12,2.86-1.1,6.23-4.01,7.29-.86.28-2.28.37-2.64.38l-4.88.21-.61-14.43,4.46-.19Z"/>
+    <path class="vdp-l" d="M154.65,17.96c2.13,2.3,4.96,3.25,7.58,3.26,4.4.02,9.51-2.91,9.54-10.03.03-6.42-4.38-10.66-9.48-10.69-4.52-.02-10.09,3.48-10.12,10.78-.01,2.47.46,4.55,2.47,6.67ZM162.19,3.52c3.35.02,6.65,2.8,6.63,7.54-.02,4.04-2.35,7.14-6.6,7.12-4.37-.02-7.04-3.14-7.02-7.18.02-4.88,3.71-7.49,7-7.48Z"/>
+    <path class="vdp-l" d="M189.15,1.9c-.71-.3-1.81-.77-3.41-.84-3.22-.13-5.84,1.75-5.97,4.85-.08,1.87.64,3.38,3.67,5.92,1.51,1.3,3.18,2.67,3.09,4.6-.03.63-.43,2.34-3.08,2.22-1.9-.08-3.16-.86-4.07-1.44l-.13,3.1c.74.36,2.34,1.13,4.38,1.21,3.43.14,5.8-2.29,5.92-5.21.11-2.62-1.39-4.34-3.31-5.93-2.65-2.25-3.61-3.05-3.56-4.37.03-.81.85-2.2,2.9-2.11,1.54.07,2.75.69,3.43,1.05l.13-3.04Z"/>
+    <path class="vdp-l" d="M211.57,14.69c3.45.33,5.01.48,6.81-.62,1.35-.81,2.43-2.28,2.62-4.29.27-2.85-1.38-5.22-3.94-5.98-.47-.17-1.32-.4-2.98-.56l-4.38-.42-1.92,20.14,2.97.28.82-8.56ZM214.35,6.14c1.35.13,2.07.26,2.82.94.72.68,1,1.55.92,2.45-.11,1.11-.83,2.07-1.8,2.4-.72.23-1.29.21-2.49.1l-1.95-.19.56-5.88,1.95.19Z"/>
+    <path class="vdp-l" d="M233.53,5.27l-10.38,19.14,3.2.43,2.19-4.06,8.52,1.14.92,4.47,3.17.42-4.41-21.12-3.2-.43ZM236.44,19.01l-6.48-.87,4.55-8.33,1.93,9.2Z"/>
+    <path class="vdp-l" d="M252.8,8.21l-3.73,19.86,7.44,1.4c2.52.47,3.47.47,4.69.17,4.29-1.1,6.65-4.89,7.32-8.44.8-4.24-.77-8.46-4.29-10.32-1.08-.6-2.69-1.03-4.53-1.37l-6.91-1.3ZM259.6,12.4c1.84.35,2.63.71,2.97.86,3.25,1.5,3.38,5.36,2.99,7.43-.53,2.81-2.47,5.83-5.55,6.2-.9.07-2.3-.16-2.66-.22l-4.8-.9,2.67-14.2,4.39.82Z"/>
+    <path class="vdp-l" d="M278.41,13.26l-4.82,19.65,2.93.72,1.95-7.97c3.4.68,3.95,2.24,6.01,9.92l3.43.84c-.4-1.03-.55-1.44-1.12-3.53-1.35-5.02-1.95-5.6-3.08-6.81,2.56-.43,4.24-1.85,4.85-4.34.62-2.52-.49-4.44-1.82-5.6-1.25-1.11-3.53-1.7-4.35-1.91l-3.98-.98ZM282.2,17.14c1.2.29,4.13,1.01,3.38,4.09-.13.53-.5,1.77-2.16,2.23-.86.22-1.8,0-2.36-.14l-1.9-.47,1.49-6.09,1.55.38Z"/>
+    <path class="vdp-l" d="M302.8,22.64l6.72,2.04.82-2.71-9.58-2.91-5.86,19.33,9.64,2.92.84-2.77-6.78-2.06,1.72-5.66,6.38,1.93.82-2.71-6.38-1.93,1.66-5.48Z"/>
+    <path class="vdp-l" d="M326.23,27.9c-.59-.5-1.49-1.28-2.99-1.83-3.03-1.1-6.09-.1-7.15,2.82-.64,1.76-.41,3.41,1.72,6.75,1.05,1.7,2.22,3.5,1.57,5.31-.22.6-1.12,2.1-3.61,1.19-1.79-.65-2.76-1.77-3.45-2.6l-1.06,2.92c.6.57,1.89,1.78,3.82,2.48,3.23,1.17,6.22-.44,7.22-3.18.9-2.47-.01-4.56-1.37-6.66-1.85-2.95-2.53-4-2.07-5.24.28-.76,1.47-1.84,3.4-1.14,1.44.53,2.41,1.49,2.95,2.03l1.04-2.86Z"/>
+  </g>
+  <g>
+    <path d="M18.97,43.05l-3.53,1.14-2.18-1.07L0,25.01l4.07-1.32,2.13.42,7.05,9.64-.26-12.95,3.59-1.16,1.88,1.01.51,22.41ZM13.88,38.01L3.81,24.25l-2.98.97,12.79,17.48,3.33-1.08-.48-21.46-2.95.96.37,16.9Z"/>
+    <path d="M35.27,38.06l-3.87,1.05-1.83-1.35-5.46-20.19,3.58-.97,2.04.98,5.53,20.48ZM27.63,17.18l-2.88.78,5.27,19.49,2.88-.78-5.27-19.49Z"/>
+    <path d="M41,13.24l2.43.39,9.89,8.82-2.48-11.37,3.68-.8,2.01,1.01,4.54,20.79-4.21.92-12.75-11.47,2.97,13.6-3.86.84-1.92-1.43-4.46-20.41,4.15-.91ZM37.45,14.5l4.32,19.79,2.94-.64-3.32-15.19,14.36,12.78,2.94-.64-4.32-19.79-2.94.64,3.23,14.78-13.98-12.44-3.24.71Z"/>
+    <path d="M85.54,28.02l-3.99.64-1.71-1.56-1.12-7-7.44,1.19,1.4,8.78-3.9.62-1.74-1.55-3.29-20.63,3.63-.58,1.96,1.18,1.11,6.97,7.44-1.19-1.35-8.43,3.63-.58,2.02,1.17,3.35,20.96ZM67.27,8.47l-2.95.47,3.19,19.98,2.95-.47-1.37-8.57,9.85-1.57,1.37,8.57,2.98-.48-3.19-19.98-2.98.48,1.35,8.43-9.85,1.57-1.35-8.43Z"/>
+    <path d="M99.48,3.37l2.18.82,10.09,20.82-4.73.52-1.71-1.21-1.41-2.88-7.28.79-1.14,4.55-3.53.39-1.86-1.49,5.7-21.9,3.69-.4ZM96.21,4.27l-5.49,21.06,3.21-.35,1.15-4.46,8.54-.93,1.97,4.12,3.18-.35-9.34-19.44-3.21.35ZM102.32,16.91l-6.5.71,2.42-9.18,4.08,8.47ZM99.27,11.73l-1.29,5.11,3.54-.39-2.24-4.73Z"/>
+    <path d="M133.7.91c2.65-.11,3.89.05,4.84.28,4.2.97,7.99,4.79,8.23,10.46.23,5.39-2.87,9.27-6.09,10.88-1.01.5-2.32.91-4.91,1.02l-7.05.3-1.52-1.66-.88-20.96,7.38-.31ZM126.85,1.74l.85,20.18,7.56-.32c2.56-.11,3.49-.33,4.61-.89,3.93-2.04,5.38-6.26,5.23-9.88-.18-4.31-2.66-8.07-6.51-9.08-1.19-.34-2.85-.39-4.72-.31l-7.02.3ZM134.42,4.29c1.87-.08,2.72.1,3.09.17,3.5.73,4.5,4.46,4.59,6.57.12,2.86-1.1,6.23-4.01,7.29-.86.28-2.28.37-2.64.38l-4.88.21-.61-14.43,4.46-.19ZM132,6.35l.5,11.96,2.5-.11c1.78-.07,2.37-.22,2.85-.39,2.83-.9,3.81-4.12,3.71-6.46-.06-1.36-.54-3.6-2.55-4.6-1.08-.56-2.14-.6-3.79-.53l-3.22.14Z"/>
+    <path d="M162.81,0c6.15.03,11.26,4.51,11.22,11.93-.03,6.85-4.72,11.41-11.18,11.38-6.72-.03-11.28-5.06-11.25-11.6C151.63,4.26,156.75-.03,162.81,0ZM154.65,17.96c2.13,2.3,4.96,3.25,7.58,3.26,4.4.02,9.51-2.91,9.54-10.03.03-6.42-4.38-10.66-9.48-10.69-4.52-.02-10.09,3.48-10.12,10.78-.01,2.47.46,4.55,2.47,6.67ZM162.19,3.52c3.35.02,6.65,2.8,6.63,7.54-.02,4.04-2.35,7.14-6.6,7.12-4.37-.02-7.04-3.14-7.02-7.18.02-4.88,3.71-7.49,7-7.48ZM162.55,17.67c1.84,0,5.67-1.33,5.7-6.46.02-4.49-2.78-6.22-5.22-6.23-2.29-.01-5.55,1.36-5.58,6.28-.02,5.43,3.62,6.41,5.1,6.42Z"/>
+    <path d="M190.9,7.56c-2.17-1.39-3.43-1.77-4.3-1.81-.87-.04-2.06.31-2.11,1.42-.03.69.57,1.38,1.88,2.55,3.63,3.26,5.06,4.62,4.93,7.54-.16,3.76-3.33,6.68-7.31,6.51-1.69-.07-2.97-.49-4.01-.83l-1.29-2.35.19-4.43c.76.54,2.52,1.86,4.63,1.95,1.48.06,2.23-.6,2.26-1.44.03-.6-.27-1.4-2.98-3.66-3.03-2.54-3.73-4.59-3.65-6.4.2-4.7,3.61-6.22,6.62-6.09.81.03,2.25.25,3.73.94l1.59,1.55-.19,4.55ZM189.15,1.9c-.71-.3-1.81-.77-3.41-.84-3.22-.13-5.84,1.75-5.97,4.85-.08,1.87.64,3.38,3.67,5.92,1.51,1.3,3.18,2.67,3.09,4.6-.03.63-.43,2.34-3.08,2.22-1.9-.08-3.16-.86-4.07-1.44l-.13,3.1c.74.36,2.34,1.13,4.38,1.21,3.43.14,5.8-2.29,5.92-5.21.11-2.62-1.39-4.34-3.31-5.93-2.65-2.25-3.61-3.05-3.56-4.37.03-.81.85-2.2,2.9-2.11,1.54.07,2.75.69,3.43,1.05l.13-3.04Z"/>
+    <path d="M212.51,25.38l-4.02-.38-1.27-1.88,1.99-20.86,4.8.46c1.62.15,3.59.43,5.32,1.42,2.93,1.61,3.55,4.34,3.36,6.35-.22,2.25-1.57,4.7-4.24,5.74-1.82.7-4.08.58-5.1.48l-.83,8.67ZM211.57,14.69c3.45.33,5.01.48,6.81-.62,1.35-.81,2.43-2.28,2.62-4.29.27-2.85-1.38-5.22-3.94-5.98-.47-.17-1.32-.4-2.98-.56l-4.38-.42-1.92,20.14,2.97.28.82-8.56ZM214.35,6.14c1.35.13,2.07.26,2.82.94.72.68,1,1.55.92,2.45-.11,1.11-.83,2.07-1.8,2.4-.72.23-1.29.21-2.49.1l-1.95-.19.56-5.88,1.95.19ZM213.84,11.52c1.53.12,3.12.27,3.29-1.5.04-.39-.05-1.09-.56-1.45-.37-.25-.7-.28-2.41-.47l-.33,3.42Z"/>
+    <path d="M236.92,5.18l1.92,1.32,4.82,22.63-4.72-.63-1.37-1.58-.68-3.13-7.26-.97-2.2,4.15-3.53-.47-1.45-1.9,10.78-19.91,3.68.49ZM233.53,5.27l-10.38,19.14,3.2.43,2.19-4.06,8.52,1.14.92,4.47,3.17.42-4.41-21.12-3.2-.43ZM236.44,19.01l-6.48-.87,4.55-8.33,1.93,9.2ZM234.71,13.24l-2.48,4.66,3.53.47-1.05-5.13Z"/>
+    <path d="M259.66,8.95c2.61.49,3.78.93,4.65,1.36,3.88,1.89,6.7,6.48,5.65,12.05-1,5.3-4.89,8.38-8.39,9.22-1.09.26-2.46.37-5.01-.11l-6.93-1.3-1.11-1.96,3.87-20.63,7.26,1.36ZM252.8,8.21l-3.73,19.86,7.44,1.4c2.52.47,3.47.47,4.69.17,4.29-1.1,6.65-4.89,7.32-8.44.8-4.24-.77-8.46-4.29-10.32-1.08-.6-2.69-1.03-4.53-1.37l-6.91-1.3ZM259.6,12.4c1.84.35,2.63.71,2.97.86,3.25,1.5,3.38,5.36,2.99,7.43-.53,2.81-2.47,5.83-5.55,6.2-.9.07-2.3-.16-2.66-.22l-4.8-.9,2.67-14.2,4.39.82ZM256.78,13.87l-2.21,11.77,2.46.46c1.75.33,2.36.32,2.87.26,2.96-.24,4.64-3.15,5.08-5.46.25-1.33.28-3.63-1.44-5.06-.93-.79-1.95-1.07-3.58-1.38l-3.17-.59Z"/>
+    <path d="M283.48,13.97c2.67.66,4.07,1.5,5.2,2.71,1.79,1.96,2.04,4.23,1.58,6.07-.8,3.28-3.32,4.31-4.19,4.68,1.28,1.99,1.7,3.09,2.33,5.04,1.51,4.59,1.7,5.11,2.43,6.68l-6.18-1.52c-.42-.82-.66-1.25-1.36-4.06-.41-1.62-1.08-3.71-2.07-4.7-.4-.41-.79-.57-1.35-.7l-1.92,7.82-3.95-.97-.97-1.98,5.01-20.41,5.45,1.34ZM278.41,13.26l-4.82,19.65,2.93.72,1.95-7.97c3.4.68,3.95,2.24,6.01,9.92l3.43.84c-.4-1.03-.55-1.44-1.12-3.53-1.35-5.02-1.95-5.6-3.08-6.81,2.56-.43,4.24-1.85,4.85-4.34.62-2.52-.49-4.44-1.82-5.6-1.25-1.11-3.53-1.7-4.35-1.91l-3.98-.98ZM282.2,17.14c1.2.29,4.13,1.01,3.38,4.09-.13.53-.5,1.77-2.16,2.23-.86.22-1.8,0-2.36-.14l-1.9-.47,1.49-6.09,1.55.38ZM281.18,22.82c.68.13,3.02.62,3.46-1.2.44-1.79-1.55-2.28-2.55-2.52l-.91,3.72Z"/>
+    <path d="M307.98,35.24l-6.35-1.93-.99,3.26,5.14,1.56,1.24,1.92-1.13,3.72-10.7-3.25-.85-2.09,6.08-20.05,10.13,3.07,1.41,2-1.12,3.69-6.72-2.04-.93,3.06,4.67,1.42,1.24,1.92-1.13,3.72ZM302.8,22.64l6.72,2.04.82-2.71-9.58-2.91-5.86,19.33,9.64,2.92.84-2.77-6.78-2.06,1.72-5.66,6.38,1.93.82-2.71-6.38-1.93,1.66-5.48Z"/>
+    <path d="M326.19,33.82c-1.65-1.98-2.73-2.72-3.55-3.02-.82-.3-2.06-.33-2.44.72-.24.65.13,1.49,1.03,3,2.48,4.21,3.43,5.93,2.43,8.68-1.29,3.54-5.19,5.37-8.93,4.01-1.59-.58-2.68-1.36-3.57-2l-.52-2.63,1.51-4.17c.56.75,1.84,2.53,3.82,3.25,1.39.5,2.31.1,2.59-.69.21-.57.16-1.42-1.74-4.39-2.12-3.34-2.17-5.5-1.55-7.2,1.61-4.42,5.32-4.84,8.15-3.81.77.28,2.07.91,3.27,2.02l1.05,1.96-1.55,4.28ZM326.23,27.9c-.59-.5-1.49-1.28-2.99-1.83-3.03-1.1-6.09-.1-7.15,2.82-.64,1.76-.41,3.41,1.72,6.75,1.05,1.7,2.22,3.5,1.57,5.31-.22.6-1.12,2.1-3.61,1.19-1.79-.65-2.76-1.77-3.45-2.6l-1.06,2.92c.6.57,1.89,1.78,3.82,2.48,3.23,1.17,6.22-.44,7.22-3.18.9-2.47-.01-4.56-1.37-6.66-1.85-2.95-2.53-4-2.07-5.24.28-.76,1.47-1.84,3.4-1.14,1.44.53,2.41,1.49,2.95,2.03l1.04-2.86Z"/>
+  </g>
+</svg></h2><p>Are you of legal drinking age (18 or over)?</p><div class="a"><button class="y" id="agY">Yes, I am 18+</button><button id="agN">No</button></div><div class="no">Sorry, this site is for adults of legal drinking age.</div></div></div><div id="vdpLoad" role="status" aria-label="Loading"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 323.81 41.15">
+  
+  <path style="animation-delay:0.16s"  d="M44.36,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <rect style="animation-delay:0.08s"  x="21.73" width="9.9" height="13.72" rx=".9" ry=".9"/>
+  <path style="animation-delay:0.08s"  d="M22.63,27.43h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.15s"  d="M41.6,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.760c0-.5-.4-.9-.9-.9Z"/>
+  <path style="animation-delay:0.07s"  d="M19.87,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z"/>
+  <path style="animation-delay:0.00s"  d="M.9,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9H.9c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.41s"  d="M111.77,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.33s"  d="M90.04,0h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9V.9c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.33s"  d="M90.04,27.43h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.40s"  d="M109.01,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z"/>
+  <path style="animation-delay:0.32s"  d="M87.28,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z"/>
+  <path style="animation-delay:0.25s"  d="M68.31,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:1.17s"  d="M314.81,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:1.08s"  d="M292.68,0h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9V.9c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:1.08s"  d="M292.68,27.43h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.920c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:1.16s"  d="M311.85,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z"/>
+  <path style="animation-delay:1.07s"  d="M289.72,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z"/>
+  <path style="animation-delay:1.00s"  d="M270.54,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.66s"  d="M179.19,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.58s"  d="M157.45,0h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9V.9c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.58s"  d="M157.45,27.43h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.65s"  d="M176.42,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z"/>
+  <path style="animation-delay:0.57s"  d="M154.69,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z"/>
+  <path style="animation-delay:0.50s"  d="M135.72,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.91s"  d="M246.6,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.83s"  d="M224.86,0h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9V.9c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.83s"  d="M224.86,27.43h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+  <path style="animation-delay:0.90s"  d="M243.84,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z"/>
+  <path style="animation-delay:0.82s"  d="M222.1,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z"/>
+  <path style="animation-delay:0.75s"  d="M203.13,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z"/>
+</svg>
+</div>
+<div id="app">
+  <svg id="map" role="img" aria-label="Map of Portugal with the Vinha dos Padres vineyards">
+    <defs>
+      <pattern id="hatch-white" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+        <rect width="6" height="6" fill="#E4D79C" fill-opacity=".25"/><rect width="2.2" height="6" fill="#E4D79C"/></pattern>
+      <pattern id="hatch-red" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+        <rect width="6" height="6" fill="#9E3A4C" fill-opacity=".25"/><rect width="2.2" height="6" fill="#C5566B"/></pattern>
+      <filter id="goo" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>
+        <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10"/>
+      </filter>
+    </defs>
+    <g id="g-neigh"></g><g id="g-pt"></g><g id="g-reg"></g><g id="g-roads"></g><g id="g-props"></g><g id="g-parcels"></g><g id="g-split" style="pointer-events:none"></g>
+  </svg>
+  <div id="labels"></div>
+  <button id="marker" aria-label="Zoom into the Vinha dos Padres vineyards"><span class="logo"></span><span class="dot"></span><span class="hint"></span></button>
+  <header id="top">
+    <div><h1 class="title">Vinha dos Padres <em>vineyards</em></h1><nav id="crumbs" aria-label="Map level"></nav></div>
+    <div class="navr"><nav aria-label="Main" id="sitenav"><ul class="menu"><li><a href="index.html" data-en="Estate" data-pt="Propriedade" aria-current="page">Estate</a></li><li><a href="history.html" data-en="History" data-pt="História">History</a></li><li><a href="wines.html" data-en="Wines" data-pt="Vinhos">Wines</a></li><li><a href="code.html" data-en="the code" data-pt="o código">the code</a></li><li><a href="recognition.html" data-en="Recognition" data-pt="Distinções">Recognition</a></li><li><a href="https://www.instagram.com/vinhadospadres/" target="_blank" rel="noopener" data-en="Gallery" data-pt="Galeria">Gallery</a></li><li><a href="contact.html" data-en="Contact" data-pt="Contacto">Contact</a></li></ul></nav>
+    <div class="seg" role="group" aria-label="Language"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="pt" aria-pressed="false">PT</button></div>
+    <button class="burger" aria-label="Open menu" onclick="document.getElementById('sitesheet').classList.add('open')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
+  </header>
+  <div class="sitesheet" id="sitesheet" role="dialog" aria-label="Menu">
+    <div class="top"><span class="tlogo"><svg  data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 327.75 47.65">
+  <defs>
+    <style>
+      .vdp-l {
+        fill: #fff;
+      }
+    .pgrp .det td:first-child{min-width:104px}
+</style>
+  </defs>
+  <g>
+    <path class="vdp-l" d="M13.88,38.01L3.81,24.25l-2.98.97,12.79,17.48,3.33-1.08-.48-21.46-2.95.96.37,16.9Z"/>
+    <path class="vdp-l" d="M27.63,17.18l-2.88.78,5.27,19.49,2.88-.78-5.27-19.49Z"/>
+    <path class="vdp-l" d="M37.45,14.5l4.32,19.79,2.94-.64-3.32-15.19,14.36,12.78,2.94-.64-4.32-19.79-2.94.64,3.23,14.78-13.98-12.44-3.24.71Z"/>
+    <path class="vdp-l" d="M67.27,8.47l-2.95.47,3.19,19.98,2.95-.47-1.37-8.57,9.85-1.57,1.37,8.57,2.98-.48-3.19-19.98-2.98.48,1.35,8.43-9.85,1.57-1.35-8.43Z"/>
+    <path class="vdp-l" d="M96.21,4.27l-5.49,21.06,3.21-.35,1.15-4.46,8.54-.93,1.97,4.12,3.18-.35-9.34-19.44-3.21.35ZM102.32,16.91l-6.5.71,2.42-9.18,4.08,8.47Z"/>
+    <path class="vdp-l" d="M126.85,1.74l.85,20.18,7.56-.32c2.56-.11,3.49-.33,4.61-.89,3.93-2.04,5.38-6.26,5.23-9.88-.18-4.31-2.66-8.07-6.51-9.08-1.19-.34-2.85-.39-4.72-.31l-7.02.3ZM134.42,4.29c1.87-.08,2.72.1,3.09.17,3.5.73,4.5,4.46,4.59,6.57.12,2.86-1.1,6.23-4.01,7.29-.86.28-2.28.37-2.64.38l-4.88.21-.61-14.43,4.46-.19Z"/>
+    <path class="vdp-l" d="M154.65,17.96c2.13,2.3,4.96,3.25,7.58,3.26,4.4.02,9.51-2.91,9.54-10.03.03-6.42-4.38-10.66-9.48-10.69-4.52-.02-10.09,3.48-10.12,10.78-.01,2.47.46,4.55,2.47,6.67ZM162.19,3.52c3.35.02,6.65,2.8,6.63,7.54-.02,4.04-2.35,7.14-6.6,7.12-4.37-.02-7.04-3.14-7.02-7.18.02-4.88,3.71-7.49,7-7.48Z"/>
+    <path class="vdp-l" d="M189.15,1.9c-.71-.3-1.81-.77-3.41-.84-3.22-.13-5.84,1.75-5.97,4.85-.08,1.87.64,3.38,3.67,5.92,1.51,1.3,3.18,2.67,3.09,4.6-.03.63-.43,2.34-3.08,2.22-1.9-.08-3.16-.86-4.07-1.44l-.13,3.1c.74.36,2.34,1.13,4.38,1.21,3.43.14,5.8-2.29,5.92-5.21.11-2.62-1.39-4.34-3.31-5.93-2.65-2.25-3.61-3.05-3.56-4.37.03-.81.85-2.2,2.9-2.11,1.54.07,2.75.69,3.43,1.05l.13-3.04Z"/>
+    <path class="vdp-l" d="M211.57,14.69c3.45.33,5.01.48,6.81-.62,1.35-.81,2.43-2.28,2.62-4.29.27-2.85-1.38-5.22-3.94-5.98-.47-.17-1.32-.4-2.98-.56l-4.38-.42-1.92,20.14,2.97.28.82-8.56ZM214.35,6.14c1.35.13,2.07.26,2.82.94.72.68,1,1.55.92,2.45-.11,1.11-.83,2.07-1.8,2.4-.72.23-1.29.21-2.49.1l-1.95-.19.56-5.88,1.95.19Z"/>
+    <path class="vdp-l" d="M233.53,5.27l-10.38,19.14,3.2.43,2.19-4.06,8.52,1.14.92,4.47,3.17.42-4.41-21.12-3.2-.43ZM236.44,19.01l-6.48-.87,4.55-8.33,1.93,9.2Z"/>
+    <path class="vdp-l" d="M252.8,8.21l-3.73,19.86,7.44,1.4c2.52.47,3.47.47,4.69.17,4.29-1.1,6.65-4.89,7.32-8.44.8-4.24-.77-8.46-4.29-10.32-1.08-.6-2.69-1.03-4.53-1.37l-6.91-1.3ZM259.6,12.4c1.84.35,2.63.71,2.97.86,3.25,1.5,3.38,5.36,2.99,7.43-.53,2.81-2.47,5.83-5.55,6.2-.9.07-2.3-.16-2.66-.22l-4.8-.9,2.67-14.2,4.39.82Z"/>
+    <path class="vdp-l" d="M278.41,13.26l-4.82,19.65,2.93.72,1.95-7.97c3.4.68,3.95,2.24,6.01,9.92l3.43.84c-.4-1.03-.55-1.44-1.12-3.53-1.35-5.02-1.95-5.6-3.08-6.81,2.56-.43,4.24-1.85,4.85-4.34.62-2.52-.49-4.44-1.82-5.6-1.25-1.11-3.53-1.7-4.35-1.91l-3.98-.98ZM282.2,17.14c1.2.29,4.13,1.01,3.38,4.09-.13.53-.5,1.77-2.16,2.23-.86.22-1.8,0-2.36-.14l-1.9-.47,1.49-6.09,1.55.38Z"/>
+    <path class="vdp-l" d="M302.8,22.64l6.72,2.04.82-2.71-9.58-2.91-5.86,19.33,9.64,2.92.84-2.77-6.78-2.06,1.72-5.66,6.38,1.93.82-2.71-6.38-1.93,1.66-5.48Z"/>
+    <path class="vdp-l" d="M326.23,27.9c-.59-.5-1.49-1.28-2.99-1.83-3.03-1.1-6.09-.1-7.15,2.82-.64,1.76-.41,3.41,1.72,6.75,1.05,1.7,2.22,3.5,1.57,5.31-.22.6-1.12,2.1-3.61,1.19-1.79-.65-2.76-1.77-3.45-2.6l-1.06,2.92c.6.57,1.89,1.78,3.82,2.48,3.23,1.17,6.22-.44,7.22-3.18.9-2.47-.01-4.56-1.37-6.66-1.85-2.95-2.53-4-2.07-5.24.28-.76,1.47-1.84,3.4-1.14,1.44.53,2.41,1.49,2.95,2.03l1.04-2.86Z"/>
+  </g>
+  <g>
+    <path d="M18.97,43.05l-3.53,1.14-2.18-1.07L0,25.01l4.07-1.32,2.13.42,7.05,9.64-.26-12.95,3.59-1.16,1.88,1.01.51,22.41ZM13.88,38.01L3.81,24.25l-2.98.97,12.79,17.48,3.33-1.08-.48-21.46-2.95.96.37,16.9Z"/>
+    <path d="M35.27,38.06l-3.87,1.05-1.83-1.35-5.46-20.19,3.58-.97,2.04.98,5.53,20.48ZM27.63,17.18l-2.88.78,5.27,19.49,2.88-.78-5.27-19.49Z"/>
+    <path d="M41,13.24l2.43.39,9.89,8.82-2.48-11.37,3.68-.8,2.01,1.01,4.54,20.79-4.21.92-12.75-11.47,2.97,13.6-3.86.84-1.92-1.43-4.46-20.41,4.15-.91ZM37.45,14.5l4.32,19.79,2.94-.64-3.32-15.19,14.36,12.78,2.94-.64-4.32-19.79-2.94.64,3.23,14.78-13.98-12.44-3.24.71Z"/>
+    <path d="M85.54,28.02l-3.99.64-1.71-1.56-1.12-7-7.44,1.19,1.4,8.78-3.9.62-1.74-1.55-3.29-20.63,3.63-.58,1.96,1.18,1.11,6.97,7.44-1.19-1.35-8.43,3.63-.58,2.02,1.17,3.35,20.96ZM67.27,8.47l-2.95.47,3.19,19.98,2.95-.47-1.37-8.57,9.85-1.57,1.37,8.57,2.98-.48-3.19-19.98-2.98.48,1.35,8.43-9.85,1.57-1.35-8.43Z"/>
+    <path d="M99.48,3.37l2.18.82,10.09,20.82-4.73.52-1.71-1.21-1.41-2.88-7.28.79-1.14,4.55-3.53.39-1.86-1.49,5.7-21.9,3.69-.4ZM96.21,4.27l-5.49,21.06,3.21-.35,1.15-4.46,8.54-.93,1.97,4.12,3.18-.35-9.34-19.44-3.21.35ZM102.32,16.91l-6.5.71,2.42-9.18,4.08,8.47ZM99.27,11.73l-1.29,5.11,3.54-.39-2.24-4.73Z"/>
+    <path d="M133.7.91c2.65-.11,3.89.05,4.84.28,4.2.97,7.99,4.79,8.23,10.46.23,5.39-2.87,9.27-6.09,10.88-1.01.5-2.32.91-4.91,1.02l-7.05.3-1.52-1.66-.88-20.96,7.38-.31ZM126.85,1.74l.85,20.18,7.56-.32c2.56-.11,3.49-.33,4.61-.89,3.93-2.04,5.38-6.26,5.23-9.88-.18-4.31-2.66-8.07-6.51-9.08-1.19-.34-2.85-.39-4.72-.31l-7.02.3ZM134.42,4.29c1.87-.08,2.72.1,3.09.17,3.5.73,4.5,4.46,4.59,6.57.12,2.86-1.1,6.23-4.01,7.29-.86.28-2.28.37-2.64.38l-4.88.21-.61-14.43,4.46-.19ZM132,6.35l.5,11.96,2.5-.11c1.78-.07,2.37-.22,2.85-.39,2.83-.9,3.81-4.12,3.71-6.46-.06-1.36-.54-3.6-2.55-4.6-1.08-.56-2.14-.6-3.79-.53l-3.22.14Z"/>
+    <path d="M162.81,0c6.15.03,11.26,4.51,11.22,11.93-.03,6.85-4.72,11.41-11.18,11.38-6.72-.03-11.28-5.06-11.25-11.6C151.63,4.26,156.75-.03,162.81,0ZM154.65,17.96c2.13,2.3,4.96,3.25,7.58,3.26,4.4.02,9.51-2.91,9.54-10.03.03-6.42-4.38-10.66-9.48-10.69-4.52-.02-10.09,3.48-10.12,10.78-.01,2.47.46,4.55,2.47,6.67ZM162.19,3.52c3.35.02,6.65,2.8,6.63,7.54-.02,4.04-2.35,7.14-6.6,7.12-4.37-.02-7.04-3.14-7.02-7.18.02-4.88,3.71-7.49,7-7.48ZM162.55,17.67c1.84,0,5.67-1.33,5.7-6.46.02-4.49-2.78-6.22-5.22-6.23-2.29-.01-5.55,1.36-5.58,6.28-.02,5.43,3.62,6.41,5.1,6.42Z"/>
+    <path d="M190.9,7.56c-2.17-1.39-3.43-1.77-4.3-1.81-.87-.04-2.06.31-2.11,1.42-.03.69.57,1.38,1.88,2.55,3.63,3.26,5.06,4.62,4.93,7.54-.16,3.76-3.33,6.68-7.31,6.51-1.69-.07-2.97-.49-4.01-.83l-1.29-2.35.19-4.43c.76.54,2.52,1.86,4.63,1.95,1.48.06,2.23-.6,2.26-1.44.03-.6-.27-1.4-2.98-3.66-3.03-2.54-3.73-4.59-3.65-6.4.2-4.7,3.61-6.22,6.62-6.09.81.03,2.25.25,3.73.94l1.59,1.55-.19,4.55ZM189.15,1.9c-.71-.3-1.81-.77-3.41-.84-3.22-.13-5.84,1.75-5.97,4.85-.08,1.87.64,3.38,3.67,5.92,1.51,1.3,3.18,2.67,3.09,4.6-.03.63-.43,2.34-3.08,2.22-1.9-.08-3.16-.86-4.07-1.44l-.13,3.1c.74.36,2.34,1.13,4.38,1.21,3.43.14,5.8-2.29,5.92-5.21.11-2.62-1.39-4.34-3.31-5.93-2.65-2.25-3.61-3.05-3.56-4.37.03-.81.85-2.2,2.9-2.11,1.54.07,2.75.69,3.43,1.05l.13-3.04Z"/>
+    <path d="M212.51,25.38l-4.02-.38-1.27-1.88,1.99-20.86,4.8.46c1.62.15,3.59.43,5.32,1.42,2.93,1.61,3.55,4.34,3.36,6.35-.22,2.25-1.57,4.7-4.24,5.74-1.82.7-4.08.58-5.1.48l-.83,8.67ZM211.57,14.69c3.45.33,5.01.48,6.81-.62,1.35-.81,2.43-2.28,2.62-4.29.27-2.85-1.38-5.22-3.94-5.98-.47-.17-1.32-.4-2.98-.56l-4.38-.42-1.92,20.14,2.97.28.82-8.56ZM214.35,6.14c1.35.13,2.07.26,2.82.94.72.68,1,1.55.92,2.45-.11,1.11-.83,2.07-1.8,2.4-.72.23-1.29.21-2.49.1l-1.95-.19.56-5.88,1.95.19ZM213.84,11.52c1.53.12,3.12.27,3.29-1.5.04-.39-.05-1.09-.56-1.45-.37-.25-.7-.28-2.41-.47l-.33,3.42Z"/>
+    <path d="M236.92,5.18l1.92,1.32,4.82,22.63-4.72-.63-1.37-1.58-.68-3.13-7.26-.97-2.2,4.15-3.53-.47-1.45-1.9,10.78-19.91,3.68.49ZM233.53,5.27l-10.38,19.14,3.2.43,2.19-4.06,8.52,1.14.92,4.47,3.17.42-4.41-21.12-3.2-.43ZM236.44,19.01l-6.48-.87,4.55-8.33,1.93,9.2ZM234.71,13.24l-2.48,4.66,3.53.47-1.05-5.13Z"/>
+    <path d="M259.66,8.95c2.61.49,3.78.93,4.65,1.36,3.88,1.89,6.7,6.48,5.65,12.05-1,5.3-4.89,8.38-8.39,9.22-1.09.26-2.46.37-5.01-.11l-6.93-1.3-1.11-1.96,3.87-20.63,7.26,1.36ZM252.8,8.21l-3.73,19.86,7.44,1.4c2.52.47,3.47.47,4.69.17,4.29-1.1,6.65-4.89,7.32-8.44.8-4.24-.77-8.46-4.29-10.32-1.08-.6-2.69-1.03-4.53-1.37l-6.91-1.3ZM259.6,12.4c1.84.35,2.63.71,2.97.86,3.25,1.5,3.38,5.36,2.99,7.43-.53,2.81-2.47,5.83-5.55,6.2-.9.07-2.3-.16-2.66-.22l-4.8-.9,2.67-14.2,4.39.82ZM256.78,13.87l-2.21,11.77,2.46.46c1.75.33,2.36.32,2.87.26,2.96-.24,4.64-3.15,5.08-5.46.25-1.33.28-3.63-1.44-5.06-.93-.79-1.95-1.07-3.58-1.38l-3.17-.59Z"/>
+    <path d="M283.48,13.97c2.67.66,4.07,1.5,5.2,2.71,1.79,1.96,2.04,4.23,1.58,6.07-.8,3.28-3.32,4.31-4.19,4.68,1.28,1.99,1.7,3.09,2.33,5.04,1.51,4.59,1.7,5.11,2.43,6.68l-6.18-1.52c-.42-.82-.66-1.25-1.36-4.06-.41-1.62-1.08-3.71-2.07-4.7-.4-.41-.79-.57-1.35-.7l-1.92,7.82-3.95-.97-.97-1.98,5.01-20.41,5.45,1.34ZM278.41,13.26l-4.82,19.65,2.93.72,1.95-7.97c3.4.68,3.95,2.24,6.01,9.92l3.43.84c-.4-1.03-.55-1.44-1.12-3.53-1.35-5.02-1.95-5.6-3.08-6.81,2.56-.43,4.24-1.85,4.85-4.34.62-2.52-.49-4.44-1.82-5.6-1.25-1.11-3.53-1.7-4.35-1.91l-3.98-.98ZM282.2,17.14c1.2.29,4.13,1.01,3.38,4.09-.13.53-.5,1.77-2.16,2.23-.86.22-1.8,0-2.36-.14l-1.9-.47,1.49-6.09,1.55.38ZM281.18,22.82c.68.13,3.02.62,3.46-1.2.44-1.79-1.55-2.28-2.55-2.52l-.91,3.72Z"/>
+    <path d="M307.98,35.24l-6.35-1.93-.99,3.26,5.14,1.56,1.24,1.92-1.13,3.72-10.7-3.25-.85-2.09,6.08-20.05,10.13,3.07,1.41,2-1.12,3.69-6.72-2.04-.93,3.06,4.67,1.42,1.24,1.92-1.13,3.72ZM302.8,22.64l6.72,2.04.82-2.71-9.58-2.91-5.86,19.33,9.64,2.92.84-2.77-6.78-2.06,1.72-5.66,6.38,1.93.82-2.71-6.38-1.93,1.66-5.48Z"/>
+    <path d="M326.19,33.82c-1.65-1.98-2.73-2.72-3.55-3.02-.82-.3-2.06-.33-2.44.72-.24.65.13,1.49,1.03,3,2.48,4.21,3.43,5.93,2.43,8.68-1.29,3.54-5.19,5.37-8.93,4.01-1.59-.58-2.68-1.36-3.57-2l-.52-2.63,1.51-4.17c.56.75,1.84,2.53,3.82,3.25,1.39.5,2.31.1,2.59-.69.21-.57.16-1.42-1.74-4.39-2.12-3.34-2.17-5.5-1.55-7.2,1.61-4.42,5.32-4.84,8.15-3.81.77.28,2.07.91,3.27,2.02l1.05,1.96-1.55,4.28ZM326.23,27.9c-.59-.5-1.49-1.28-2.99-1.83-3.03-1.1-6.09-.1-7.15,2.82-.64,1.76-.41,3.41,1.72,6.75,1.05,1.7,2.22,3.5,1.57,5.31-.22.6-1.12,2.1-3.61,1.19-1.79-.65-2.76-1.77-3.45-2.6l-1.06,2.92c.6.57,1.89,1.78,3.82,2.48,3.23,1.17,6.22-.44,7.22-3.18.9-2.47-.01-4.56-1.37-6.66-1.85-2.95-2.53-4-2.07-5.24.28-.76,1.47-1.84,3.4-1.14,1.44.53,2.41,1.49,2.95,2.03l1.04-2.86Z"/>
+  </g>
+</svg><span class="est">Est. 1795</span></span><button class="burger" style="display:grid" aria-label="Close" onclick="this.closest('.sitesheet').classList.remove('open')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <ul><li><a href="index.html" aria-current="page"><b data-en="Estate" data-pt="Propriedade">Estate</b> <span>Map & 3D parcels</span></a></li><li><a href="history.html"><b data-en="History" data-pt="História">History</b> <span>1534 – today</span></a></li><li><a href="wines.html"><b data-en="Wines" data-pt="Vinhos">Wines</b> <span>Four wines · two vintages</span></a></li><li><a href="code.html"><b data-en="the code" data-pt="o código">the code</b> <span>How to read our labels</span></a></li><li><a href="recognition.html"><b data-en="Recognition" data-pt="Distinções">Recognition</b> <span>Reviews · awards · mentions</span></a></li><li><a href="https://www.instagram.com/vinhadospadres/" target="_blank" rel="noopener"><b data-en="Gallery" data-pt="Galeria">Gallery</b> <span>Instagram</span></a></li><li><a href="contact.html"><b data-en="Contact" data-pt="Contacto">Contact</b> <span>Write to us</span></a></li></ul>
+    <div class="foot">Reguengo, Portalegre · Serra de São Mamede · Alto Alentejo, Portugal<br><div class="seg" id="sheetLang" style="display:inline-flex;margin-top:10px"><button data-l="en" aria-pressed="true">EN</button><button data-l="pt" aria-pressed="false">PT</button></div></div>
+  </div>
+  <div id="legend"></div>
+  <aside id="panel" aria-live="polite"></aside>
+  <div id="credit"></div>
+  <div id="tip" role="status"></div>
+  <div id="loader" role="status" aria-live="polite"><div class="box"><div class="lg"></div><div class="ld"><svg viewBox="0 0 323.81 41.15" aria-hidden="true"><path d="M44.36,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.098s"/><rect x="21.73" width="9.9" height="13.72" rx=".9" ry=".9" style="animation-delay:0.06s"/><path d="M22.63,27.43h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.038s"/><path d="M41.6,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.760c0-.5-.4-.9-.9-.9Z" style="animation-delay:0.091s"/><path d="M19.87,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z" style="animation-delay:0.03s"/><path d="M.9,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9H.9c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.003s"/><path d="M111.77,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.286s"/><path d="M90.04,0h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9V.9c0-.5.4-.9.9-.9Z" style="animation-delay:0.225s"/><path d="M90.04,27.43h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.225s"/><path d="M109.01,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z" style="animation-delay:0.278s"/><path d="M87.28,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z" style="animation-delay:0.218s"/><path d="M68.31,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.165s"/><path d="M314.81,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.85s"/><path d="M292.68,0h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9V.9c0-.5.4-.9.9-.9Z" style="animation-delay:0.788s"/><path d="M292.68,27.43h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.920c0-.5.4-.9.9-.9Z" style="animation-delay:0.788s"/><path d="M311.85,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z" style="animation-delay:0.842s"/><path d="M289.72,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z" style="animation-delay:0.78s"/><path d="M270.54,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.727s"/><path d="M179.19,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.473s"/><path d="M157.45,0h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9V.9c0-.5.4-.9.9-.9Z" style="animation-delay:0.413s"/><path d="M157.45,27.43h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.413s"/><path d="M176.42,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z" style="animation-delay:0.465s"/><path d="M154.69,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z" style="animation-delay:0.405s"/><path d="M135.72,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.352s"/><path d="M246.6,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.66s"/><path d="M224.86,0h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9V.9c0-.5.4-.9.9-.9Z" style="animation-delay:0.6s"/><path d="M224.86,27.43h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.6s"/><path d="M243.84,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z" style="animation-delay:0.653s"/><path d="M222.1,6.86h-8.11c-.5,0-.9.4-.9.9v25.63c0,.5.4.9.9.9h8.11c.49,0,.9-.4.9-.9V7.76c0-.5-.4-.9-.9-.9Z" style="animation-delay:0.592s"/><path d="M203.13,14.05h8.1c.5,0,.9.4.9.9v11.92c0,.5-.4.9-.9.9h-8.11c-.5,0-.9-.4-.9-.9v-11.92c0-.5.4-.9.9-.9Z" style="animation-delay:0.54s"/></svg></div><div class="msg"></div></div></div>
+
+  <section id="axo" aria-hidden="true">
+    <canvas id="gl"></canvas>
+    <button class="back" id="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg><span></span></button>
+    <div class="pill"><h2></h2><div class="sub"></div></div>
+    <div class="grid-note"></div>
+    <div class="statbar"></div>
+    <aside class="side"></aside>
+    <div class="ctrl">
+      <button class="cbtn" id="compass" aria-label="Reset view to north">
+        <svg width="44" height="44" viewBox="-22 -22 44 44"><circle r="20" fill="none" stroke="rgba(35,31,32,.35)"/>
+          <g id="needle"><path d="M0,-15 L4,0 L-4,0Z" fill="#C76653"/><path d="M0,15 L4,0 L-4,0Z" fill="rgba(35,31,32,.45)"/>
+          <text y="-16.5" text-anchor="middle" font-size="7" font-weight="700" fill="#231F20" font-family="Arno Pro, Georgia, serif" font-style="italic">N</text></g></svg></button>
+      <button class="cbtn" id="toggle-side" aria-pressed="true" aria-label="Show harvest table">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg></button><div class="ctip" id="table-tip"></div>
+      <div class="cstack" role="group" id="relief"></div><div class="ctip" id="relief-tip"></div>
+      <div class="cstack" role="group" id="datum"></div><div class="ctip" id="datum-tip"></div>
+    </div>
+    <div class="help"></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="data/estate.js"></script><script>
+const R = D.regions, V = D.vdp;
+
+/* ---------------- language ---------------- */
+let lang = 'en';
+const T = {
+ en:{portugal:'Portugal',alentejo:'Alentejo',portalegre:'Portalegre',vdp:'Vinha dos Padres',lisbon:'Lisbon',reguengo:'Reguengo',evora:'Évora',estremoz:'Estremoz',drive:'2hr 15min',titleA:'Vinha dos Padres',titleB:'vineyards',ocean:'Atlantic Ocean',
+  doc:'Portalegre DOC',park:'Serra de São Mamede Natural Park',prov:'provisional outline',city:'Portalegre',
+  explore:'Explore the vineyards',clickAl:'Click to zoom into Alentejo',
+  lgAl:'Alentejo region',lgDoc:'Portalegre DOC',lgPark:'Serra de São Mamede Natural Park',lgProp:'Property boundary',
+  blend:'Field blend',lgBlend:'Mixed centenary bush vines',harvestY:'{y} harvest',training:'Training',cta3d:'Click for 3D',ctaIso:'Click to isolate',ctaBack:'Click to return to property',loading:'Building 3D view…',red:'red',white:'white',pink:'Pink','young-white':'Young vines, white','young-red':'Young vines, red',
+  area:'Area',vines:'Vines',elev:'Elevation',slope:'Slope',facing:'Facing',latest:'Latest harvest',kgha:'Yield',variety:'Variety',
+  drop:'m drop',plots:'plots',plot:'plot',harvests:'Harvests',notes:'Notes',parcels:'Vine parcels',props:'Properties',
+  overview:'Six properties around Portalegre, on the slopes of the Serra de São Mamede.',totalArea:'Property area',vineArea:'Vine area',
+  byYear:'Harvest by year, with stems',back:'Back to map',close:'Close',lot:'Lot',noHarvest:'No harvest recorded yet.',
+  shared:'Shared record',joint:'Joint pick',partial:'some values TBC',inclJoint:'includes a joint pick',
+  cols:['Year','Property','Parcel(s)','Age','Registered','Type','Variety','Date(s)','Qty.','Without stems','Stems','Stem R'],
+  grpDate:'Date',grpHarvest:'Harvest',grpAmount:'Amount (kg)',
+  unassigned:'Rows below the notes in the Yields sheet, not linked to a parcel:',
+  gentle:'gentle',flat:'nearly flat',moderate:'moderate',steep:'steep',
+  sunS:'sun all day',sunE:'morning sun',sunW:'afternoon sun',sunN:'cooler, indirect sun',
+  grid:'Grid squares are {g} m. Relief ×{e}.',relief:'Relief',tableBtn:'Table',gmaps:'Google Maps',tmTitle:'Harvest Timing, Quantity & Climate',tmQtyPanel:'Harvest quantity per pick (kg)',tmBand:'Harvest days',tmAll:'All years',tmRangeLab:'Time range',hvTable:'Table',hvChart:'Graphs',tmSize:'Size = quantity (kg)',wxGroup:'Weather layer',wxL_temp:'Temperature and dew point',wxL_wind:'Wind speed and gust',wxL_dir:'Wind direction',wxL_rain:'Precipitation',wxL_pres:'Pressure',wxL_hum:'Humidity',wxL_solar:'Solar radiation and UV index',wx_temp:'Daily high',wx_dew:'Dew point',wx_spd:'Wind speed',wx_gust:'Gust',wx_deg:'Wind direction',wx_pacc:'Rain',wx_prate:'Peak rate',wx_pres:'Pressure',wx_hum:'Humidity',wx_solar:'Solar radiation',wx_uv:'UV index',wxDirLeg:'Weekly prevailing wind, arrow points downwind',wxPerDay:'per day',wxSrc:'Weather data: station IPORTALE14, Portalegre.',wxSrcSolar:'Solar radiation and UV: station ISOSAL3, São Salvador da Aramenha (from Jun 2023); IPORTALE14 records neither.',tmColDates:'Harvest dates',tmColQty:'Qty. (kg)',tmColRain:'Rain (mm)',tmColHot:'Hot days',tmTipRain:'{y}: {v} mm rain, Oct {prev} to Aug {y}',tmTipHot:'{y}: {v} days with a high of 35 °C or more (Apr–Aug); average daily high {tm} °C',tmPartial:'(partial record)',tmPartialNote:'† Rain record incomplete for {y} (station data starts Feb 2022).',tmClimNote:'Climate from weather station IPORTALE14, Portalegre. Rain: October to August before each harvest. Hot days: daily high of 35 °C or more, April to August.',tmFirst:'First pick',tmEarlier:'{b} harvest started {n} days earlier than {a}.',tmLater:'{b} harvest started {n} days later than {a}.',tmSame:'{b} harvest started on the same day as {a}.',all:'All',varieties:'Varieties',clickExpand:'Click to expand',clickCollapse:'Click to collapse',amp:'&',dTo:'to',dAnd:'and',fnJoint:'* Joint pick: the amount covers grapes picked together with another property that year.',fnTbc:'** Total excludes values still TBC.',fnJointOv:'* Joint picks counted once.',fnTbcOv:'* TBC values excluded.',datum:'Base',section:'Cut',sea:'Sea',
+  datumTipS:'Cut {d} m below lowest point',datumTipSea:'Extruded to sea level (0 m)',
+  terrainSrc:'Terrain: Copernicus GLO-30 (30 m grid), approximate for small parcels. Surface is stylised until aerial imagery is added.',
+  help:'Left-drag to move, right-drag to rotate, scroll to zoom',
+  credit:'Boundaries: Vinha dos Padres base maps (Portugal, Alentejo, Portalegre DOC, Serra de São Mamede), georeferenced; neighbouring countries from Natural Earth. Terrain: Copernicus GLO-30.<br>07 – VdP Interactive Atlas (prototype)',
+  ofVines:'of vines',vparcels:'vine parcels',vparcel:'vine parcel',clickIsolate:'Click a parcel to isolate it',showAll:'Show whole property',clickZoom:'Click to zoom in',hintKg:'kg',sharedWith:'shared with',firstHarvest:'First harvest expected 2027–2028',
+  levels:{pt:'Portugal',al:'Alentejo',pg:'Portalegre',vdp:'Vinha dos Padres'}},
+ pt:{portugal:'Portugal',alentejo:'Alentejo',portalegre:'Portalegre',vdp:'Vinha dos Padres',lisbon:'Lisboa',reguengo:'Reguengo',evora:'Évora',estremoz:'Estremoz',drive:'2h 15min',titleA:'Vinha dos Padres',titleB:'vinhas',ocean:'Oceano Atlântico',
+  doc:'DOC Portalegre',park:'Parque Natural da Serra de São Mamede',prov:'limite provisório',city:'Portalegre',
+  explore:'Explorar as vinhas',clickAl:'Clique para ampliar o Alentejo',
+  lgAl:'Região do Alentejo',lgDoc:'DOC Portalegre',lgPark:'Parque Natural da Serra de São Mamede',lgProp:'Limite da propriedade',
+  blend:'Mistura de castas',lgBlend:'Vinhas centenárias mistas em vaso',harvestY:'Vindima {y}',training:'Condução',cta3d:'Clique para 3D',ctaIso:'Clique para isolar',ctaBack:'Clique para voltar à propriedade',loading:'A preparar a vista 3D…',red:'tinto',white:'branco',pink:'Rosé','young-white':'Vinha jovem, branco','young-red':'Vinha jovem, tinto',
+  area:'Área',vines:'Vinha',elev:'Altitude',slope:'Declive',facing:'Exposição',latest:'Última vindima',kgha:'Rendimento',variety:'Casta',
+  drop:'m de desnível',plots:'parcelas',plot:'parcela',harvests:'Vindimas',notes:'Notas',parcels:'Parcelas de vinha',props:'Propriedades',
+  overview:'Seis propriedades em redor de Portalegre, nas encostas da Serra de São Mamede.',totalArea:'Área das propriedades',vineArea:'Área de vinha',
+  byYear:'Vindima por ano, com engaço',back:'Voltar ao mapa',close:'Fechar',lot:'Lote',noHarvest:'Ainda sem vindima registada.',
+  shared:'Registo partilhado',joint:'Vindima conjunta',partial:'alguns valores a confirmar (TBC)',inclJoint:'inclui vindima conjunta',
+  cols:['Ano','Propriedade','Parcela(s)','Idade','Registo','Tipo','Casta','Data(s)','Qtd.','Sem engaço','Engaço','Rácio E'],
+  grpDate:'Data',grpHarvest:'Vindima',grpAmount:'Quantidade (kg)',
+  unassigned:'Linhas abaixo das notas na folha Yields, sem parcela associada:',
+  gentle:'suave',flat:'quase plano',moderate:'moderado',steep:'acentuado',
+  sunS:'sol todo o dia',sunE:'sol da manhã',sunW:'sol da tarde',sunN:'mais fresca, sol indireto',
+  grid:'Quadrícula de {g} m. Relevo ×{e}.',relief:'Relevo',tableBtn:'Tabela',gmaps:'Google Maps',tmTitle:'Calendário, Quantidade e Clima da Vindima',tmQtyPanel:'Quantidade por apanha (kg)',tmBand:'Dias de vindima',tmAll:'Todos os anos',tmRangeLab:'Período',hvTable:'Tabela',hvChart:'Gráficos',tmSize:'Tamanho = quantidade (kg)',wxGroup:'Camada meteorológica',wxL_temp:'Temperatura e ponto de orvalho',wxL_wind:'Velocidade do vento e rajada',wxL_dir:'Direção do vento',wxL_rain:'Precipitação',wxL_pres:'Pressão',wxL_hum:'Humidade',wxL_solar:'Radiação solar e índice UV',wx_temp:'Máxima diária',wx_dew:'Ponto de orvalho',wx_spd:'Vento',wx_gust:'Rajada',wx_deg:'Direção do vento',wx_pacc:'Chuva',wx_prate:'Intensidade máx.',wx_pres:'Pressão',wx_hum:'Humidade',wx_solar:'Radiação solar',wx_uv:'Índice UV',wxDirLeg:'Vento dominante semanal, seta a favor do vento',wxPerDay:'por dia',wxSrc:'Dados meteorológicos: estação IPORTALE14, Portalegre.',wxSrcSolar:'Radiação solar e UV: estação ISOSAL3, São Salvador da Aramenha (desde jun 2023); a IPORTALE14 não regista estes dados.',tmColDates:'Datas de vindima',tmColQty:'Qtd. (kg)',tmColRain:'Chuva (mm)',tmColHot:'Dias quentes',tmTipRain:'{y}: {v} mm de chuva, out {prev} a ago {y}',tmTipHot:'{y}: {v} dias com máxima de 35 °C ou mais (abr–ago); máxima média {tm} °C',tmPartial:'(registo parcial)',tmPartialNote:'† Registo de chuva incompleto em {y} (dados da estação desde fev 2022).',tmClimNote:'Clima da estação meteorológica IPORTALE14, Portalegre. Chuva: outubro a agosto antes de cada vindima. Dias quentes: máxima de 35 °C ou mais, abril a agosto.',tmFirst:'Primeira apanha',tmEarlier:'A vindima de {b} começou {n} dias mais cedo do que em {a}.',tmLater:'A vindima de {b} começou {n} dias mais tarde do que em {a}.',tmSame:'A vindima de {b} começou no mesmo dia que em {a}.',all:'Todas',varieties:'Castas',clickExpand:'Clique para expandir',clickCollapse:'Clique para fechar',amp:'e',dTo:'a',dAnd:'e',fnJoint:'* Vindima conjunta: a quantidade inclui uvas apanhadas em conjunto com outra propriedade nesse ano.',fnTbc:'** Total exclui valores ainda TBC.',fnJointOv:'* Vindimas conjuntas contadas uma vez.',fnTbcOv:'* Valores TBC excluídos.',datum:'Base',section:'Corte',sea:'Mar',
+  datumTipS:'Corte {d} m abaixo do ponto mais baixo',datumTipSea:'Extrudido até ao nível do mar (0 m)',
+  terrainSrc:'Terreno: Copernicus GLO-30 (grelha de 30 m), aproximado em parcelas pequenas. Superfície estilizada até serem adicionadas fotografias aéreas.',
+  help:'Arrastar com botão esquerdo para mover, direito para rodar, roda para ampliar',
+  credit:'Limites: mapas base da Vinha dos Padres (Portugal, Alentejo, DOC Portalegre, Serra de São Mamede), georreferenciados; países vizinhos: Natural Earth. Terreno: Copernicus GLO-30.<br>07 – VdP Interactive Atlas (protótipo)',
+  ofVines:'de vinha',vparcels:'parcelas de vinha',vparcel:'parcela de vinha',clickIsolate:'Clique numa parcela para a isolar',showAll:'Ver toda a propriedade',clickZoom:'Clique para ampliar',hintKg:'kg',sharedWith:'partilhado com',firstHarvest:'Primeira vindima prevista para 2027–2028',
+  levels:{pt:'Portugal',al:'Alentejo',pg:'Portalegre',vdp:'Vinha dos Padres'}}
+};
+Object.assign(T.en,{goWines:'Go to wines →',vintK:'Vintage',typeK:'Type',harvestOf:'{y} harvest',backVdp:'Vinha dos Padres',winePage:'See the wine →',codeK:'Code',winesSoon:'Wines coming soon',vintNote:'2024, 2025 and 2026 vintages not available yet.',soldOut:'Sold out',picks:'picks',seeWines:'see wines →',legendBtn:'Legend',wines:'Wines',bottles:'bottles',bottlesK:'Bottles',allWines:'All wines',grapesK:'Grapes picked',kgBottle:'kg of grapes per bottle',srcTitle:'Source parcels',seasonTitle:'Growing season',seasonSub:'1 Apr to first pick',rainK:'Rain',meanHighK:'Mean daily high',hotK:'Days ≥ 35 °C',missK:'{n} days without station data',wineSite:'vinhadospadres.com',wineNote:'Made from all Centenary Bush Vines picks of the same colour and vintage. Quantities include stems.',wineName:'Quinta da Vinha dos Padres',wineTip:'Click for wine details',wineTip3d:'Click to see this wine on the map',labelCode:'Label code'});
+Object.assign(T.pt,{goWines:'Ir para os vinhos →',vintK:'Colheita',typeK:'Tipo',harvestOf:'colheita de {y}',backVdp:'Vinha dos Padres',winePage:'Ver o vinho →',codeK:'Código',winesSoon:'Vinhos em breve',vintNote:'Colheitas de 2024, 2025 e 2026 ainda não disponíveis.',soldOut:'Esgotado',picks:'colheitas',seeWines:'ver vinhos →',legendBtn:'Legenda',wines:'Vinhos',bottles:'garrafas',bottlesK:'Garrafas',allWines:'Todos os vinhos',grapesK:'Uva vindimada',kgBottle:'kg de uva por garrafa',srcTitle:'Parcelas de origem',seasonTitle:'Ciclo vegetativo',seasonSub:'1 abr até à primeira vindima',rainK:'Chuva',meanHighK:'Média das máximas',hotK:'Dias ≥ 35 °C',missK:'{n} dias sem dados da estação',wineSite:'vinhadospadres.com',wineNote:'Feito com todas as vindimas das Vinhas Centenárias da mesma cor e colheita. Quantidades com engaço.',wineName:'Quinta da Vinha dos Padres',wineTip:'Clique para ver o vinho',wineTip3d:'Clique para ver este vinho no mapa',labelCode:'Código do rótulo'});
+const t = (k, vars) => { let s = T[lang][k] ?? T.en[k] ?? k; if (vars) for (const v in vars) s = s.replace('{'+v+'}', vars[v]); return s; };
+const XL = {en:{White:'White',Red:'Red',Pink:'Pink',Blend:'Blend'}, pt:{White:'Branco',Red:'Tinto',Pink:'Rosé',Blend:'Lote'}};
+const xl = v => (XL[lang][v] ?? v);
+
+/* notes: index from the Yields sheet + one note from the owner */
+const NOTE_PT = [
+ 'Os lotes brancos da Quinta da Vinha dos Padres e da Quinta da Casquinha são vinificados em conjunto, tal como os lotes tintos.',
+ 'Bical e Corropio (Quinta da Vinha dos Padres) e Chardonnay (Rua do Saco) só serão vindimados em 2027 ou 2028.',
+ 'Quinta da Vinha dos Padres: os porta-enxertos de Bical e Corropio foram plantados em 2024 e enxertados com as respetivas castas em 2025.',
+ 'Rua do Saco: o porta-enxerto da Chardonnay foi plantado em 2024 e a Chardonnay foi enxertada em 2025.',
+ 'Quantidades marcadas com «*» de parcelas diferentes foram vindimadas em conjunto; o valor reflete as uvas de ambas nesse ano.'];
+const LEONA = {en:'Leona also grows within the Quinta da Vinha dos Padres parcels and has only recently been harvested separately.',
+               pt:'A Leona também existe nas parcelas da Quinta da Vinha dos Padres e só recentemente passou a ser vindimada em separado.'};
+const NOTE_MAP = {0:['padres-mixed','casquinha-mixed','quinta_da_vinha_dos_padres','quinta_da_casquinha'],
+  1:['padres-bical','padres-corropio','saco-chardonnay','quinta_da_vinha_dos_padres','rua_do_saco'],
+  2:['padres-bical','padres-corropio','quinta_da_vinha_dos_padres'],3:['saco-chardonnay','rua_do_saco'],
+  4:['padres-mixed','broa-mixed','quinta_da_vinha_dos_padres','vinha_da_broa']};
+const NOTE_HIDE=[0,1,2];
+function notesFor(id){
+  const out=[]; V.notes.forEach((n,i)=>{ if(NOTE_HIDE.includes(i)) return; if((NOTE_MAP[i]||[]).includes(id)) out.push(lang==='pt'?NOTE_PT[i]:n.replace('grafter','grafted')); });
+  return out;
+}
+function trendNote(recs){
+  const yrs={}; recs.forEach(r=>dParse(r.date||'').forEach(q=>{ const x=doy(q.d,q.m); yrs[r.year]=Math.min(yrs[r.year]??999,x); }));
+  const ys=Object.keys(yrs).map(Number).sort(); if(ys.length<2) return null;
+  const a=ys[0], b=ys[ys.length-1], diff=yrs[b]-yrs[a];
+  return diff===0 ? t('tmSame',{a,b}) : t(diff<0?'tmEarlier':'tmLater',{n:Math.abs(diff),a,b});
+}
+
+/* ---------------- data helpers ---------------- */
+const PROP = Object.fromEntries(V.properties.map(p=>[p.id,p]));
+const PARCEL = Object.fromEntries(V.parcels.map(p=>[p.id,p]));
+const num = v => typeof v==='number' ? v : (typeof v==='string' && /^[\d.]+\*?$/.test(v) ? parseFloat(v) : null);
+const loc = () => lang==='pt' ? 'pt-PT' : 'en-GB';
+const fmtN = (v,d=2) => v==null ? '—' : v.toLocaleString(loc(),{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtHa = v => fmtN(v, v<0.1?3:2)+' ha';
+const fmtKg = v => Math.round(v).toLocaleString(loc())+' kg';
+const MON={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+const MONS={en:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],pt:['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']};
+const dParse = str => [...String(str).matchAll(/(\d{1,2})[-\s]([A-Za-z]{3})[-\s]\d{4}/g)].map(m=>({d:+m[1],m:MON[m[2]]}));
+const dOne = a => `${a.d} ${MONS[lang][a.m]}`;
+const dSpan = (a,b) => (a.d===b.d&&a.m===b.m) ? dOne(a) : a.m===b.m ? `${a.d} ${t('dTo')} ${b.d} ${MONS[lang][a.m]}` : `${dOne(a)} ${t('dTo')} ${dOne(b)}`;
+function fmtDate(v){
+  if(v==null||v==='TBC') return v;
+  return String(v).split(/\s+and\s+/).map(part=>{ const ds=dParse(part); if(!ds.length) return part; return dSpan(ds[0],ds[ds.length-1]); }).join(` ${t('dAnd')} `);
+}
+function cellVal(v, isRatio){
+  if (v==null) return '—';
+  if (typeof v==='number') return isRatio ? fmtN(v*100,1)+'%' : fmtN(v);
+  if (v==='TBC') return '<span class="tbc">TBC</span>';
+  if (/^[\d.]+\*$/.test(v)) return fmtN(parseFloat(v))+'<span class="tbc">*</span>';
+  return v;
+}
+const recsFor = pid => V.records.filter(r=>r.parcels.includes(pid));
+function parcelLatest(p){
+  const rs = recsFor(p.id); if(!rs.length) return null;
+  const y = Math.max(...rs.map(r=>r.year)); const cur = rs.filter(r=>r.year===y);
+  let total=0, tbc=false, joint=false; const ids=new Set();
+  cur.forEach(r=>{ const n=num(r.kg_with); if(n==null) tbc=true; else total+=n; if(r.joint) joint=true; r.parcels.forEach(i=>ids.add(i)); });
+  const area=[...ids].reduce((s,i)=>s+PARCEL[i].area_ha,0);
+  return {year:y,total,tbc,joint,area,kgha: total>0 ? total/area : null, shared:[...ids].filter(i=>i!==p.id)};
+}
+function compass16(a){ const n=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  const pt=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO']; return (lang==='pt'?pt:n)[Math.round(a/22.5)%16]; }
+function sunNote(a){ if(a>=112.5&&a<=247.5) return t('sunS'); if(a>45&&a<112.5) return t('sunE'); if(a>247.5&&a<315) return t('sunW'); return t('sunN'); }
+function slopeNote(s){ return s<2?t('flat'):s<6?t('gentle'):s<12?t('moderate'):t('steep'); }
+
+/* ---------------- map ---------------- */
+const svg = d3.select('#map'), app = document.getElementById('app');
+let W = app.clientWidth, H = app.clientHeight;
+let isPhone=false, isSheet=false, isTablet=false;
+const isTouch = matchMedia('(hover: none), (pointer: coarse)').matches;
+function layoutMode(){ isPhone = W<700; isSheet = isPhone || (W<1100 && H>W*1.05); isTablet = !isSheet && W<1100;
+  document.body.classList.toggle('phone',isPhone); document.body.classList.toggle('sheet',isSheet); document.body.classList.toggle('tablet',isTablet); }
+layoutMode();
+const F = g => ({type:'Feature',properties:{},geometry:g});
+const proj = d3.geoMercator().clipExtent([[-80,-80],[W+80,H+80]]);
+const path = d3.geoPath(proj);
+const base = d3.geoMercator(); const basePath = d3.geoPath(base);
+let s0, x0, y0;
+function fitBase(){
+  W = app.clientWidth; H = app.clientHeight; layoutMode();
+  base.fitExtent(isPhone?[[16,120],[W-16,H-40]]:[[60,110],[W-60,H-60]], F(R.portugal));
+  s0 = base.scale(); [x0,y0] = base.translate();
+  proj.clipExtent([[-80,-80],[W+80,H+80]]);
+}
+fitBase();
+const VDP_PT = [-7.392245, 39.298075]; // on Reguengo
+const allProps = {type:'GeometryCollection',geometries:V.properties.map(p=>p.geom)};
+const pgArea = {type:'GeometryCollection',geometries:[R.doc,R.park]};
+function fitK(geo, inset={}){
+  const [[a,b],[c,d]] = basePath.bounds(geo.type==='GeometryCollection'?geo:F(geo));
+  let l=inset.l||40, r=inset.r||40, tp=inset.t||110, bt=inset.b||70;
+  // never let insets eat the screen (phones): keep at least 60% of width / 45% of height for the map
+  if(W-l-r < W*0.6){ const f=(W*0.4)/(l+r); l*=f; r*=f; }
+  if(H-tp-bt < H*0.45){ const f=(H*0.55)/(tp+bt); tp*=f; bt*=f; }
+  const k = Math.min((W-l-r)/(c-a),(H-tp-bt)/(d-b));
+  return {k, x:l+(W-l-r)/2 - k*(a+c)/2, y:tp+(H-tp-bt)/2 - k*(b+d)/2};
+}
+let K = {};
+function vdpInsets(){ if(isSheet) return {l:isPhone?48:60,r:isPhone?48:60,t:isPhone?110:130,b:SHEET_PEEK_MAP+30}; if(isTablet) return {l:40,r:400,t:110,b:70}; return {r:600,l:50}; }
+const SHEET_PEEK_MAP=150, SHEET_PEEK_3D=128;
+function computeLevels(){ K.al = fitK(R.alentejo).k; K.pg = fitK(pgArea).k; K.vdp = fitK(allProps,vdpInsets()).k; }
+computeLevels();
+
+/* draw static paths */
+const gNeigh=d3.select('#g-neigh'), gPt=d3.select('#g-pt'), gReg=d3.select('#g-reg'), gProps=d3.select('#g-props'), gParcels=d3.select('#g-parcels');
+const neigh = gNeigh.selectAll('path').data(R.neighbours.filter(n=>n.name!=='Portugal')).join('path').attr('class','n-land');
+const ptPath = gPt.append('path').datum(R.portugal).attr('class','pt');
+const alFill = gPt.append('path').datum(R.alentejo).attr('class','al-fill');
+const alPath = gReg.append('path').datum(R.alentejo).attr('class','al');
+const ptLine = gReg.append('path').datum(R.portugal).attr('class','pt-line');
+const parkPath = gReg.append('path').datum(R.park).attr('class','park');
+const docPath = gReg.append('path').datum(R.doc).attr('class','doc');
+const lisPath = gReg.append('path').datum(R.lisbon).attr('class','lis');
+const gRoads=d3.select('#g-roads');
+/* cell-division split: the gold dot divides into one blob per property, each blob morphs into its outline */
+function resampleRing(ring,n){
+  const kx=Math.cos(39.29*Math.PI/180), seg=[]; let L=0;
+  for(let i=0;i<ring.length-1;i++){ const a=ring[i],b=ring[i+1],d=Math.hypot((b[0]-a[0])*kx,b[1]-a[1]); seg.push([a,b,L,d]); L+=d; }
+  const out=[]; let j=0;
+  for(let i=0;i<n;i++){ const t=L*i/n; while(j<seg.length-1 && seg[j][2]+seg[j][3]<t) j++; const [a,b,s0,d]=seg[j], f=d?(t-s0)/d:0; out.push([a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f]); }
+  return out;
+}
+const SPLIT=V.properties.map(p=>{ const polys=p.geom.type==='Polygon'?[p.geom.coordinates]:p.geom.coordinates;
+  const ring=polys.map(pl=>pl[0]).reduce((a,b)=>b.length>a.length?b:a); return {id:p.id, c:d3.geoCentroid(F(p.geom)), pts:resampleRing(ring,96)}; });
+const gSplit=d3.select('#g-split');
+const blobs=gSplit.append('g').attr('filter','url(#goo)').selectAll('circle').data(SPLIT).join('circle').attr('fill','#C76653');
+const morphs=gSplit.append('g').selectAll('path').data(SPLIT).join('path').attr('stroke','#231F20').attr('stroke-width',1).attr('stroke-dasharray','4 3').attr('stroke-linejoin','round');
+const easeIO=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;
+function drawSplit(sp,ox,oy){
+  if(sp<=0||sp>=1){ gSplit.style('display','none'); return; }
+  gSplit.style('display',null);
+  const P1=0.35, gold=d3.rgb('#C76653');
+  if(sp<P1){
+    const u=easeIO(sp/P1);
+    blobs.style('display',null).each(function(d){ const C=proj(d.c); this.setAttribute('cx',ox+(C[0]-ox)*0.3*u); this.setAttribute('cy',oy+(C[1]-oy)*0.3*u); this.setAttribute('r',6.5-1.5*u); });
+    morphs.style('display','none');
+  } else {
+    const u=easeIO((sp-P1)/(1-P1)), r=5;
+    blobs.style('display','none');
+    morphs.style('display',null).each(function(d){
+      const C=proj(d.c), px=ox+(C[0]-ox)*(0.3+0.7*u), py=oy+(C[1]-oy)*(0.3+0.7*u);
+      const pts=d.pts.map(q=>{ const T=proj(q), vx=T[0]-C[0], vy=T[1]-C[1], n=Math.hypot(vx,vy)||1;
+        const cx_=px+r*vx/n, cy_=py+r*vy/n; return [cx_+(T[0]-cx_)*u, cy_+(T[1]-cy_)*u]; });
+      this.setAttribute('d','M'+pts.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join('L')+'Z');
+      const f=d3.interpolateRgb(gold,'rgba(35,31,32,0.05)')(u);
+      this.setAttribute('fill',f); this.setAttribute('stroke-opacity',u); this.style.opacity=1-clamp((sp-0.9)/0.1);
+    });
+  }
+}
+const ROADS=[R.road0,...R.roads];
+const roadLocal=d=>!!d.local;
+const roadCase = gRoads.selectAll('path.road-case').data(ROADS).join('path').attr('class','road-case');
+const roadLine = gRoads.selectAll('path.road').data(ROADS).join('path').attr('class','road');
+const propPaths = gProps.selectAll('path').data(V.properties).join('path').attr('class','prop');
+const parcelPaths = gParcels.selectAll('path').data(V.parcels).join('path').attr('class',d=>'parcel t-'+d.type);
+
+/* labels */
+const parkC = d3.geoCentroid(F(R.park)), docC = d3.geoCentroid(F(R.doc));
+const DRIVE_LL = [R.road0.label[0]-0.14540, R.road0.label[1]-0.03199]; // net offset from the road label after SW/NW/SE/NE moves
+const LBL = [
+ {k:'lisbon',ll:[-9.41036,38.58801],cls:'sm lblR',min:0,max:9},
+ {k:'alentejo',ll:[-7.85,38.43],cls:'big',min:0,max:12},
+ {k:'doc',ll:[-7.54,39.18],cls:'mid lblR',min:5,max:120,fade:true},
+ {k:'park',ll:[-7.5601,39.4400],cls:'mid lblR',min:5,max:120,fade:true},
+ {k:'city',ll:[-7.429092,39.289373],cls:'sm cityL',min:0,max:9e9,kmin:16667},
+ {k:'drive',ll:DRIVE_LL,cls:'drive',min:0,max:9e9},
+ {k:'evora',ll:[-7.9093,38.5711],cls:'sm cityR',min:0,max:9e9,kmin:16667},
+ {k:'estremoz',ll:[-7.5866,38.8443],cls:'sm cityR',min:0,max:9e9,kmin:16667},
+ {k:'reguengo',ll:[-7.392245,39.298075],cls:'sm cityR',min:0,max:9e9,kmin:1667}
+];
+const lblLayer = d3.select('#labels');
+const lbls = lblLayer.selectAll('.lbl.reg').data(LBL).join('div').attr('class',d=>'lbl reg '+d.cls);
+const plbls = lblLayer.selectAll('.lbl.prop-l').data(V.properties).join('div').attr('class','lbl prop-l');
+const PLBL={caldeiras:'s',vinha_da_broa:'r',fialha:'s',quinta_da_vinha_dos_padres:'tr',rua_do_saco:'l'};
+function propLabelLL(p){ const b=d3.geoBounds(F(p.geom)); return [(b[0][0]+b[1][0])/2, b[1][1]]; }
+function setTexts(){
+  lbls.text(d=>t(d.k)); plbls.text(d=>d.name);
+  document.querySelector('.title').innerHTML=`<a class="tlogo" href="index.html" aria-label="${t('titleA')} ${t('titleB')}">${D.logo}<span class="est">Est. 1795</span></a><span class="vh">${t('titleA')} ${t('titleB')}</span>`;
+  document.querySelector('#marker .hint').textContent = t('explore');
+  document.getElementById('credit').innerHTML = '';
+}
+
+/* marker */
+const marker = document.getElementById('marker');
+marker.querySelector('.logo').innerHTML = D.logo+'<span class=est>Est. 1795</span>';
+
+/* zoom */
+let cur = d3.zoomIdentity, level='pt', selectedProp=null, inAxo=false;
+let K0=1;
+function computeK0(){ const a=base.invert([W/2,H/2]), b=base.invert([W/2+100,H/2]); const m=d3.geoDistance(a,b)*6371008.8; K0 = m>=83000 ? m/83000*1.02 : 1; }
+computeK0();
+const zoom = d3.zoom().scaleExtent([K0, 4000])
+  .filter(ev => !inAxo && (!ev.button || ev.type==='wheel') && !ev.ctrlKey || ev.type==='wheel')
+  .wheelDelta(ev => -ev.deltaY*(ev.deltaMode===1?0.05:ev.deltaMode?1:0.002)*2)
+  .on('zoom', ev => { cur = ev.transform; schedule(); });
+svg.call(zoom).on('dblclick.zoom', null);
+svg.on('click.bg',ev=>{ if(ev.target===svg.node()){ disarm(); hideTip(); if(!openWine) propPaths.classed('hl',false); } });
+zoom.on('start.tip',ev=>{ if(ev.sourceEvent && isTouch){ hideTip(); } });
+function bindExtent(){ // half of the former margin (0.6 screen beyond the start view), measured from Portugal's own edges
+  const [[a,b],[c,d]]=basePath.bounds(F(R.portugal)), h=(v,e)=>v-(v-e)/2;
+  zoom.translateExtent([[h(a,-W*0.6),h(b,-H*0.6)],[h(c,W*1.6),h(d,H*1.6)]]).extent([[0,0],[W,H]]); }
+bindExtent();
+let raf=null; function schedule(){ if(!raf) raf=requestAnimationFrame(()=>{raf=null; render();}); }
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const fadeIn=(k,a,b)=>clamp(Math.log(k/a)/Math.log(b/a));
+function render(){
+  const k=cur.k;
+  proj.scale(s0*k).translate([k*x0+cur.x, k*y0+cur.y]);
+  const _a=proj.invert([W/2,H/2]), _b=proj.invert([W/2+100,H/2]), mPer100=d3.geoDistance(_a,_b)*6371008.8;
+  const aO=clamp((46000-mPer100)/(46000-41667));
+  alPath.style('stroke-opacity',aO);
+  neigh.attr('d',d=>path(F(d.geom))); lisPath.attr('d',path(F(R.lisbon)));
+  ptPath.attr('d',path(F(R.portugal))); ptLine.attr('d',path(F(R.portugal)));
+  alPath.attr('d',path(F(R.alentejo))); alFill.attr('d',path(F(R.alentejo)));
+  const grey=d3.interpolateRgb('#E6DED0','#DCD3C4')(fadeIn(k,1.15,K.al*0.85)); ptPath.style('fill',grey);
+  const regO = fadeIn(k, K.al*0.9, K.al*2.2) * (1 - 0.7*fadeIn(k, K.vdp*0.2, K.vdp*0.5));
+  parkPath.attr('d',regO>0?path(F(R.park)):null).style('opacity',regO);
+  docPath.attr('d',regO>0?path(F(R.doc)):null).style('opacity',regO);
+  // VdP dot splits into the property outlines between the 2 km and 1 km scale-bar steps
+  const sp = clamp(Math.log(4167/mPer100)/Math.log(4167/1667));
+  const [ox,oy]=proj(VDP_PT); const oY=oy-9.5;
+  drawSplit(sp,ox,oY);
+  const realO=clamp((sp-0.85)/0.15);
+  gProps.style('opacity',realO).style('display',realO>0?null:'none').style('pointer-events',sp>=1?null:'none');
+  gParcels.style('opacity',realO).style('display',realO>0?null:'none').style('pointer-events',sp>=1?null:'none');
+  if(sp>0){ propPaths.attr('d',d=>path(F(d.geom))); parcelPaths.attr('d',d=>path(F(d.geom))); }
+  roadCase.attr('d',d=>path(d.geom)).style('opacity',d=>roadLocal(d)?sp:1); roadLine.attr('d',d=>path(d.geom)).style('opacity',d=>roadLocal(d)?sp:1);
+  { const g=Math.max(0,Math.min(1,(mPer100-16667)/(25000-16667))); roadLine.style('stroke-dasharray', g>0.02 ? `0.01 ${(1+5*g).toFixed(2)}` : null).style('stroke-linecap','round').style('stroke-width', g>0.02 ? 2.6 : null); }
+  // labels
+  lbls.each(function(d){ const [x,y]=proj(d.ll); let o = (k>=d.min && k<d.max) ? 1 : 0;
+    if(d.fade) o *= regO; if(d.k==='alentejo') o *= aO; if(d.kmin) o *= clamp((d.kmin*1.1-mPer100)/(d.kmin*0.1));
+    this.style.left=x+'px'; this.style.top=y+'px'; this.style.opacity=o; this.style.display=o>0.01?'':'none'; });
+  const po=clamp((900-mPer100)/(900-416.7));
+  plbls.each(function(d){ this.style.opacity=po; this.style.display=po>0.01?'':'none'; if(po<=0.01) return;
+    const gb=d3.geoBounds(F(d.geom)), [x0,y0]=proj([gb[0][0],gb[1][1]]), [x1,y1]=proj([gb[1][0],gb[0][1]]), a=PLBL[d.id]||'n'; let x,y,tf;
+    if(a==='s'){ x=(x0+x1)/2; y=y1+16; tf='translate(-50%,-50%)'; }
+    else if(a==='r'){ x=x1+10; y=(y0+y1)/2; tf='translate(0,-50%)'; }
+    else if(a==='tr'){ x=x1+8; y=y0; tf='translate(0,-50%)'; }
+    else if(a==='l'){ x=x0-10; y=(y0+y1)/2; tf='translate(-100%,-50%)'; }
+    else { x=(x0+x1)/2; y=y0-16; tf='translate(-50%,-50%)'; }
+    this.style.left=x+'px'; this.style.top=y+'px'; this.style.transform=tf; });
+  // marker
+  const [mx,my]=proj(VDP_PT); const mO = 1-clamp(sp/0.3);
+  marker.style.left=mx+'px'; marker.style.top=my+'px'; marker.style.opacity=sp>0?Math.max(mO,0):1; marker.style.display=(sp>0&&mO<=0.02)?'none':'';
+  marker.querySelector('.dot').style.visibility=sp>0?'hidden':''; marker.style.pointerEvents=sp>0.3?'none':'';
+  marker.querySelector('.logo').style.width = (k>K.pg*0.6? 210:180)+'px';
+  // level
+  const nl = k < Math.sqrt(K.al) ? 'pt' : k < Math.sqrt(K.al*K.pg) ? 'al' : k < Math.sqrt(K.pg*K.vdp) ? 'pg' : 'vdp';
+  alPath.classed('live', nl==='pt'); docPath.classed('live', nl==='al'||nl==='pg'); parkPath.classed('live', nl==='al'||nl==='pg');
+  if(nl!==level){ level=nl; disarm(); crumbs(); legend(); panelState(); }
+  document.body.classList.toggle('zoomed', level!=='pt');
+  // small nudge only: labels whose anchor is on screen may shift up to 40 px to stay readable; otherwise they move off-screen with the map
+  if(isSheet) [lbls,plbls].forEach(sel=>sel.each(function(){ if(this.style.display==='none') return; const ax=parseFloat(this.style.left); if(!(ax>=0 && ax<=W)) return; const b=this.getBoundingClientRect(); let dx=0; if(b.left<6) dx=6-b.left; else if(b.right>W-6) dx=(W-6)-b.right; dx=Math.max(-40,Math.min(40,dx)); if(dx) this.style.left=(ax+dx)+'px'; }));
+  scalebar();
+}
+function scalebar(){
+  const cx=W/2, cy=H/2, a=proj.invert([cx,cy]), b=proj.invert([cx+100,cy]);
+  const mPer100 = d3.geoDistance(a,b)*6371008.8; let best=1;
+  for(const m of [1,2,5,10,20,50,100,200,500,1000,2000,5000,10000,20000,50000,100000,200000]) if(m/mPer100*100<=120) best=m;
+  const px = best/mPer100*100, el=document.getElementById('scale');
+  if(el){ el.querySelector('.bar').style.width=px+'px'; el.querySelector('span').textContent = best>=1000? (best/1000)+' km' : best+' m'; }
+}
+function fly(target, dur){
+  const tr = d3.zoomIdentity.translate(target.x,target.y).scale(target.k);
+  const d = dur ?? Math.min(2600, 900+260*Math.abs(Math.log(target.k/cur.k)));
+  return svg.transition().duration(d).ease(d3.easeCubicInOut).call(zoom.transform, tr).end().catch(()=>{});
+}
+function ptView(){ const [[a,b],[c,d]]=basePath.bounds(F(R.portugal)); return {k:K0, x:W/2-K0*(a+c)/2, y:(H+40)/2-K0*(b+d)/2}; }
+const goto = {
+  pt:()=>fly(ptView()),
+  al:()=>fly(fitK(R.alentejo)),
+  pg:()=>fly(fitK(pgArea)),
+  vdp:()=>fly(fitK(allProps,vdpInsets()))
+};
+
+/* breadcrumbs */
+function crumbs(){
+  const order=['pt','al','pg','vdp'], idx=order.indexOf(level), nav=document.getElementById('crumbs'); nav.innerHTML='';
+  if(level==='pt' && !inAxo) return;
+  const items = order.slice(0, idx+1).map(l=>({l,txt:T[lang].levels[l]}));
+  if(inAxo && P3){ items.push({l:'prop',txt:P3.prop.name}); if(P3.sel) items.push({l:'parcel',txt:PARCEL[P3.sel].name}); }
+  items.forEach((it,i)=>{
+    if(i) nav.insertAdjacentHTML('beforeend','<span class="sep" aria-hidden="true">›</span>');
+    const b=document.createElement('button'); b.textContent=it.txt;
+    if(i===items.length-1) b.setAttribute('aria-current','page');
+    else b.onclick=()=>{ if(inAxo) exitAxo(it.l); else if(it.l==='prop') return; else { selectedProp=null; goto[it.l](); } };
+    nav.appendChild(b);
+  });
+  nav.scrollLeft=nav.scrollWidth;
+}
+/* legend */
+function legend(){
+  const el=document.getElementById('legend'); let h='';
+  if(level==='vdp'){
+    for(const ty of ['blend','red','white','pink','young-white','young-red']){
+      const st = ty.startsWith('young') ? `background:repeating-linear-gradient(45deg,${ty==='young-red'?'#C5566B':'#E4D79C'} 0 2px,transparent 2px 5px)` : `background:var(--${ty})`;
+      h+=`<div class="lg"><span class="sw" style="${st}"></span>${ty==='blend'?t('lgBlend'):t(ty)}</div>`; }
+    h+=`<div class="lg"><span class="ln d"></span>${t('lgProp')}</div>`;
+  } else {
+    h+=`<div class="lg"><span class="ln"></span>${t('lgAl')}</div>`;
+    if(level!=='pt'){ h+=`<div class="lg"><span class="ln d"></span>${t('lgDoc')}</div><div class="lg"><span class="ln" style="border-top-width:1px"></span>${t('lgPark')}</div>`; }
+  }
+  const sc=`<div id="scale"><div class="bar"></div><span></span></div>`;
+  h = isSheet ? `<div class="lgi">${h}</div><div class="lgrow"><button class="lgbtn" aria-expanded="${el.classList.contains('open')}">${t('legendBtn')}</button>${sc}</div>` : h+sc;
+  el.innerHTML=h; scalebar();
+  const lb=el.querySelector('.lgbtn'); if(lb) lb.onclick=()=>{ el.classList.toggle('open'); lb.setAttribute('aria-expanded',el.classList.contains('open')); };
+}
+
+const propTip=d=>`<h4>${d.name}</h4><div class="sub">${t('lot')} ${d.lot}</div><dl><dt>${t('area')}</dt><dd>${fmtHa(d.area_ha)}</dd><dt>${t('vines')}</dt><dd>${fmtHa(d.vine_ha)}</dd></dl><div class="cta">${t('cta3d')}</div>`;
+/* touch: first tap previews, second tap acts */
+let armed=null;
+function tapGate(key, ev, preview, act){ if(!isTouch){ act(); return; } if(armed===key){ armed=null; hideTip(); act(); } else { armed=key; preview(ev); } }
+function disarm(){ armed=null; marker.classList.remove('armed'); }
+/* tooltip */
+const tip=document.getElementById('tip');
+function showTip(ev, html){ tip.innerHTML=html; tip.style.opacity=1;
+  const r=app.getBoundingClientRect(); let x=ev.clientX-r.left+16, y=ev.clientY-r.top+16;
+  if(x+tip.offsetWidth>W-10) x=ev.clientX-r.left-tip.offsetWidth-16; if(y+tip.offsetHeight>H-10) y=ev.clientY-r.top-tip.offsetHeight-16;
+  tip.style.left=x+'px'; tip.style.top=y+'px'; }
+const hideTip=()=>tip.style.opacity=0;
+const TRN={pt:{'Dry bush vines':'Vinha em vaso, sequeiro','Trellis trained':'Em espaldeira'}};
+function parcelTip(p, cta){
+  const L=parcelLatest(p), pr=PROP[p.prop]; let h=`<h4>${p.name}</h4><div class="sub">${pr.name}</div><dl>`;
+  h+=`<dt>${t('variety')}</dt><dd>${p.variety==='Field blend'?t('blend'):p.variety}</dd>`;
+  if(p.training) h+=`<dt>${t('training')}</dt><dd>${(TRN[lang]||{})[p.training]||p.training}</dd>`;
+  h+=`<dt>${t('area')}</dt><dd>${fmtHa(p.area_ha)}</dd>`;
+  if(L){ h+=`<dt>${t('harvestY',{y:L.year})}</dt><dd>${L.total?fmtKg(L.total):'TBC'}</dd>`;
+         h+=`<dt>${t('kgha')}</dt><dd>${L.kgha? Math.round(L.kgha).toLocaleString(loc())+' kg/ha':'—'}</dd></dl>`;
+         const f=[]; if(L.shared.length) f.push(`${t('sharedWith')} ${L.shared.map(i=>PARCEL[i].name).join(', ')}`); if(L.joint) f.push(t('inclJoint')); if(L.tbc) f.push(t('partial'));
+         if(f.length) h+=`<div class="flag">${f.join('; ')}</div>`; }
+  else h+=`</dl><div class="flag">${p.type.startsWith('young')?t('firstHarvest'):t('noHarvest')}</div>`;
+  return h+`<div class="cta">${t(cta||'cta3d')}</div>`;
+}
+alPath.on('mousemove',ev=>{ if(level==='pt') showTip(ev,`<h4>${t('alentejo')}</h4><div class="sub">${t('clickAl')}</div>`); })
+  .on('mouseleave',hideTip).on('click',ev=>{ if(level==='pt') tapGate('al',ev,e=>showTip(e,`<h4>${t('alentejo')}</h4><div class="sub">${t('clickAl')}</div>`),()=>{ hideTip(); goto.al(); }); });
+parcelPaths.on('mousemove',(ev,d)=>showTip(ev,parcelTip(d))).on('mouseleave',hideTip)
+  .on('click',(ev,d)=>{ ev.stopPropagation(); tapGate('pc:'+d.id,ev,e=>showTip(e,parcelTip(d)),()=>{ hideTip(); enter3D(PROP[d.prop], d.id); }); });
+propPaths.on('mouseenter',function(){ d3.select(this).raise(); }).on('mousemove',(ev,d)=>showTip(ev,propTip(d)))
+  .on('mouseleave',hideTip).on('click',(ev,d)=>tapGate('pp:'+d.id,ev,e=>{ propPaths.classed('hl',x=>x.id===d.id); showTip(e,propTip(d)); },()=>{ hideTip(); propPaths.classed('hl',false); enter3D(d); }));
+marker.onclick=ev=>tapGate('marker',ev,()=>marker.classList.add('armed'),()=>{ marker.classList.remove('armed'); selectedProp=null; goto.vdp(); });
+marker.addEventListener('wheel',e=>{ e.preventDefault(); svg.node().dispatchEvent(new WheelEvent('wheel',e)); },{passive:false});
+[[docPath,R.doc,'doc'],[parkPath,R.park,'park']].forEach(([p,g,key])=>{
+  p.on('mousemove',ev=>{ if(level==='al'||level==='pg') showTip(ev,`<h4>${t(key)}</h4><div class="sub">${t('clickZoom')}</div>`); })
+   .on('mouseleave',hideTip).on('click',ev=>{ if(level==='al'||level==='pg') tapGate(key,ev,e=>showTip(e,`<h4>${t(key)}</h4><div class="sub">${t('clickZoom')}</div>`),()=>{ hideTip(); fly(fitK(g)); }); }); });
+
+/* ---------------- panels ---------------- */
+const panel=document.getElementById('panel');
+function sheetSizes(el){ const peek = el===panel ? SHEET_PEEK_MAP : SHEET_PEEK_3D; return {peek, half:Math.round(H*0.52), full:Math.round(H-(isPhone?118:140))}; }
+function sheetH(el){ return isSheet ? (sheetSizes(el)[el.dataset.sheet||'peek']) : 0; }
+function syncSheetVar(){ const v = isSheet && panel.classList.contains('on') && !inAxo ? sheetH(panel) : 0; document.body.style.setProperty('--sheet-h', v+'px'); document.body.classList.toggle('sheet-up', v>0 && (panel.dataset.sheet||'peek')!=='peek'); }
+function setSheet(el,state){ el.dataset.sheet=state; if(isSheet) el.style.setProperty('--sh', sheetSizes(el)[state]+'px'); else el.style.removeProperty('--sh'); syncSheetVar(); if(el!==panel && typeof viewOff==='function') viewOff(); }
+function makeSheet(el){
+  const h=document.createElement('div'); h.className='sh-h'; h.setAttribute('role','button'); h.setAttribute('aria-label','Resize panel');
+  const c=document.createElement('div'); c.className='sh-c'; while(el.firstChild) c.appendChild(el.firstChild); el.append(h,c);
+  let st=null;
+  h.addEventListener('pointerdown',e=>{ if(!isSheet) return; st={y:e.clientY,h:el.getBoundingClientRect().height}; h.setPointerCapture(e.pointerId); el.style.transition='none'; });
+  h.addEventListener('pointermove',e=>{ if(!st) return; el.style.setProperty('--sh', clamp(st.h-(e.clientY-st.y),70,H-40)+'px'); });
+  const end=e=>{ if(!st) return; el.style.transition=''; const dy=e.clientY-st.y, nh=st.h-dy, sz=sheetSizes(el); let n;
+    if(Math.abs(dy)<6){ const cur=el.dataset.sheet||'peek'; n = cur==='peek'?'half':cur==='half'?'full':'peek'; }
+    else n=Object.entries(sz).reduce((a,b)=>Math.abs(b[1]-nh)<Math.abs(a[1]-nh)?b:a)[0];
+    st=null; setSheet(el,n); };
+  h.addEventListener('pointerup',end); h.addEventListener('pointercancel',end);
+  el.dataset.sheet='peek'; return c; }
+const panelC=makeSheet(panel);
+function panelState(){ const was=panel.classList.contains('on'); panel.classList.toggle('on', level==='vdp' && !inAxo); if(!was && panel.classList.contains('on')) setSheet(panel,'peek'); syncSheetVar(); if(level!=='vdp' && openWine){ openWine=null; hoverWine=null; wineAccent(); propPaths.classed('hl',false); } if(level==='vdp') renderPanel(); }
+function yieldTable(recs){
+  const c=T[lang].cols;
+  let h=`<div class="tbl-wrap"><table><thead>
+  <tr><th>${c[0]}</th><th>${c[2]}</th><th>${c[5]}</th><th>${c[6]}</th><th>${c[7]}</th>
+  <th class="num">${c[8]} (kg)</th><th class="num">${c[11]}</th></tr></thead><tbody>`;
+  let py=null;
+  recs.forEach(r=>{
+    const badges=[]; if(r.parcels.length>1) badges.push(`<span class="badge">${t('shared')}</span>`);
+    h+=`<tr class="${r.year!==py?'ystart':''}"><td>${r.year}</td><td>${r.parcel_label}${badges.join('')}</td>
+    <td>${xl(r.type)}</td><td>${xl(r.variety)}</td><td>${cellVal(fmtDate(r.date))}</td><td class="num">${cellVal(r.kg_with)}</td><td class="num">${cellVal(r.stem_ratio,true)}</td></tr>`; py=r.year; });
+  return h+'</tbody></table></div>';
+}
+function joinList(a){ return a.length<2 ? (a[0]||'—') : a.slice(0,-1).join(', ')+` ${t('amp')} `+a[a.length-1]; }
+let openYear=null, notesOpen=false, harvestView='chart', propWines=false, pwOpen=new Set();
+function propTable(recs){
+  const c=T[lang].cols, years=[...new Set(recs.map(r=>r.year))].sort((a,b)=>b-a), TO={Red:0,White:1,Pink:2};
+  let anyJ=false, anyT=false;
+  let h=`<div class="tbl-wrap"><table class="ptable pgrp"><thead>
+  <tr><th>${c[2]}</th><th>${c[5]}</th><th>${t('varieties')}</th><th>${c[7]}</th><th class="num">${c[8]} (kg)</th><th class="num">${c[11]}</th></tr></thead><tbody>`;
+  years.forEach(y=>{
+    const rs=recs.filter(r=>r.year===y).sort((a,b)=>(TO[a.type]??9)-(TO[b.type]??9)||String(a.date).localeCompare(String(b.date)));
+    const ds=rs.flatMap(r=>dParse(r.date||'')).sort((a,b)=>a.m-b.m||a.d-b.d);
+    const date= ds.length ? dSpan(ds[0],ds[ds.length-1]) : (rs.some(r=>r.date==='TBC')?'TBC':'—');
+    let kg=0, j=false, tb=false; rs.forEach(r=>{ const n=num(r.kg_with); if(n==null){ if(r.kg_with==='TBC') tb=true; } else kg+=n; if(r.joint) j=true; });
+    const rats=rs.map(r=>r.stem_ratio).filter(v=>typeof v==='number');
+    anyJ=anyJ||j; anyT=anyT||tb;
+    const kgTxt = kg>0 ? fmtN(kg)+(tb?'<span class="tbc">**</span>':'') : (tb?'<span class="tbc">TBC</span>':'—');
+    const open=openYear===y;
+    h+=`<tr class="yg yr${open?' open':''}" data-y="${y}"><td colspan="3"><b>${y}</b><span class="yn">${rs.length>1?' · '+rs.length+' '+t('picks'):''}</span></td><td>${date}</td><td class="num">${kgTxt}</td><td class="num">${rats.length?fmtN(rats.reduce((a,b)=>a+b,0)/rats.length*100,1)+'%':'—'}</td></tr>`;
+    if(open) rs.forEach(r=>{
+      const badge = r.parcels.length>1 ? `<span class="badge">${t('shared')}</span>` : '';
+      h+=`<tr class="det"><td>${r.parcel_label}${badge}</td><td><span class="tdot" style="background:${{Red:'#C76653',White:'#275FAC',Pink:'#D98FA0'}[r.type]||'#999'}"></span>${xl(r.type)}</td><td>${xl(r.variety)}</td><td>${cellVal(fmtDate(r.date))}</td><td class="num">${cellVal(r.kg_with)}${r.joint&&typeof r.kg_with==='number'?'<span class="tbc">*</span>':''}</td><td class="num">${cellVal(r.stem_ratio,true)}</td></tr>`; });
+  });
+  h+='</tbody></table></div>';
+  const fn=[]; if(anyJ) fn.push(t('fnJoint')); if(anyT) fn.push(t('fnTbc'));
+  if(fn.length) h+=`<div class="foot fn">${fn.join('<br>')}</div>`;
+  return h;
+}
+/* harvest timing: one row per year, a dot per pick date (shape + colour by type), first-pick trend line */
+const TYPE_STYLE={White:{c:'#E4D79C',sh:'circle'},Red:{c:'#C5566B',sh:'square'},Pink:{c:'#E39CB0',sh:'diamond'}};
+const doy=(d,m)=>Math.round((Date.UTC(2001,m,d)-Date.UTC(2001,0,1))/864e5);
+let wxLayer='temp', tmRange='all';
+const WXL=[
+ {id:'temp', panels:[{f:['temp','dew'],unit:'°C',kind:'line'}], col:{temp:'#C9A54A',dew:'#7FA8D6'}},
+ {id:'wind', panels:[{f:['spd','gust'],unit:'km/h',kind:'line+pts'}], col:{spd:'#7FA8D6',gust:'#C9A54A'}},
+ {id:'dir',  panels:[{f:['deg'],unit:'°',kind:'pts',fixed:[0,360]}], col:{deg:'#7FA8D6'}},
+ {id:'rain', panels:[{f:['pacc'],unit:'mm',kind:'bars',zero:true}], col:{pacc:'#4B8ED0'}},
+ {id:'pres', panels:[{f:['pres'],unit:'hPa',kind:'line'}], col:{pres:'#A98BD6'}},
+ {id:'hum',  panels:[{f:['hum'],unit:'%',kind:'line',fixed:[0,100]}], col:{hum:'#5BA3D9'}},
+ {id:'solar',panels:[{f:['solar'],unit:'W/m²',kind:'line',zero:true},{f:['uv'],unit:'UV',kind:'line',zero:true}], col:{solar:'#E3C24A',uv:'#C77BD1'}}];
+const WXD=V.wx, DAY=864e5;
+const wxAt=(f,i)=> (i<0||i>=WXD.n) ? null : WXD.f[f][i];
+const dayIdx=ms=>Math.round((ms-WXD.t0)/DAY);
+const pickMs=(y,q)=>Date.UTC(y,q.m,q.d);
+function timingChart(recs){
+  const picks=[]; recs.forEach(r=>{ const ds=dParse(r.date||''); if(!ds.length) return;
+    const n=num(r.kg_with); picks.push({y:r.year,t:r.type,v:r.variety,ds,ms:ds.map(q=>pickMs(r.year,q)),kg:n,raw:r.kg_with,joint:r.joint,cbv:r.training==='Dry bush vines'}); });
+  const years=[...new Set(picks.map(p=>p.y))].sort();
+  if(years.length<2) return '';
+  if(tmRange!=='all' && !years.includes(+tmRange)) tmRange='all';
+  const first=years.map(y=>({y,x:Math.min(...picks.filter(p=>p.y===y).map(p=>doy(p.ds[0].d,p.ds[0].m)))}));
+  const L=wxLayer?WXL.find(l=>l.id===wxLayer):null;
+  const x0 = tmRange==='all' ? Date.UTC(years[0],0,1) : Date.UTC(+tmRange,3,1);
+  const x1 = tmRange==='all' ? Date.UTC(years[years.length-1],9,31) : Date.UTC(+tmRange,9,15);
+  const W_=isSheet?Math.max(300,Math.min(560,W-30)):560, padL=isSheet?40:46, padR=10, top=38, hA=92, gap=26, nP=L?L.panels.length:0, hP=nP===2?66:140, gapP=16;
+  const H_= top+hA+(L? gap+nP*hP+(nP-1)*gapP : 0)+22;
+  const X=ms=>padL+(ms-x0)/(x1-x0)*(W_-padL-padR);
+  let g='';
+  // harvest bands (both panels)
+  const bandTop=top+hA+gap, bandBot=H_-22;
+  if(L) picks.forEach(p=>{ const a=Math.min(...p.ms), b=Math.max(...p.ms)+DAY; if(b<x0||a>x1) return;
+    g+=`<rect x="${X(a)}" y="${bandTop}" width="${Math.max(1.5,X(b)-X(a))}" height="${bandBot-bandTop}" fill="rgba(201,162,74,.2)" stroke="rgba(160,124,44,.5)" stroke-width="0.6"/>`; });
+  // x axis ticks
+  const ticks=[]; if(tmRange==='all'){ for(let y=years[0];y<=years[years.length-1];y++){ ticks.push([Date.UTC(y,0,1), String(y)]); ticks.push([Date.UTC(y,6,1), '']); } }
+  else { for(let m=3;m<=9;m++) ticks.push([Date.UTC(+tmRange,m,1), MONS[lang][m]]); }
+  ticks.forEach(([ms,lab])=>{ if(ms<x0||ms>x1) return; g+=`<line x1="${X(ms)}" x2="${X(ms)}" y1="${top-4}" y2="${H_-22}" stroke="rgba(35,31,32,${lab&&tmRange==='all'?.16:.08})"/>${lab?`<text x="${X(ms)+(tmRange==='all'?4:0)}" y="${H_-8}" text-anchor="${tmRange==='all'?'start':'middle'}" font-size="10" fill="#5A5450">${lab}</text>`:''}`; });
+  // panel A: harvest quantity lollipops
+  const kgMax=Math.max(1,...picks.map(p=>p.kg||0)), YA=v=>top+hA-(v/kgMax)*(hA-8);
+  const nice=d3.scaleLinear().domain([0,kgMax]).nice().ticks(3);
+  nice.forEach(v=>{ if(v>kgMax) return; g+=`<line x1="${padL}" x2="${W_-padR}" y1="${YA(v)}" y2="${YA(v)}" stroke="rgba(35,31,32,${v?0.08:0.3})"/><text x="${padL-6}" y="${YA(v)+3.5}" text-anchor="end" font-size="10" fill="#5A5450">${v.toLocaleString(loc())}</text>`; });
+  g+=`<text x="${padL}" y="${top-26}" font-size="10.5" font-weight="600" fill="#5A5450">${t('tmQtyPanel')}</text>`;
+  const seen={}, snaps=[];
+  picks.slice().sort((a,b)=>(b.kg||0)-(a.kg||0)).forEach(p=>{ const ms=p.ms[0]; if(ms<x0||ms>x1) return; const st=TYPE_STYLE[p.t]||TYPE_STYLE.White;
+    const key=Math.round(X(ms)/4); const k=seen[key]=(seen[key]||0)+1; const cx=X(ms)+(k-1)*(tmRange==='all'?3.5:7);
+    const v=p.kg||0, cy=YA(v), r=4.5; snaps.push([+cx.toFixed(1),+cy.toFixed(1),ms]);
+    g+=`<line x1="${cx}" x2="${cx}" y1="${YA(0)}" y2="${cy}" stroke="${st.c}" stroke-width="1.6"/>`;
+    const shape = st.sh==='circle' ? `<circle cx="${cx}" cy="${cy}" r="${r}"/>` : st.sh==='square' ? `<rect x="${cx-4}" y="${cy-4}" width="8" height="8" rx="1.5"/>` : `<path d="M${cx},${cy-5.5}L${cx+5.5},${cy}L${cx},${cy+5.5}L${cx-5.5},${cy}Z"/>`;
+    g+=`<g class="mk" data-i="${snaps.length-1}" data-y="${p.y}" data-t="${p.t}" data-c="${p.cbv?1:0}" fill="${st.c}" stroke="#231F20" stroke-width="1">${shape}</g>`; });
+  // year totals
+  years.forEach(yr=>{ const ps=picks.filter(p=>p.y===yr), ms=Math.min(...ps.map(p=>p.ms[0])); if(ms<x0||ms>x1) return;
+    let kg=0,j=false,tb=false; recs.filter(r=>r.year===yr).forEach(r=>{ const n=num(r.kg_with); if(n==null){ if(r.kg_with==='TBC') tb=true; } else kg+=n; if(r.joint) j=true; });
+    g+=`<text x="${X(ms)}" y="${top-8}" text-anchor="middle" font-size="10" fill="#231F20">${kg>0?Math.round(kg).toLocaleString(loc()):'TBC'}${j?'*':''}${tb?'**':''}</text>`; });
+  // panel B: weather
+  let legendWx='';
+  if(L){
+    const i0=Math.max(0,dayIdx(x0)), i1=Math.min(WXD.n-1,dayIdx(x1));
+    L.panels.forEach((P,pi)=>{
+      const pt=top+hA+gap+pi*(hP+gapP), pb=pt+hP;
+      let lo=1e9,hi=-1e9; P.f.forEach(f=>{ for(let i=i0;i<=i1;i++){ const v=wxAt(f,i); if(v!=null){ lo=Math.min(lo,v); hi=Math.max(hi,v); } } });
+      if(P.fixed){ [lo,hi]=P.fixed; } else if(P.zero){ lo=0; }
+      if(!(hi>lo)){ hi=lo+1; }
+      const ys=d3.scaleLinear().domain([lo,hi]).nice(4).range([pb,pt]); const tk=P.fixed&&P.f[0]==='deg'?[[0,'N'],[90,'E'],[180,'S'],[270,'W'],[360,'N']]:ys.ticks(4).map(v=>[v,fmtN(v,0)]);
+      tk.forEach(([v,lab])=>{ g+=`<line x1="${padL}" x2="${W_-padR}" y1="${ys(v)}" y2="${ys(v)}" stroke="rgba(35,31,32,.08)"/><text x="${padL-6}" y="${ys(v)+3.5}" text-anchor="end" font-size="10" fill="#5A5450">${lab}</text>`; });
+      g+=`<text x="${padL}" y="${pt-6}" font-size="10.5" font-weight="600" fill="#5A5450">${P.f.map(f=>t('wx_'+f)).join(' · ')} (${P.unit})</text>`;
+      const stepPx=(W_-padL-padR)/((x1-x0)/DAY);
+      P.f.forEach((f,fi)=>{ const col=L.col[f];
+        const pts=[]; for(let i=i0;i<=i1;i++){ pts.push([X(WXD.t0+i*DAY),wxAt(f,i)]); }
+        if(P.kind==='bars'){ pts.forEach(([x,v])=>{ if(v>0) g+=`<rect x="${x}" y="${ys(v)}" width="${Math.max(1,stepPx*0.85)}" height="${pb-ys(v)}" fill="${col}"/>`; }); }
+        else if(P.kind==='pts' || (P.kind==='line+pts'&&fi===1)){ pts.forEach(([x,v])=>{ if(v!=null) g+=`<circle cx="${x}" cy="${ys(v)}" r="${tmRange==='all'?1.1:1.8}" fill="${col}"/>`; }); }
+        else { const d=d3.line().defined(q=>q[1]!=null).x(q=>q[0]).y(q=>ys(q[1]))(pts); g+=`<path d="${d}" fill="none" stroke="${col}" stroke-width="${tmRange==='all'?1:1.5}" stroke-linejoin="round"/>`; }
+      });
+    });
+    legendWx=L.panels.flatMap(P=>P.f).map(f=>`<span class="tleg"><svg width="14" height="10"><rect x="0" y="2" width="14" height="6" rx="1.5" fill="${L.col[f]}"/></svg>${t('wx_'+f)}</span>`).join('')
+      +`<span class="tleg"><svg width="12" height="12"><rect x="3" y="0" width="6" height="12" fill="rgba(201,162,74,.2)" stroke="rgba(160,124,44,.5)" stroke-width=".6"/></svg>${t('tmBand')}</span>`;
+  }
+  g+=`<line class="tmx" x1="0" x2="0" y1="${top-4}" y2="${H_-22}" stroke="#275FAC" stroke-width="1" style="display:none"/>`;
+  g+=`<rect class="tmov" x="${padL}" y="${top-4}" width="${W_-padL-padR}" height="${H_-22-top+4}" fill="transparent"/>`;
+  const fA=first[0], fB=first[first.length-1], diff=fB.x-fA.x;
+  const head = diff===0 ? t('tmSame',{a:fA.y,b:fB.y}) : t(diff<0?'tmEarlier':'tmLater',{n:Math.abs(diff),a:fA.y,b:fB.y});
+  const types=['White','Red','Pink'].filter(ty=>picks.some(p=>p.t===ty));
+  const leg=types.map(ty=>{ const st=TYPE_STYLE[ty]; const ic= st.sh==='circle'?'<circle cx="6" cy="6" r="4.5"/>':st.sh==='square'?'<rect x="2" y="2" width="8" height="8" rx="1.5"/>':'<path d="M6,0.5L11.5,6L6,11.5L0.5,6Z"/>';
+    return `<span class="tleg"><svg width="12" height="12" fill="${st.c}">${ic}</svg>${xl(ty)}</span>`; }).join('');
+  const rng=`<div class="seg sm tmr" role="group" aria-label="${t('tmRangeLab')}"><button data-tr="all" aria-pressed="${tmRange==='all'}">${t('tmAll')}</button>${years.map(y=>`<button data-tr="${y}" aria-pressed="${String(tmRange)===String(y)}">${y}</button>`).join('')}</div>`;
+  const btns=WXL.map(l=>`<button class="wxb" data-wx="${l.id}" aria-pressed="${wxLayer===l.id}"><span class="dotb"></span>${t('wxL_'+l.id)}</button>`).join('');
+  const anyJ=recs.some(r=>r.joint), anyT=recs.some(r=>r.kg_with==='TBC');
+  const notes=[]; if(L) notes.push(t(L.id==='solar'?'wxSrcSolar':'wxSrc')); if(anyJ) notes.push(t('fnJoint')); if(anyT) notes.push(t('fnTbc'));
+  return `${rng}<div class="wxbtns" role="group" aria-label="${t('wxGroup')}">${btns}</div>
+    <svg class="tchart" data-snap='${JSON.stringify(snaps)}' data-pa="${top+hA}" data-x0="${x0}" data-x1="${x1}" data-pl="${padL}" data-pr="${W_-padR}" viewBox="0 0 ${W_} ${H_}" width="100%" role="img" aria-label="${t('tmTitle')}">${g}</svg><div class="tmleg below">${leg}${legendWx}</div>${notes.length?`<div class="foot fn">${notes.join('<br>')}</div>`:''}`;
+}
+function tmTipAt(ms,recs){
+  const d=new Date(ms), y=d.getUTCFullYear(), m=d.getUTCMonth(), dd=d.getUTCDate();
+  let h=`<b>${dd} ${MONS[lang][m]} ${y}</b>`;
+  const hits=recs.filter(r=>r.year===y && dParse(r.date||'').some(q=>q.m===m&&q.d===dd) || (r.year===y && (()=>{ const ds=dParse(r.date||''); if(ds.length<2) return false; const a=pickMs(y,ds[0]), b=pickMs(y,ds[ds.length-1]); return ms>=a&&ms<=b; })()));
+  hits.forEach(r=>{ h+=`<br>${xl(r.type)}, ${xl(r.variety)}: ${num(r.kg_with)!=null?fmtN(num(r.kg_with))+' kg'+(r.joint?'*':''):'TBC'}`; });
+  const L=wxLayer?WXL.find(l=>l.id===wxLayer):null;
+  if(L){ const i=dayIdx(ms); L.panels.flatMap(P=>P.f.map(f=>[f,P.unit])).forEach(([f,u])=>{ const v=wxAt(f,i);
+      if(f==='deg'){ const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW']; h+=`<br>${t('wx_deg')}: ${v==null?'—':dirs[Math.round(v/22.5)%16]+' ('+v+'°)'}`; return; }
+      h+=`<br>${t('wx_'+f)}: ${v==null?'—':fmtN(v,f==='hum'||f==='solar'?0:1)+' '+(u==='UV'?'':u)}`; });
+    if(L.id==='rain'){ const r=wxAt('prate',i); if(r!=null) h+=`<br>${t('wx_prate')}: ${fmtN(r,1)} mm/h`; } }
+  return `<div class="sub" style="margin:0;color:var(--ink)">${h}</div>`;
+}
+function wirePropTable(root){
+  root.querySelectorAll('[data-hv]').forEach(b=>b.onclick=()=>{ harvestView=b.dataset.hv; hideTip(); axoUI(); });
+  root.querySelectorAll('.wxb').forEach(b=>b.onclick=()=>{ wxLayer = b.dataset.wx; hideTip(); axoUI(); });
+  root.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>{ tmRange=b.dataset.tr; hideTip(); axoUI(); });
+  const sv=root.querySelector('svg.tchart');
+  if(sv){ const ov=sv.querySelector('.tmov'), ln=sv.querySelector('.tmx'), mks=[...sv.querySelectorAll('g.mk')], setMk=i=>mks.forEach(m=>m.classList.toggle('on',+m.dataset.i===i)), snaps=JSON.parse(sv.dataset.snap||'[]'), pa=+sv.dataset.pa, x0=+sv.dataset.x0, x1=+sv.dataset.x1, pl=+sv.dataset.pl, pr=+sv.dataset.pr;
+    const recsP=V.records.filter(r=>r.prop===(P3&&P3.prop.id));
+    ov.onpointerdown=ev=>ov.onmousemove(ev); ov.onpointermove=ev=>{ if(ev.pointerType!=='mouse') ov.onmousemove(ev); };
+    ov.onmousemove=ev=>{ const pt=sv.createSVGPoint(); pt.x=ev.clientX; pt.y=ev.clientY; const p=pt.matrixTransform(sv.getScreenCTM().inverse());
+      // snap to the nearest harvest marker when the pointer is close to it
+      let best=null, bi=-1, bd=1e9; for(const [qi,q] of snaps.entries()){ const dx=Math.abs(q[0]-p.x), dy=Math.abs(q[1]-p.y), dd=(p.y<=pa+10)? (dx<=9?dx:1e9) : Math.hypot(dx,dy); if(dd<bd && (p.y<=pa+10 || dd<=16)){ bd=dd; best=q; bi=qi; } }
+      if(best){ ln.setAttribute('x1',best[0]); ln.setAttribute('x2',best[0]); ln.style.display=''; setMk(bi); showTip(ev,tmTipAt(best[2],recsP)); return; }
+      setMk(-1);
+      const ms=x0+(p.x-pl)/(pr-pl)*(x1-x0); const day=Math.round((ms-Date.UTC(1970,0,1))/DAY)*DAY; const xx=pl+(day-x0)/(x1-x0)*(pr-pl);
+      ln.setAttribute('x1',xx); ln.setAttribute('x2',xx); ln.style.display=''; showTip(ev,tmTipAt(day,recsP)); };
+    ov.onmouseleave=()=>{ ln.style.display='none'; setMk(-1); hideTip(); }; }
+  root.querySelectorAll('.tpk').forEach(e=>{ e.onmousemove=ev=>showTip(ev,`<div class="sub" style="margin:0;color:var(--ink)">${e.dataset.tip}</div>`); e.onmouseleave=hideTip; });
+  root.querySelectorAll('tr.yr').forEach(tr=>{
+    const y=+tr.dataset.y;
+    tr.onmousemove=ev=>showTip(ev,`<div class="cta" style="margin:0;padding:0;border:0">${t(openYear===y?'clickCollapse':'clickExpand')}</div>`);
+    tr.onmouseleave=hideTip;
+    tr.onclick=()=>{ openYear = openYear===y ? null : y; if(openYear!==null) notesOpen=false; hideTip(); axoUI(); hideTip(); };
+  });
+}
+const YOUNG_EST={'padres-bical':'Est. 2024','padres-corropio':'Est. 2024','saco-chardonnay':'Est. 2024'};
+function ageReg(recs){
+  const u=k=>[...new Set(recs.map(r=>r[k]).filter(v=>v!=null))].join(', ')||'—';
+  const c=T[lang].cols;
+  return `<div class="agereg"><div><div class="k">${c[3]}</div><div class="v">${u('age')}</div></div><div><div class="k">${c[4]}</div><div class="v">${u('registered')}</div></div></div>`;
+}
+function yearTotals(recs, dedupeJoint){
+  const by={}; const seen=new Set();
+  recs.forEach(r=>{ const n=num(r.kg_with); if(n==null) return;
+    if(dedupeJoint && r.joint){ const key=r.year+r.type+r.kg_with; if(seen.has(key)) return; seen.add(key); }
+    by[r.year]=(by[r.year]||0)+n; });
+  return by;
+}
+function propIcon(p){ const pr=d3.geoMercator().fitExtent([[1.5,1.5],[20.5,16.5]],F(p.geom)); const d=d3.geoPath(pr)(F(p.geom));
+  return `<svg class="picon" width="22" height="18" viewBox="0 0 22 18" aria-hidden="true"><path d="${d}" fill="rgba(35,31,32,.06)" stroke="#231F20" stroke-width="1" stroke-dasharray="2 1.5" stroke-linejoin="round"/></svg>`; }
+/* ---------------- wines ---------------- */
+const WIMG={"red-2022": "img/bottles/cb4fdb24bd.webp", "red-2023": "img/bottles/29491c477e.webp", "white-2022": "img/bottles/b79d063202.webp", "white-2023": "img/bottles/829ea65c87.webp"};
+const WINES=[
+ {id:'r22',vin:2022,col:'Red',bottles:1063,code:'3M12M',img:'red-2022',motif:'#C76653'},
+ {id:'w22',vin:2022,col:'White',bottles:1113,code:'3M12M',img:'white-2022',motif:'#275FAC'},
+ {id:'r23',vin:2023,col:'Red',bottles:1090,code:'3M3M4M',img:'red-2023',motif:'#C76653'},
+ {id:'w23',vin:2023,col:'White',bottles:3600,code:'3M3M',img:'white-2023',motif:'#275FAC'}];
+const WINE_URL='https://www.vinhadospadres.com/home';
+const wineSrc=w=>V.records.filter(r=>r.year===w.vin && r.type===w.col && r.training==='Dry bush vines');
+const wineProps=w=>[...new Set(wineSrc(w).map(r=>r.prop))];
+const wineKg=w=>wineSrc(w).reduce((a,r)=>a+(num(r.kg_with)||0),0);
+function wineSeason(w){
+  const ms=wineSrc(w).flatMap(r=>dParse(r.date||'').map(q=>pickMs(w.vin,q))); if(!ms.length) return null;
+  const i0=dayIdx(Date.UTC(w.vin,3,1)), i1=dayIdx(Math.min(...ms))-1; let rain=0,hi=0,n=0,hot=0,miss=0;
+  for(let i=i0;i<=i1;i++){ const tv=wxAt('temp',i), pv=wxAt('pacc',i); if(tv==null){ miss++; } else { hi+=tv; n++; if(tv>=35) hot++; } if(pv!=null) rain+=pv; }
+  return {rain, mean:n?hi/n:null, hot, miss};
+}
+let openWine=null, hoverWine=null, winesOpen=false; const openYears=new Set([2023]);
+function wineAccent(){ const id=hoverWine||openWine, w=id&&WINES.find(x=>x.id===id); document.body.classList.toggle('wine-white', !!w && w.col==='White'); }
+const wineCap=w=>`${w.vin} · ${t(w.col.toLowerCase())}`;
+const soldOut=w=>w.vin===2022;
+const soldTag=w=>soldOut(w)?`<div><span class="sold" style="background:${w.motif}">${t('soldOut')}</span></div>`:'';
+function highlightProps(ids){ propPaths.classed('hl',d=>ids.includes(d.id)).filter(d=>ids.includes(d.id)).raise(); }
+function wineCard(w){
+  const src=wineSrc(w), kg=wineKg(w), se=wineSeason(w);
+  let h=`<button class="link" id="wback">‹ ${t('wines')}</button>
+  <div class="wcard"><img src="${WIMG[w.img]}" alt="${t('wineName')} ${wineCap(w)}">
+  <div><h2>${t('wineName')}</h2>${soldOut(w)?`<span class="sold wso" style="background:${w.motif}">${t('soldOut')}</span>`:''}
+  <div class="wstats"><div><div class="k">${t('vintK')}</div><div class="v">${w.vin}</div></div>
+  <div><div class="k">${t('typeK')}</div><div class="v"><span class="wdot" style="background:${w.motif}"></span> ${t(w.col.toLowerCase())}</div></div>
+  <div><div class="k">${t('codeK')}</div><div class="v">${w.code||'—'}</div></div>
+  <div><div class="k">${t('grapesK')}</div><div class="v">${Math.round(kg).toLocaleString(loc())} kg</div></div>
+  <div><div class="k">${t('bottlesK')}</div><div class="v">${w.bottles.toLocaleString(loc())}</div></div>
+  <div><div class="k">${t('kgBottle')}</div><div class="v">${fmtN(kg/w.bottles,2)}</div></div></div></div><a class="wpage" href="wine-${w.col.toLowerCase()}-${w.vin}.html">${t('winePage')}</a></div></div>
+  <h3>${t('srcTitle')} <span class="d" style="font-family:var(--sans);font-size:11px;font-weight:400;color:var(--muted)">${t('harvestOf',{y:w.vin})}</span></h3><div class="wsrc">`;
+  src.forEach(r=>{ const v=num(r.kg_with)||0, ds=dParse(r.date||''); const pr=PROP[r.prop];
+    h+=`<div class="row" data-wp="${r.prop}"><span>${pr.name}</span><span>${Math.round(v).toLocaleString(loc())} kg · ${fmtN(100*v/kg,0)}%</span>
+      <span class="d">${ds.length?dSpan(ds[0],ds[ds.length-1]):'—'}</span><span></span><span class="bar"><i style="width:${100*v/kg}%;background:${w.motif}"></i></span></div>`; });
+  h+=`</div>`;
+  if(se) h+=`<h3>${t('seasonTitle')} <span class="d" style="font-family:var(--sans);font-size:11px;font-weight:400;color:var(--muted)">${t('seasonSub')}</span></h3>
+    <div class="wseason"><div><div class="k">${t('rainK')}</div><div class="v">${Math.round(se.rain)} mm</div></div>
+    <div><div class="k">${t('meanHighK')}</div><div class="v">${se.mean==null?'—':fmtN(se.mean,1)+' °C'}</div></div>
+    <div><div class="k">${t('hotK')}</div><div class="v">${se.hot}</div></div></div>`;
+  h+=`<div class="foot fn">${t('wineNote')}${se&&se.miss?' '+t('missK',{n:se.miss})+'.':''} ${t('wxSrc')}</div>`;
+  return h;
+}
+function openWineCard(id){ openWine=id; wineAccent(); renderPanel(); }
+function bindWineBtns(){
+  panel.querySelectorAll('[data-wine]').forEach(b=>{ const w=WINES.find(x=>x.id===b.dataset.wine);
+    b.onclick=ev=>tapGate('w:'+w.id,ev,e=>{ hoverWine=w.id; wineAccent(); highlightProps(wineProps(w)); const r=b.getBoundingClientRect(); showTip({clientX:r.left,clientY:r.top-110},`<h4>${t('wineName')}</h4><div class="sub">${wineCap(w)} · ${w.bottles.toLocaleString(loc())} ${t('bottles')}</div>${soldTag(w)}<div class="cta">${t('wineTip')}</div>`); },()=>{ hideTip(); hoverWine=null; openWineCard(w.id); });
+    b.onmouseenter=()=>{ hoverWine=w.id; wineAccent(); highlightProps(wineProps(w)); };
+    b.onmousemove=ev=>showTip(ev,`<h4>${t('wineName')}</h4><div class="sub">${wineCap(w)} · ${w.bottles.toLocaleString(loc())} ${t('bottles')}</div>${soldTag(w)}<div class="cta">${t('wineTip')}</div>`);
+    b.onmouseleave=()=>{ hideTip(); hoverWine=null; wineAccent(); propPaths.classed('hl',false); }; });
+}
+function winesPanel(){
+  const yrs=[...new Set(WINES.map(w=>w.vin))].sort((a,b)=>b-a);
+  let h=`<button class="link" id="wvback">‹ ${t('backVdp')}</button><div class="p-h" style="margin-top:6px"><div><h2>${t('wines')}</h2></div></div><div class="wyears">`;
+  yrs.forEach(y=>{ const op=openYears.has(y);
+    h+=`<div class="wyr${op?' op':''}"><button class="wyh" data-yr="${y}" aria-expanded="${op}"><span>${y}</span><span class="meta">${WINES.filter(w=>w.vin===y).length} ${t('wines').toLowerCase()}</span><span class="arr">›</span></button>`;
+    if(op) h+=`<div class="wines">`+WINES.filter(w=>w.vin===y).map(w=>`<button class="wbtl" data-wine="${w.id}"><img src="${WIMG[w.img]}" alt=""><span class="wfn">Quinta da Vinha dos Padres</span><span class="wy">${w.vin} ${t(w.col.toLowerCase())} <span style="color:${w.motif}">${w.code}</span></span></button>`).join('')+`</div>`;
+    h+=`</div>`; });
+  h+=`</div><div class="foot fn">${t('vintNote')}</div><a class="gowines" href="wines.html">${t('goWines')}</a>`;
+  return h;
+}
+function renderPanel(){
+  if(!openWine && winesOpen){ panelC.innerHTML=winesPanel(); if(isSheet && panel.dataset.sheet==='peek') setSheet(panel,'half');
+    panel.querySelector('#wvback').onclick=()=>{ winesOpen=false; hoverWine=null; wineAccent(); propPaths.classed('hl',false); renderPanel(); };
+    panel.querySelectorAll('[data-yr]').forEach(b=>b.onclick=()=>{ const y=+b.dataset.yr; openYears.has(y)?openYears.delete(y):openYears.add(y); renderPanel(); });
+    bindWineBtns(); return; }
+  if(openWine){ const w=WINES.find(x=>x.id===openWine); panelC.innerHTML=wineCard(w); if(isSheet && panel.dataset.sheet==='peek') setSheet(panel,'half'); const ids=wineProps(w); highlightProps(ids);
+    panel.querySelector('#wback').onclick=()=>{ openWine=null; winesOpen=true; hoverWine=null; wineAccent(); propPaths.classed('hl',false); renderPanel(); };
+    panel.querySelectorAll('[data-wp]').forEach(r=>{ r.onmouseenter=()=>highlightProps([r.dataset.wp]); r.onmouseleave=()=>highlightProps(ids); });
+    return; }
+  const tot=V.properties.reduce((s,p)=>s+p.area_ha,0), vine=V.parcels.reduce((s,p)=>s+p.area_ha,0);
+  const by=yearTotals(V.records,true);
+  let h=`<div class="p-h"><div><h2>Vinha dos Padres</h2></div><a class="gmaps" href="https://maps.app.goo.gl/udE8fscNHYi5LfY57" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>${t('gmaps')}</a></div>
+  <div class="stats"><div class="stat"><div class="k">${t('props')}</div><div class="v">6</div></div>
+  <div class="stat"><div class="k">${t('totalArea')}</div><div class="v">${fmtN(tot,1)} ha</div></div>
+  <div class="stat"><div class="k">${t('vineArea')}</div><div class="v">${fmtN(vine,1)} ha</div></div>
+  <div class="stat"><div class="k">${t('parcels')}</div><div class="v">${V.parcels.length}</div></div></div>
+  <h3>${t('byYear')}</h3><div class="totals">${Object.keys(by).sort().map(y=>{ const rs=V.records.filter(r=>r.year==+y); const tb=rs.some(r=>r.kg_with==='TBC');
+      return `<div><div class="y">${y}</div><div class="v">${Math.round(by[y]).toLocaleString(loc())}</div><div class="u">kg</div></div>`; }).join('')}</div>
+  <h3>${t('props')}</h3><div class="plist">`;
+  V.properties.forEach(p=>{ h+=`<button data-prop="${p.id}">${propIcon(p)}<span>${p.name}</span><span class="meta">${fmtHa(p.area_ha)}</span></button>`; });
+  h+=`</div><button id="wopen" class="h3btn" aria-label="${t('wines')}"><span>${t('wines')}</span><span class="arr">›</span></button>`;
+  panelC.innerHTML=h;
+  panel.querySelector('#wopen').onclick=()=>{ winesOpen=true; renderPanel(); panelC.scrollTop=0; };
+
+  panel.querySelectorAll('[data-prop]').forEach(b=>{ b.onclick=ev=>{ const d=PROP[b.dataset.prop]; tapGate('pl:'+d.id,ev,e=>{ propPaths.classed('hl',x=>x.id===d.id).filter(x=>x.id===d.id).raise(); const r=b.getBoundingClientRect(); showTip({clientX:r.left+20,clientY:r.top-90},propTip(d)); },()=>{ hideTip(); propPaths.classed('hl',false); enter3D(d); }); };
+    b.onmouseenter=()=>{ propPaths.classed('hl',d=>d.id===b.dataset.prop).filter(d=>d.id===b.dataset.prop).raise(); };
+    b.onmouseleave=()=>propPaths.classed('hl',false); });
+}
+
+/* ---------------- 3D property view ---------------- */
+const axo=document.getElementById('axo'), canvas=document.getElementById('gl');
+const sideC=makeSheet(axo.querySelector('.side'));
+let renderer, scene, camera, controls, world=null, P3=null, ex=2, datum='section', loopOn=false, rise=1, riseStart=0, hovered=null;
+const dem=V.dem;
+function elevLL(lon,lat){
+  let c=(lon-dem.lon0)/dem.dx, r=(dem.lat0-lat)/dem.dx; c=clamp(c,0,dem.w-1.0001); r=clamp(r,0,dem.h-1.0001);
+  const c0=c|0, r0=r|0, fc=c-c0, fr=r-r0, z=dem.z, w=dem.w;
+  return z[r0*w+c0]*(1-fc)*(1-fr)+z[r0*w+c0+1]*fc*(1-fr)+z[(r0+1)*w+c0]*(1-fc)*fr+z[(r0+1)*w+c0+1]*fc*fr;
+}
+const rings = geom => geom.type==='Polygon' ? [geom.coordinates] : geom.coordinates;
+function disposeObj(o){ o.traverse(n=>{ if(n.geometry) n.geometry.dispose(); if(n.material){ const ms=Array.isArray(n.material)?n.material:[n.material];
+  ms.forEach(m=>{ if(m.map) m.map.dispose(); m.dispose(); }); } if(n.customDepthMaterial) n.customDepthMaterial.dispose(); }); }
+function pip(x,z,polys){ let inside=false; polys.forEach(pl=>pl.forEach(r=>{ for(let i=0,j=r.length-1;i<r.length;j=i++){
+  const xi=r[i][0], zi=r[i][1], xj=r[j][0], zj=r[j][1]; if(((zi>z)!==(zj>z)) && (x < (xj-xi)*(z-zi)/(zj-zi)+xi)) inside=!inside; } })); return inside; }
+
+function initGL(){
+  if(renderer) return;
+  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(isPhone?1.5:2,devicePixelRatio)); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.outputEncoding=THREE.sRGBEncoding; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+  camera=new THREE.PerspectiveCamera(32,1,0.5,20000);
+  controls=new THREE.OrbitControls(camera,canvas);
+  controls.mouseButtons={LEFT:THREE.MOUSE.PAN, MIDDLE:THREE.MOUSE.DOLLY, RIGHT:THREE.MOUSE.ROTATE};
+  controls.touches={ONE:THREE.TOUCH.ROTATE, TWO:THREE.TOUCH.DOLLY_PAN};
+  controls.zoomSpeed=2; controls.enableDamping=true; controls.dampingFactor=0.08; controls.screenSpacePanning=true; controls.maxPolarAngle=Math.PI*0.47;
+  canvas.addEventListener('contextmenu',e=>e.preventDefault());
+  let down=null;
+  canvas.addEventListener('pointerdown',e=>{ down={x:e.clientX,y:e.clientY,b:e.button}; });
+  canvas.addEventListener('pointerup',e=>{ if(!down||!P3) return; const moved=Math.hypot(e.clientX-down.x,e.clientY-down.y);
+    if(down.b===0 && moved<(isTouch?10:5)){ if(P3.sel){ armed=null; select(null); } else { const o=pick(e); if(o) tapGate('3d:'+o.id,e,ev=>setHover(o,ev),()=>{ setHover(null); select(o.id); }); else { armed=null; setHover(null); } } } down=null; });
+  canvas.addEventListener('pointermove',e=>{ if(!P3 || e.buttons || e.pointerType==='touch') return; const o=pick(e); setHover(o, e); });
+  canvas.addEventListener('pointerleave',()=>setHover(null));
+}
+const ray=new THREE.Raycaster(), ndc=new THREE.Vector2();
+function pick(ev){
+  const r=canvas.getBoundingClientRect(); ndc.set(((ev.clientX-r.left)/r.width)*2-1, -((ev.clientY-r.top)/r.height)*2+1); ray.setFromCamera(ndc,camera);
+  const objs=Object.values(P3.objs), hits=ray.intersectObjects(objs.flatMap(o=>[o.top,o.walls]),false);
+  for(const h of hits){ const o=h.object.userData.owner;
+    if(P3.sel && o.id!==P3.sel && h.object===o.walls) continue;
+    if(h.object===o.top){ const lp=o.group.worldToLocal(h.point.clone()); if(!pip(lp.x,lp.z,o.rings)) continue; }
+    return o; }
+  return null;
+}
+function setHover(o, ev){
+  if(hovered && hovered!==o) hovered.topMat.emissive.setHex(0x000000);
+  hovered=o; canvas.style.cursor = o ? 'pointer' : '';
+  if(o){ o.topMat.emissive.setHex(0x2a2410); showTip(ev, parcelTip(PARCEL[o.id], P3.sel ? 'ctaBack' : 'ctaIso')); } else hideTip();
+}
+function soilTexture(){
+  const c=document.createElement('canvas'); c.width=c.height=256; const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,256); g.addColorStop(0,'#6B5236'); g.addColorStop(1,'#3E2C1E'); x.fillStyle=g; x.fillRect(0,0,256,256);
+  for(let i=0;i<5000;i++){ x.fillStyle=`rgba(${Math.random()<.5?'255,235,200':'20,12,6'},${Math.random()*0.12})`; x.fillRect(Math.random()*256,Math.random()*256,1+Math.random()*2.5,1+Math.random()*2); }
+  const t=new THREE.CanvasTexture(c); t.wrapS=THREE.RepeatWrapping; t.wrapT=THREE.ClampToEdgeWrapping; t.encoding=THREE.sRGBEncoding; return t;
+}
+/* one extruded solid: textured terrain top, soil walls to the base (y=0), outline */
+function solid(PLs, o){
+  const pts=PLs.flatMap(pl=>pl[0]);
+  const minx=Math.min(...pts.map(q=>q[0])), maxx=Math.max(...pts.map(q=>q[0])), minz=Math.min(...pts.map(q=>q[1])), maxz=Math.max(...pts.map(q=>q[1]));
+  const w=Math.max(1,maxx-minx), h=Math.max(1,maxz-minz), shell=o.kind==='shell';
+  const ppm=Math.min(shell?5:10, (isPhone?1024:2048)/Math.max(w,h)), CW=Math.max(64,Math.round(w*ppm)), CH=Math.max(64,Math.round(h*ppm));
+  const cv=document.createElement('canvas'); cv.width=CW; cv.height=CH; const cx=cv.getContext('2d');
+  const px=x=>(x-minx)/w*CW, pz=z=>(z-minz)/h*CH, sc=CW/w;
+  const trace=(list)=>{ list.forEach(pl=>pl.forEach(r=>{ r.forEach((q,i)=>i?cx.lineTo(px(q[0]),pz(q[1])):cx.moveTo(px(q[0]),pz(q[1]))); cx.closePath(); })); };
+  cx.beginPath(); trace(PLs); cx.save(); cx.clip('evenodd');
+  if(shell){
+    cx.fillStyle='#7A7550'; cx.fillRect(0,0,CW,CH);
+    for(let i=0;i<CW*CH/40;i++){ cx.fillStyle=`rgba(${Math.random()<.5?'235,225,180':'40,44,22'},${Math.random()*0.16})`; cx.fillRect(Math.random()*CW,Math.random()*CH,2,2); }
+    cx.restore(); cx.globalCompositeOperation='destination-out'; cx.beginPath(); o.holes.forEach(hp=>trace(hp)); cx.fill('evenodd'); cx.globalCompositeOperation='source-over';
+  } else {
+    const young=o.type.startsWith('young');
+    const bg=cx.createLinearGradient(0,0,CW,CH); bg.addColorStop(0, young||o.bush?'#9C8558':'#86703F'); bg.addColorStop(1, young||o.bush?'#8D774D':'#73603A');
+    cx.fillStyle=bg; cx.fillRect(0,0,CW,CH);
+    for(let i=0;i<CW*CH/120;i++){ cx.fillStyle=`rgba(${Math.random()<.5?'255,240,210':'40,28,12'},${Math.random()*0.10})`; cx.fillRect(Math.random()*CW,Math.random()*CH,1.5,1.5); }
+    const mxp=pts.reduce((s,q)=>s+q[0],0)/pts.length, mzp=pts.reduce((s,q)=>s+q[1],0)/pts.length;
+    let sxx=0,szz=0,sxz=0; pts.forEach(q=>{ const a=q[0]-mxp,b=q[1]-mzp; sxx+=a*a; szz+=b*b; sxz+=a*b; });
+    cx.translate(CW/2,CH/2); cx.rotate(o.rowAngle!=null ? o.rowAngle : 0.5*Math.atan2(2*sxz, sxx-szz));
+    const sp=2.6*sc, diag=Math.hypot(CW,CH);
+    if(o.bush){ const bs=2.4*sc; cx.fillStyle='rgba(190,165,110,.35)'; cx.fillRect(-diag,-diag,2*diag,2*diag);
+      for(let yy=-diag; yy<diag; yy+=bs) for(let xx=-diag; xx<diag; xx+=bs){ if(Math.random()<0.07) continue;
+        const jx=(Math.random()-.5)*0.55*bs, jy=(Math.random()-.5)*0.55*bs, r=Math.max(1.6,(0.55+Math.random()*0.25)*sc);
+        cx.fillStyle=`rgba(${34+Math.random()*18},${62+Math.random()*22},${24+Math.random()*10},.95)`;
+        cx.beginPath(); cx.arc(xx+jx,yy+jy,r,0,7); cx.fill(); cx.beginPath(); cx.arc(xx+jx+r*.45,yy+jy-r*.3,r*.65,0,7); cx.fill(); }
+    } else
+    for(let yy=-diag; yy<diag; yy+=sp){
+      if(young){ cx.fillStyle=`rgba(${48+Math.random()*4},${80+Math.random()*4},${32+Math.random()*2},1)`; for(let xx=-diag; xx<diag; xx+=1.2*sc) cx.fillRect(xx, yy-0.18*sc, Math.max(1,0.36*sc), Math.max(1,0.36*sc)); }
+      else { cx.strokeStyle=`rgba(${34+Math.random()*6},${62+Math.random()*8},${24+Math.random()*4},.95)`; cx.lineWidth=Math.max(1,0.95*sc); cx.beginPath(); cx.moveTo(-diag,yy); cx.lineTo(diag,yy); cx.stroke(); }
+    }
+    cx.restore();
+  }
+  const tex=new THREE.CanvasTexture(cv); tex.encoding=THREE.sRGBEncoding; tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+  const lift=o.lift||0, Y=o.Y, elev=o.elev;
+  const segX=Math.min(shell?140:120,Math.max(12,Math.ceil(w/(shell?2.5:1.5)))), segZ=Math.min(shell?140:120,Math.max(12,Math.ceil(h/(shell?2.5:1.5))));
+  const tg=new THREE.PlaneGeometry(w,h,segX,segZ); tg.rotateX(-Math.PI/2); tg.translate(minx+w/2,0,minz+h/2);
+  const pos=tg.attributes.position; for(let i=0;i<pos.count;i++) pos.setY(i, Y(elev(pos.getX(i),pos.getZ(i)))+lift);
+  tg.computeVertexNormals();
+  const topMat=new THREE.MeshStandardMaterial({map:tex,alphaTest:0.5,roughness:0.95,metalness:0,side:THREE.DoubleSide,transparent:shell,opacity:shell?0.5:1,depthWrite:!shell});
+  const top=new THREE.Mesh(tg,topMat);
+  if(!shell){ top.customDepthMaterial=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking,map:tex,alphaTest:0.5}); top.castShadow=true; top.receiveShadow=true; }
+  const g=new THREE.Group(); g.add(top);
+  const k=o.scaleOut||1, ccx=(minx+maxx)/2, ccz=(minz+maxz)/2, S=q=>[ccx+(q[0]-ccx)*k, ccz+(q[1]-ccz)*k];
+  const ytop=Y(o.zmax)+lift+0.5, wallPos=[], wallUv=[], lineMat=new THREE.LineBasicMaterial({color:0x231F20,transparent:true,opacity:shell?0.95:0.75});
+  PLs.forEach(pl=>{
+    pl.forEach(r0=>{ const r=r0.map(S);
+      const dense=[]; for(let i=0;i<r.length-1;i++){ const a=r[i],b=r[i+1],n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/0.8)); for(let j=0;j<n;j++) dense.push([a[0]+(b[0]-a[0])*j/n, a[1]+(b[1]-a[1])*j/n]); }
+      dense.push(dense[0]); let s=0; const lp=[];
+      for(let i=0;i<dense.length-1;i++){
+        const a=dense[i], b=dense[i+1], ya=Y(elev(a[0],a[1]))+lift, yb=Y(elev(b[0],b[1]))+lift, ds=Math.hypot(b[0]-a[0],b[1]-a[1]);
+        wallPos.push(a[0],ya,a[1], a[0],0,a[1], b[0],yb,b[1],  b[0],yb,b[1], a[0],0,a[1], b[0],0,b[1]);
+        wallUv.push(s/14,ya/ytop, s/14,0, (s+ds)/14,yb/ytop,  (s+ds)/14,yb/ytop, s/14,0, (s+ds)/14,0); s+=ds;
+        lp.push(new THREE.Vector3(a[0],ya+0.06,a[1]));
+      }
+      lp.push(lp[0].clone()); g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(lp), lineMat));
+    });
+    if(!shell){ const sh=new THREE.Shape(pl[0].map(q=>new THREE.Vector2(q[0],q[1]))); pl.slice(1).forEach(hl=>sh.holes.push(new THREE.Path(hl.map(q=>new THREE.Vector2(q[0],q[1])))));
+      const bg2=new THREE.ShapeGeometry(sh); bg2.rotateX(Math.PI/2); g.add(new THREE.Mesh(bg2,new THREE.MeshStandardMaterial({color:0x2c2017,side:THREE.DoubleSide}))); }
+  });
+  const wg=new THREE.BufferGeometry(); wg.setAttribute('position',new THREE.Float32BufferAttribute(wallPos,3)); wg.setAttribute('uv',new THREE.Float32BufferAttribute(wallUv,2)); wg.computeVertexNormals();
+  const wallMat=new THREE.MeshStandardMaterial({map:soilTexture(),roughness:1,side:THREE.DoubleSide,transparent:shell,opacity:shell?0.5:1,depthWrite:!shell, color: shell?0xd8ccb4:0xffffff});
+  const walls=new THREE.Mesh(wg,wallMat); if(!shell){ walls.castShadow=true; walls.receiveShadow=true; } g.add(walls);
+  if(shell){ top.renderOrder=2; walls.renderOrder=3; }
+  return {group:g, top, walls, topMat, wallMat, lineMat, center:[ccx,ccz], mats:[topMat,wallMat]};
+}
+function buildWorld(prop){
+  if(world){ scene.remove(world); disposeObj(world); }
+  const polys=rings(prop.geom), all=polys.flatMap(pl=>pl[0]);
+  const lons=all.map(c=>c[0]), lats=all.map(c=>c[1]);
+  const lonc=(Math.min(...lons)+Math.max(...lons))/2, latc=(Math.min(...lats)+Math.max(...lats))/2;
+  const mx=111320*Math.cos(latc*Math.PI/180), my=110574, toL=c=>[(c[0]-lonc)*mx, -(c[1]-latc)*my];
+  const elev=(x,z)=>elevLL(lonc+x/mx, latc - z/my);
+  const PL=polys.map(pl=>pl.map(r=>r.map(toL))), pts=PL.flatMap(pl=>pl[0]);
+  const w=Math.max(...pts.map(q=>q[0]))-Math.min(...pts.map(q=>q[0])), h=Math.max(...pts.map(q=>q[1]))-Math.min(...pts.map(q=>q[1])), maxDim=Math.max(w,h);
+  const parcels=V.parcels.filter(q=>q.prop===prop.id);
+  const zmin=Math.min(prop.terrain.zmin, ...parcels.map(q=>q.terrain.zmin)), zmax=Math.max(prop.terrain.zmax, ...parcels.map(q=>q.terrain.zmax));
+  const T_=Math.max(5,0.09*maxDim), off=datum==='sea'?zmin:T_, Y=e=>(e-zmin)*ex+off;
+  const grp=new THREE.Group(), objs={};
+  const PLs=parcels.map(q=>rings(q.geom).map(pl=>pl.map(r=>r.map(toL))));
+  const shell=solid(PL,{kind:'shell',Y,elev,zmax,holes:PLs,scaleOut:1+0.6/maxDim}); grp.add(shell.group);
+  parcels.forEach((q,i)=>{ const s=solid(PLs[i],{kind:'parcel',type:q.type,Y,elev,zmax,lift:0.15,bush:q.type==='blend',rowAngle:q.row_angle}); s.id=q.id; s.rings=PLs[i];
+    s.top.userData.owner=s; s.walls.userData.owner=s; s.targetS=1; objs[q.id]=s; grp.add(s.group); });
+  world=grp; scene.add(grp);
+  const sel = P3 && P3.prop.id===prop.id ? P3.sel : null;
+  const bbox={minx:Math.min(...pts.map(q=>q[0])),maxx:Math.max(...pts.map(q=>q[0])),minz:Math.min(...pts.map(q=>q[1])),maxz:Math.max(...pts.map(q=>q[1]))};
+  P3={prop, parcels, objs, maxDim, T_, Y, sel, shell, zmax, bbox};
+  return P3;
+}
+function buildScene(prop){
+  scene=new THREE.Scene(); P3=null;
+  const info=buildWorld(prop), md=info.maxDim, gsp=md>160?20:10;
+  scene.add(new THREE.HemisphereLight(0xe6eef2,0x2a2118,0.75));
+  const sun=new THREE.DirectionalLight(0xfff0d8,1.25); sun.position.set(-md*0.9, md*1.4, md*0.75); sun.castShadow=true;
+  const sc=sun.shadow.camera, e=md*1.3; sc.left=-e; sc.right=e; sc.top=e; sc.bottom=-e; sc.near=1; sc.far=md*8+800;
+  sun.shadow.mapSize.set(isPhone?1024:2048,isPhone?1024:2048); sun.shadow.bias=-0.0004; sun.shadow.normalBias=0.03; scene.add(sun); scene.add(sun.target);
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(md*12,md*12),new THREE.ShadowMaterial({opacity:0.5,color:0x000000}));
+  ground.rotation.x=-Math.PI/2; ground.position.y=-0.02; ground.receiveShadow=true; scene.add(ground);
+  { const b=P3.bbox, ext=10*gsp, gx0=Math.floor((b.minx-ext)/gsp)*gsp, gx1=Math.ceil((b.maxx+ext)/gsp)*gsp, gz0=Math.floor((b.minz-ext)/gsp)*gsp, gz1=Math.ceil((b.maxz+ext)/gsp)*gsp, v=[];
+    for(let x=gx0;x<=gx1;x+=gsp) v.push(x,0,gz0, x,0,gz1);
+    for(let z=gz0;z<=gz1;z+=gsp) v.push(gx0,0,z, gx1,0,z);
+    const gg=new THREE.BufferGeometry(); gg.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
+    const gm=new THREE.ShaderMaterial({transparent:true,depthWrite:false,
+      uniforms:{uC:{value:new THREE.Vector2((b.minx+b.maxx)/2,(b.minz+b.maxz)/2)},uH:{value:new THREE.Vector2((b.maxx-b.minx)/2,(b.maxz-b.minz)/2)},uG:{value:gsp},uCol:{value:new THREE.Color(0x6E6556)}},
+      vertexShader:'varying vec2 vP; void main(){ vP=position.xz; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+      fragmentShader:'uniform vec2 uC; uniform vec2 uH; uniform float uG; uniform vec3 uCol; varying vec2 vP; void main(){ vec2 q=max(abs(vP-uC)-uH,0.0); float d=length(q); float a=0.6*(1.0-smoothstep(2.0*uG,7.0*uG,d)); if(a<0.004) discard; gl_FragColor=vec4(uCol,a); }'});
+    const grid=new THREE.LineSegments(gg,gm); grid.position.y=0.01; scene.add(grid); }
+  // scale measurement on the grid square under the property's south-east bounding corner
+  const bb=P3.bbox, x0=Math.floor(bb.maxx/gsp)*gsp, z1=Math.floor(bb.maxz/gsp)*gsp+gsp, off=gsp*0.28, tk=gsp*0.12, yy=0.08;
+  const dm=new THREE.LineBasicMaterial({color:0xA84E3D});
+  const seg=(a,b)=>scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a),new THREE.Vector3(...b)]),dm));
+  seg([x0,yy,z1+off],[x0+gsp,yy,z1+off]); seg([x0,yy,z1+off-tk],[x0,yy,z1+off+tk]); seg([x0+gsp,yy,z1+off-tk],[x0+gsp,yy,z1+off+tk]);
+  seg([x0,yy,z1],[x0,yy,z1+off+tk]); seg([x0+gsp,yy,z1],[x0+gsp,yy,z1+off+tk]);
+  const cv=document.createElement('canvas'); cv.width=256; cv.height=96; const g2=cv.getContext('2d');
+  g2.font='italic 700 58px "Arno Pro", Georgia, serif'; g2.fillStyle='#A84E3D'; g2.textAlign='center'; g2.textBaseline='middle'; g2.fillText(gsp+' m',128,50);
+  const tx=new THREE.CanvasTexture(cv); tx.encoding=THREE.sRGBEncoding;
+  const lab=new THREE.Mesh(new THREE.PlaneGeometry(gsp*2.0,gsp*0.75),new THREE.MeshBasicMaterial({map:tx,transparent:true,depthWrite:false}));
+  lab.rotation.x=-Math.PI/2; lab.position.set(x0+gsp/2,yy,z1+off+gsp*0.55); scene.add(lab);
+}
+function applySel(instant){
+  const sel=P3.sel;
+  Object.values(P3.objs).forEach(o=>{ const on=!sel || o.id===sel;
+    o.mats.forEach(m=>{ m.transparent=!on; m.opacity=on?1:0.22; m.depthWrite=on; m.needsUpdate=true; });
+    o.top.castShadow=on; o.walls.castShadow=on;
+    o.lineMat.color.setHex(o.id===sel?0x275FAC:0x231F20); o.lineMat.opacity = on?0.85:0.35;
+    o.targetS = o.id===sel ? 1 + P3.T_*0.5625/P3.Y(P3.zmax) : 1; if(instant) o.group.scale.y=o.targetS; });
+}
+function frame(){
+  const box=new THREE.Box3(); world.updateMatrixWorld(true); [P3.shell.walls, ...Object.values(P3.objs).map(o=>o.walls)].forEach(m=>box.expandByObject(m)); const sph=box.getBoundingSphere(new THREE.Sphere());
+  const vf=camera.fov*Math.PI/360, hf=Math.atan(Math.tan(vf)*camera.aspect); const dist=sph.radius/Math.sin(Math.min(vf,hf))*(isSheet?1.08:1.02), az=-0.42, pol=0.92;
+  controls.target.copy(sph.center);
+  camera.position.set(sph.center.x+dist*Math.sin(pol)*Math.sin(az), sph.center.y+dist*Math.cos(pol), sph.center.z+dist*Math.sin(pol)*Math.cos(az));
+  controls.minDistance=sph.radius*0.25; controls.maxDistance=dist*1.12; camera.far=dist*10; camera.updateProjectionMatrix(); controls.update();
+}
+function viewOff(){ if(!camera) return; const side=axo.querySelector('.side'); const open=side && !side.classList.contains('min');
+  const o=(open && W>1100)? Math.min(300,(side.offsetWidth+70)/2):0; const oy=(open && isSheet)? Math.round(Math.min(sheetH(side),H*0.6)/2 - (isPhone?50:30)) : 0;
+  camera.setViewOffset(W,H,o,oy,W,H); camera.updateProjectionMatrix(); }
+function resizeGL(){ if(!renderer) return; renderer.setSize(W,H,false); camera.aspect=W/H; viewOff(); }
+let tgtTween=null;
+function loop(now){
+  if(!loopOn) return; requestAnimationFrame(loop);
+  if(rise<1){ rise=clamp((now-riseStart)/1100); world.scale.y=Math.max(0.002,1-Math.pow(1-rise,3)); }
+  if(P3) Object.values(P3.objs).forEach(o=>{ o.group.scale.y += ((o.targetS||1)-o.group.scale.y)*0.12; });
+  if(tgtTween){ const k=clamp((now-tgtTween.t0)/700), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+    const nt=tgtTween.from.clone().lerp(tgtTween.to,e), d=nt.clone().sub(controls.target); controls.target.add(d); camera.position.add(d); if(k>=1) tgtTween=null; }
+  controls.update(); renderer.render(scene,camera);
+  document.getElementById('needle').setAttribute('transform',`rotate(${controls.getAzimuthalAngle()*180/Math.PI})`);
+}
+function select(id){
+  P3.sel=id; applySel(); axoUI(); hideTip();
+  let to;
+  if(id){ const o=P3.objs[id], c=o.center, q=PARCEL[id]; to=new THREE.Vector3(c[0], P3.Y((q.terrain.zmin+q.terrain.zmax)/2)*o.targetS, c[1]); }
+  else { const bx=new THREE.Box3(); [P3.shell.walls].forEach(m=>bx.expandByObject(m)); to=bx.getBoundingSphere(new THREE.Sphere()).center; }
+  tgtTween={from:controls.target.clone(), to, t0:performance.now()};
+  crumbs();
+}
+const swatch = ty => ty.startsWith('young') ? `background:repeating-linear-gradient(45deg,${ty==='young-red'?'#C5566B':'#E4D79C'} 0 2px,transparent 2px 5px)` : `background:var(--${ty})`;
+function statsHTML(item, isProp){
+  const tr=item.terrain;
+  const areaSub = isProp ? `${fmtHa(item.vine_ha)} ${t('ofVines')}` : (()=>{ const n=rings(item.geom).length; return `${n} ${n>1?t('plots'):t('plot')}`; })();
+  return `<div><div class="k">${t('area')}</div><div class="v">${fmtHa(item.area_ha)}</div><div class="s">${areaSub}</div></div>
+    <div><div class="k">${t('elev')}</div><div class="v">${Math.round(tr.zmin)}–${Math.round(tr.zmax)} m</div><div class="s">${Math.round(tr.zmax-tr.zmin)} ${t('drop')}</div></div>
+    <div><div class="k">${t('slope')}</div><div class="v">${fmtN(tr.slope,1)}°</div><div class="s">${slopeNote(tr.slope)}</div></div>
+    <div><div class="k">${t('facing')}</div><div class="v">${compass16(tr.aspect)}</div><div class="s">${sunNote(tr.aspect)}</div></div>
+`;
+}
+function axoChrome(){
+  axo.querySelector('.help').textContent=t('help');
+  axo.querySelector('.grid-note').textContent=t('grid',{g:P3.maxDim>160?20:10,e:ex});
+  document.getElementById('relief').innerHTML=[1,2].map(v=>`<button class="cbtn" aria-pressed="${v===ex}" data-ex="${v}">×${v}</button>`).join('');
+  document.getElementById('relief-tip').textContent=t('relief');
+  document.getElementById('table-tip').textContent=t('tableBtn');
+  document.getElementById('datum').innerHTML=`<button class="cbtn" aria-pressed="${datum==='section'}" data-d="section">${t('section')}</button><button class="cbtn" aria-pressed="${datum==='sea'}" data-d="sea">${t('sea')}</button>`;
+  document.getElementById('datum-tip').textContent = datum==='sea' ? t('datumTipSea') : t('datumTipS',{d:Math.round(P3.T_)});
+  document.querySelectorAll('#relief [data-ex]').forEach(b=>b.onclick=()=>{ ex=+b.dataset.ex; rebuild(); });
+  document.querySelectorAll('#datum [data-d]').forEach(b=>b.onclick=()=>{ datum=b.dataset.d; rebuild(); });
+}
+function propWinesHTML(pr,ws){
+  const yrs=[...new Set(ws.map(w=>w.vin))].sort((a,b)=>b-a);
+  let h=`<button class="link" id="pwback">‹ ${pr.name}</button><div class="p-h" style="margin-top:6px"><div><h2>${t('wines')}</h2></div></div><div class="wyears">`;
+  yrs.forEach(y=>{ const yw=ws.filter(w=>w.vin===y);
+    const op=pwOpen.has(y);
+    h+=`<div class="wyr${op?' op':''}"><button class="wyh" data-pwy="${y}" aria-expanded="${op}"><span>${y}</span><span class="meta">${yw.length} ${t('wines').toLowerCase()}</span><span class="arr">›</span></button>`+(!op?'':`<div class="wines">`+yw.map(w=>`<button class="wbtl" data-pw="${w.id}"><img src="${WIMG[w.img]}" alt=""><span class="wfn">Quinta da Vinha dos Padres</span><span class="wy">${w.vin} ${t(w.col.toLowerCase())} <span style="color:${w.motif}">${w.code}</span></span></button>`).join('')+`</div>`)+`</div>`; });
+  return h+`</div><div class="foot fn">${t('vintNote')}</div><a class="gowines" href="wines.html">${t('goWines')}</a>`;
+}
+function bindPropWines(root,pr){
+  root.querySelector('#pwback').onclick=()=>{ propWines=false; hideTip(); axoUI(); };
+  root.querySelectorAll('[data-pwy]').forEach(b=>b.onclick=()=>{ const y=+b.dataset.pwy; pwOpen.has(y)?pwOpen.delete(y):pwOpen.add(y); hideTip(); axoUI(); });
+  root.querySelectorAll('[data-pw]').forEach(b=>{ const w=WINES.find(x=>x.id===b.dataset.pw);
+    const tip=`<h4>${t('wineName')}</h4><div class="sub">${wineCap(w)} · ${w.bottles.toLocaleString(loc())} ${t('bottles')}</div>${soldTag(w)}<div class="cta">${t('wineTip3d')}</div>`;
+    b.onmouseenter=()=>wineHover3D(w,true);
+    b.onmousemove=ev=>showTip(ev,tip);
+    b.onmouseleave=()=>{ hideTip(); wineHover3D(w,false); };
+    b.onclick=ev=>tapGate('pw:'+w.id,ev,e=>{ wineHover3D(w,true); const r=b.getBoundingClientRect(); showTip({clientX:r.left,clientY:r.bottom+8},tip); },()=>{ hideTip(); wineHover3D(w,false); propWines=false; openWine=w.id; wineAccent(); exitAxo('vdp'); }); });
+}
+function axoUI(){
+  if(!P3) return;
+  const pr=P3.prop, sel=P3.sel?PARCEL[P3.sel]:null;
+  axo.querySelector('.back span').textContent=t('back');
+  axo.querySelector('.pill h2').textContent=pr.name;
+  axo.querySelector('.pill .sub').innerHTML = sel
+    ? `<i style="${swatch(sel.type)}"></i>${sel.name}${sel.variety===sel.name?'':', '+(sel.variety==='Field blend'?t('blend').toLowerCase():sel.variety)}`
+    : '';
+  axo.querySelector('.statbar').innerHTML = statsHTML(sel||pr, !sel);
+  let arHTML='';
+  if(sel){ const rr=recsFor(sel.id); if(rr.length) arHTML=ageReg(rr); else if(YOUNG_EST[sel.id]) arHTML=ageReg([{age:YOUNG_EST[sel.id],registered:null}]); }
+  else { const sig=P3.parcels.map(q=>{ const r=recsFor(q.id)[0]; return r&&(r.age!=null||r.registered!=null) ? JSON.stringify([r.age,r.registered]) : null; });
+    if(sig.every(x=>x && x===sig[0])) arHTML=ageReg(recsFor(P3.parcels[0].id)); }
+  const pw=WINES.filter(w=>wineProps(w).includes(pr.id) && (sel || tmRange==='all' || harvestView!=='chart' || w.vin===+tmRange));
+  const allPW=WINES.filter(w=>wineProps(w).includes(pr.id));
+  if(propWines && allPW.length){ sideC.innerHTML=(isSheet?`<div class="statm">${statsHTML(pr,true)}</div>`:'')+propWinesHTML(pr,allPW); bindPropWines(sideC,pr); return axoChrome(); }
+  let h=arHTML+`<div class="hrow"><h3>${t('parcels')}</h3>${allPW.length?`<button class="link seew" id="seew">${t('seeWines')}</button>`:(!sel && harvestView==='chart' && tmRange!=='all' && +tmRange>=2024 ? `<div class="wsoon">${t('winesSoon')}</div>`:'')}</div><div class="chips">`;
+  P3.parcels.forEach(q=>{ h+=`<button data-p="${q.id}" aria-pressed="${q.id===P3.sel}"><span class="dotc" style="${swatch(q.type)}"></span>${q.name}</button>`; });
+  h+=`</div>`;
+  if(sel){
+    h+=`<div class="selhead"><h3>${sel.name}</h3><button class="link" id="showall">${t('showAll')}</button></div>`;
+    const recs=recsFor(sel.id);
+    h+= recs.length ? propTable(recs) : `<div class="foot">${sel.type.startsWith('young')?t('firstHarvest'):t('noHarvest')}</div>`;
+    if(recs.some(r=>r.parcels.length>1)) h+=`<div class="foot">${t('shared')}: ${[...new Set(recs.flatMap(r=>r.parcels))].map(i=>PARCEL[i].name).join(' + ')}</div>`;
+  } else {
+    const recs=V.records.filter(r=>r.prop===pr.id);
+    const ch=recs.length?timingChart(recs):''; if(!ch) harvestView='table';
+    h+=`<div class="hvhead"><h3>${harvestView==='chart'&&ch?t('tmTitle'):t('harvests')}</h3>${ch?`<div class="seg sm" role="group"><button data-hv="table" aria-pressed="${harvestView==='table'}">${t('hvTable')}</button><button data-hv="chart" aria-pressed="${harvestView==='chart'}">${t('hvChart')}</button></div>`:''}</div>`
+      + (harvestView==='chart' && ch ? ch : (recs.length?propTable(recs):`<div class="foot">${t('noHarvest')}</div>`));
+  }
+  const side=sideC; side.innerHTML=(isSheet?`<div class="statm">${statsHTML(sel||pr, !sel)}</div>`:'')+h; wirePropTable(side);
+  const nd=side.querySelector('details.ndet'); if(nd) nd.ontoggle=()=>{ notesOpen=nd.open; if(nd.open && openYear!==null){ openYear=null; axoUI(); } };
+  side.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>select(b.dataset.p===P3.sel?null:b.dataset.p));
+  side.querySelectorAll('[data-w3]').forEach(b=>{ const w=WINES.find(x=>x.id===b.dataset.w3);
+    b.onmouseenter=()=>wineHover3D(w,true);
+    b.onmousemove=ev=>showTip(ev,`<h4>${t('wineName')}</h4><div class="sub">${wineCap(w)} · ${w.bottles.toLocaleString(loc())} ${t('bottles')}</div>${soldTag(w)}<div class="cta">${t('wineTip3d')}</div>`);
+    b.onmouseleave=()=>{ hideTip(); wineHover3D(w,false); };
+    b.onclick=ev=>tapGate('w3:'+w.id,ev,e=>{ wineHover3D(w,true); const r=b.getBoundingClientRect(); showTip({clientX:r.left-200,clientY:r.bottom+8},`<h4>${t('wineName')}</h4><div class="sub">${wineCap(w)} · ${w.bottles.toLocaleString(loc())} ${t('bottles')}</div>${soldTag(w)}<div class="cta">${t('wineTip3d')}</div>`); },()=>{ hideTip(); wineHover3D(w,false); openWine=w.id; wineAccent(); exitAxo('vdp'); }); });
+  const sa=side.querySelector('#showall'); if(sa) sa.onclick=()=>select(null);
+  const sw=side.querySelector('#seew'); if(sw) sw.onclick=()=>{ propWines=true; pwOpen=new Set([Math.max(...allPW.map(w=>w.vin))]); hideTip(); axoUI(); side.scrollTop=0; };
+  axoChrome();
+}
+function wineHover3D(w,on){
+  hoverWine=on?w.id:null; wineAccent();
+  const ids=new Set(wineSrc(w).filter(r=>r.prop===P3.prop.id).flatMap(r=>r.parcels));
+  Object.values(P3.objs).forEach(o=>{ if(on && ids.has(o.id)){ o.lineMat.color.setHex(w.col==='White'?0x275FAC:0xC76653); o.lineMat.opacity=1; o.topMat.emissive.setHex(0x2a1208); } });
+  if(!on) applySel(false), Object.values(P3.objs).forEach(o=>o.topMat.emissive.setHex(0x000000));
+  axo.querySelectorAll('svg.tchart g.mk').forEach(m=>m.classList.toggle('on', on && +m.dataset.y===w.vin && m.dataset.t===w.col && m.dataset.c==='1'));
+}
+function rebuild(){ buildWorld(P3.prop); world.scale.y=1; applySel(true); frame(); axoUI(); }
+async function enter3D(prop, selId){
+  if(inAxo) return;
+  initGL(); hideTip(); armed=null; selectedProp=prop.id; openYear=null; propWines=false; notesOpen=false; harvestView='chart'; showLoader(true);
+  { const ys=V.records.filter(r=>r.prop===prop.id).map(r=>r.year); tmRange = (isSheet && ys.length) ? String(Math.max(...ys)) : 'all'; }
+  setSheet(axo.querySelector('.side'),'peek');
+  await fly(fitK(prop.geom,isSheet?{l:30,r:30,t:120,b:SHEET_PEEK_3D+30}:{l:220,r:220,t:200,b:200}), 1100);
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  inAxo=true; panel.classList.remove('on');
+  buildScene(prop); P3.sel=selId||null; applySel(true); axoUI(); resizeGL(); frame();
+  if(selId){ const c=P3.objs[selId].center; }
+  rise=0; riseStart=performance.now(); world.scale.y=0.002;
+  axo.classList.add('on'); document.body.classList.add('axo-on'); axo.setAttribute('aria-hidden','false'); loopOn=true; requestAnimationFrame(loop); crumbs();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>showLoader(false)));
+  axo.querySelector('.back').focus({preventScroll:true});
+}
+const loader=document.getElementById('loader');
+loader.querySelector('.lg').innerHTML=D.logo;
+function showLoader(on){ loader.querySelector('.msg').textContent=t('loading'); loader.classList.toggle('on',on); }
+function exitAxo(to='vdp'){
+  if(!inAxo) return;
+  inAxo=false; axo.classList.remove('on'); document.body.classList.remove('axo-on'); axo.setAttribute('aria-hidden','true'); hideTip();
+  setTimeout(()=>{ loopOn=false; },650);
+  const target = ['pt','al','pg','vdp'].includes(to) ? to : 'vdp';
+  selectedProp=null; goto[target](); level='__'; render(); crumbs(); panelState();
+}
+document.getElementById('back').onclick=()=>exitAxo('vdp');
+document.getElementById('compass').onclick=()=>{
+  const off=camera.position.clone().sub(controls.target), r=Math.hypot(off.x,off.z), a0=Math.atan2(off.x,off.z), st=performance.now();
+  (function step(now){ const k=clamp((now-st)/600), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, a=a0*(1-e);
+    camera.position.set(controls.target.x+r*Math.sin(a), camera.position.y, controls.target.z+r*Math.cos(a)); if(k<1) requestAnimationFrame(step); })(st);
+};
+document.getElementById('toggle-side').onclick=e=>{ const s=axo.querySelector('.side'); const on=s.classList.toggle('min'); e.currentTarget.setAttribute('aria-pressed',String(!on)); viewOff(); };
+addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(inAxo){ if(P3&&P3.sel) select(null); else exitAxo('vdp'); } } });
+
+/* language */
+document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{ lang=b.dataset.lang; document.documentElement.lang=lang;
+  document.querySelectorAll('[data-lang]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  setTexts(); crumbs(); legend(); if(level==='vdp') renderPanel(); if(inAxo) axoUI(); });
+
+/* resize */
+addEventListener('resize',()=>{
+  const c = proj.invert([W/2,H/2]); const wasSheet=isSheet; fitBase(); computeLevels(); if(wasSheet!==isSheet){ legend(); if(level==='vdp') renderPanel(); if(inAxo) axoUI(); }
+  setSheet(panel,panel.dataset.sheet||'peek'); setSheet(axo.querySelector('.side'),axo.querySelector('.side').dataset.sheet||'peek'); computeK0(); zoom.scaleExtent([K0,4000]); bindExtent();
+  const bp=base(c); const k=Math.max(K0,cur.k); cur=d3.zoomIdentity.translate(W/2-k*bp[0], H/2-k*bp[1]).scale(k);
+  svg.call(zoom.transform,cur); resizeGL();
+});
+
+/* start */
+{ const v=ptView(); cur=d3.zoomIdentity.translate(v.x,v.y).scale(v.k); svg.call(zoom.transform,cur); }
+setTexts(); crumbs(); legend(); render();
+/* deep link from History: #vdp or #prop=<id> opens the estate view directly (v39) */
+(function(){ const c=location.hash.match(/^#climate(?:=(\d{4}))?/); if(c){ const pr=PROP['quinta_da_vinha_dos_padres']; if(pr) Promise.resolve(enter3D(pr)).then(()=>{ if(c[1]){ tmRange=c[1]; } harvestView='chart'; axoUI(); }); return; }
+  const m=location.hash.match(/^#(?:vdp|prop=([\w]+))/); if(!m) return;
+  const v=fitK(allProps,vdpInsets()); cur=d3.zoomIdentity.translate(v.x,v.y).scale(v.k); svg.call(zoom.transform,cur); render();
+  const id=m[1]; if(id&&PROP[id]) setTimeout(()=>{ propPaths.classed('hl',x=>x.id===id).filter(x=>x.id===id).raise(); setTimeout(()=>propPaths.classed('hl',false),2800); },400); })();
+</script>
+<script>
+(function(){ function setNav(l){ document.querySelectorAll('[data-en][data-pt]').forEach(e=>{ e.textContent=e.dataset[l]||e.dataset.en; }); }
+ document.querySelectorAll('#top .seg button[data-lang]').forEach(b=>b.addEventListener('click',()=>{ setNav(b.dataset.lang); document.querySelectorAll('#sheetLang button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.l===b.dataset.lang)); }));
+ document.querySelectorAll('#sheetLang button').forEach(x=>x.addEventListener('click',()=>{ const b=document.querySelector('#top .seg button[data-lang="'+x.dataset.l+'"]'); if(b) b.click(); })); })();
+</script>
+<div id="welcome" hidden role="dialog" aria-label="Welcome"><button class="x2" aria-label="Close">×</button><h2 data-en="Welcome to Vinha dos Padres" data-pt="Bem-vindo à Vinha dos Padres">Welcome to Vinha dos Padres</h2>
+<p data-en="Centenary bush vines in the Serra de São Mamede, made into wine in centenary amphoras. Click any property on the map to explore it in 3D." data-pt="Vinhas velhas centenárias na Serra de São Mamede, vinificadas em talhas centenárias. Clique numa propriedade no mapa para a explorar em 3D.">Centenary bush vines in the Serra de São Mamede, made into wine in centenary amphoras. Click any property on the map to explore it in 3D.</p>
+<a class="proof" href="recognition.html"><span data-en="Our first harvest was" data-pt="A nossa primeira colheita foi">Our first harvest was</span> <b>#32 Top 100 Portugal</b> · <b>94–95 pts</b></a>
+<div class="acts"><button class="solid" id="wlgo" data-en="Explore the vineyard" data-pt="Explorar a vinha">Explore the vineyard</button><a href="history.html" data-en="Read our story" data-pt="A nossa história">Read our story</a></div></div>
+<a id="proofTag" href="recognition.html" hidden><span data-en="Our first harvest was" data-pt="A nossa primeira colheita foi">Our first harvest was</span> <b>#32 Top 100 Portugal</b> · <b>94–95 pts</b></a><script id="wljs">(function(){const W=document.getElementById('welcome'),P=document.getElementById('proofTag');let seen=false;try{seen=localStorage.getItem('vdpWelcome')==='1'}catch(_){}
+const lang=()=>document.documentElement.lang&&document.documentElement.lang.startsWith('pt')?'pt':'en';
+const tr=()=>[W,P].forEach(r=>r.querySelectorAll('[data-en]').forEach(e=>e.textContent=e.dataset[lang()]));
+function close(){W.hidden=true;P.hidden=false;try{localStorage.setItem('vdpWelcome','1')}catch(_){}}
+W.querySelector('.x2').onclick=close;document.getElementById('wlgo').onclick=close;
+if(location.hash){W.hidden=true;P.hidden=false;}else if(seen){P.hidden=false;}else{W.hidden=false;}
+tr();new MutationObserver(tr).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+const ax=document.getElementById('axo');if(ax)new MutationObserver(()=>document.body.classList.toggle('in-axo',ax.classList.contains('on'))).observe(ax,{attributes:true,attributeFilter:['class']});})();</script><script id="ldjs">(function(){const L=document.getElementById('vdpLoad');function done(){requestAnimationFrame(()=>requestAnimationFrame(()=>{L.classList.add('out');setTimeout(()=>L.remove(),600);}));}
+if(document.readyState==='complete')done();else addEventListener('load',done);setTimeout(done,8000);})();</script><script id="estlang">(function(){
+var forcePT=/-pt\.html$/.test(location.pathname);var pref=null;try{pref=localStorage.getItem('vdpLang')}catch(_){}
+function cur(){var b=document.querySelector('button[data-lang][aria-pressed="true"]');return b?b.dataset.lang:'en';}
+function setL(l){var b=document.querySelector('button[data-lang="'+l+'"]');if(b&&cur()!==l)b.click();}
+document.querySelectorAll('button[data-lang]').forEach(function(b){b.addEventListener('click',function(){try{localStorage.setItem('vdpLang',b.dataset.lang)}catch(_){}});});
+document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href]');if(!a)return;var u=a.getAttribute('href');
+ if(!/^[a-z0-9-]+\.html/.test(u))return;var pt=cur()==='pt',isPt=/-pt\.html/.test(u);
+ if(pt&&!isPt)a.setAttribute('href',u.replace(/\.html/,'-pt.html'));else if(!pt&&isPt)a.setAttribute('href',u.replace(/-pt\.html/,'.html'));},true);
+function go(){setL(forcePT?'pt':(pref==='pt'?'pt':'en'));}
+if(document.readyState==='complete')go();else addEventListener('load',go);
+})();</script><script id="agjs">(function(){var G=document.getElementById('ageGate'),ok=false;try{ok=localStorage.getItem('vdpAge')==='1'}catch(_){}
+if(/privacy|404/.test(location.pathname)||ok)return;G.hidden=false;document.getElementById('agY').focus();
+document.getElementById('agY').onclick=function(){try{localStorage.setItem('vdpAge','1')}catch(_){}G.hidden=true;};
+document.getElementById('agN').onclick=function(){G.classList.add('denied');};})();</script></body>
+</html>
