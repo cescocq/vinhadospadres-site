@@ -385,8 +385,8 @@ h2{font-family:var(--serif);font-weight:600;font-size:28px;line-height:1.15;marg
 <script id="nljs">document.querySelectorAll('.nlf').forEach(f=>f.addEventListener('submit',async e=>{e.preventDefault();const i=f.querySelector('input'),b=f.querySelector('button');
 if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(i.value)){i.focus();i.style.borderColor='#C76653';return;}b.disabled=true;
 try{await fetch('https://formsubmit.co/ajax/vdp@silimosa.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({email:i.value,_subject:'Mailing list sign-up: '+i.value,page:location.pathname.split('/').pop()||'index.html',_template:'table'})});}catch(_){}
-f.closest('.nl').classList.add('done');}));</script><script id="langjs">(function(){var pt=document.documentElement.lang.indexOf('pt')===0,me=location.pathname.split('/').pop()||'index.html';
-var en=me.replace(/-pt\.html$/,'.html'),ptp=en.replace(/\.html$/,'-pt.html');
+f.closest('.nl').classList.add('done');}));</script><script id="langjs">(function(){var pt=document.documentElement.lang.indexOf('pt')===0,me=location.pathname.split('/').pop()||'index';
+var base=me.replace(/\.html$/,'').replace(/-pt$/,''),en=base+'.html',ptp=base+'-pt.html';
 document.querySelectorAll('.seg button').forEach(function(b){var l=b.textContent.trim();if(l!=='EN'&&l!=='PT')return;b.setAttribute('aria-pressed',String((l==='PT')===pt));
 b.addEventListener('click',function(){try{localStorage.setItem('vdpLang',l.toLowerCase())}catch(_){}if((l==='PT')!==pt)location.href=(l==='PT'?ptp:en)+location.search+location.hash;});});
 try{localStorage.setItem('vdpLang',pt?'pt':'en')}catch(_){}})();</script><script id="agjs">(function(){var G=document.getElementById('ageGate'),ok=false;try{ok=localStorage.getItem('vdpAge')==='1'}catch(_){}

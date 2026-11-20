@@ -1236,7 +1236,7 @@ function wineCard(w){
   <div><div class="k">${t('codeK')}</div><div class="v">${w.code||'—'}</div></div>
   <div><div class="k">${t('grapesK')}</div><div class="v">${Math.round(kg).toLocaleString(loc())} kg</div></div>
   <div><div class="k">${t('bottlesK')}</div><div class="v">${w.bottles.toLocaleString(loc())}</div></div>
-  <div><div class="k">${t('kgBottle')}</div><div class="v">${fmtN(kg/w.bottles,2)}</div></div></div></div><a class="wpage" href="wine-${w.col.toLowerCase()}-${w.vin}.html">${t('winePage')}</a></div></div>
+  <div><div class="k">${t('kgBottle')}</div><div class="v">${fmtN(kg/w.bottles,2)}</div></div></div></div><a class="wpage" href="qdvdp-${w.code.toLowerCase()}-${w.vin}-${w.col.toLowerCase()}.html">${t('winePage')}</a></div></div>
   <h3>${t('srcTitle')} <span class="d" style="font-family:var(--sans);font-size:11px;font-weight:400;color:var(--muted)">${t('harvestOf',{y:w.vin})}</span></h3><div class="wsrc">`;
   src.forEach(r=>{ const v=num(r.kg_with)||0, ds=dParse(r.date||''); const pr=PROP[r.prop];
     h+=`<div class="row" data-wp="${r.prop}"><span>${pr.name}</span><span>${Math.round(v).toLocaleString(loc())} kg · ${fmtN(100*v/kg,0)}%</span>
@@ -1672,7 +1672,7 @@ if(location.hash){W.hidden=true;P.hidden=false;}else if(seen){P.hidden=false;}el
 tr();new MutationObserver(tr).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 const ax=document.getElementById('axo');if(ax)new MutationObserver(()=>document.body.classList.toggle('in-axo',ax.classList.contains('on'))).observe(ax,{attributes:true,attributeFilter:['class']});})();</script><script id="ldjs">(function(){const L=document.getElementById('vdpLoad');function done(){requestAnimationFrame(()=>requestAnimationFrame(()=>{L.classList.add('out');setTimeout(()=>L.remove(),600);}));}
 if(document.readyState==='complete')done();else addEventListener('load',done);setTimeout(done,8000);})();</script><script id="estlang">(function(){
-var forcePT=/-pt\.html$/.test(location.pathname);var pref=null;try{pref=localStorage.getItem('vdpLang')}catch(_){}
+var forcePT=/-pt(\.html)?$/.test(location.pathname);var pref=null;try{pref=localStorage.getItem('vdpLang')}catch(_){}
 function cur(){var b=document.querySelector('button[data-lang][aria-pressed="true"]');return b?b.dataset.lang:'en';}
 function setL(l){var b=document.querySelector('button[data-lang="'+l+'"]');if(b&&cur()!==l)b.click();}
 document.querySelectorAll('button[data-lang]').forEach(function(b){b.addEventListener('click',function(){try{localStorage.setItem('vdpLang',b.dataset.lang)}catch(_){}});});
