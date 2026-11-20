@@ -4,8 +4,8 @@ SITE='https://www.vinhadospadres.com'
 def url(name,pt):
     if name=='index': return SITE+('/index-pt' if pt else '/')
     return f'{SITE}/{name}{"-pt" if pt else ""}'
-SLUG={'quinta-da-vinha-dos-padres-2022-white-3m12m':'wine-white-2022','quinta-da-vinha-dos-padres-2022-red-3m12m':'wine-red-2022',
-      'quinta-da-vinha-dos-padres-2023-white-3m3m':'wine-white-2023','quinta-da-vinha-dos-padres-2023-red-3m3m4m':'wine-red-2023'}
+SLUG={'quinta-da-vinha-dos-padres-2022-white-3m12m':'qdvdp-3m12m-2022-white','quinta-da-vinha-dos-padres-2022-red-3m12m':'qdvdp-3m12m-2022-red',
+      'quinta-da-vinha-dos-padres-2023-white-3m3m':'qdvdp-3m3m-2023-white','quinta-da-vinha-dos-padres-2023-red-3m3m4m':'qdvdp-3m3m4m-2023-red'}
 for f in glob.glob(S+'*.html'):
     fn=os.path.basename(f)[:-5]
     if fn=='404': continue

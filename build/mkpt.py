@@ -5,7 +5,7 @@ from extract import segments
 PT['Field blend']='Castas (vinha misturada)'
 S='/home/claude/vdp/s65/'
 SITE='https://www.vinhadospadres.com'
-PAGES=['history','code','wines','recognition','contact','compare','wine-white-2022','wine-red-2022','wine-white-2023','wine-red-2023']
+PAGES=['history','code','wines','recognition','contact','compare','qdvdp-3m12m-2022-white','qdvdp-3m12m-2022-red','qdvdp-3m3m-2023-white','qdvdp-3m3m4m-2023-red']
 OURS=['index']+PAGES+['privacy','404']
 missing=set()
 def tr(s):
@@ -36,8 +36,8 @@ def alt_links(name):
     en=SITE+'/' if name=='index' else f'{SITE}/{name}.html'
     pt=SITE+'/pt/' if name=='index' else f'{SITE}/pt/{name}.html'
     return en,pt,f'<link rel="alternate" hreflang="en" href="{en}"><link rel="alternate" hreflang="pt-PT" href="{pt}"><link rel="alternate" hreflang="x-default" href="{en}">'
-LANGJS='''<script id="langjs">(function(){var pt=document.documentElement.lang.indexOf('pt')===0,me=location.pathname.split('/').pop()||'index.html';
-var en=me.replace(/-pt\\.html$/,'.html'),ptp=en.replace(/\\.html$/,'-pt.html');
+LANGJS='''<script id="langjs">(function(){var pt=document.documentElement.lang.indexOf('pt')===0,me=location.pathname.split('/').pop()||'index';
+var base=me.replace(/\\.html$/,'').replace(/-pt$/,''),en=base+'.html',ptp=base+'-pt.html';
 document.querySelectorAll('.seg button').forEach(function(b){var l=b.textContent.trim();if(l!=='EN'&&l!=='PT')return;b.setAttribute('aria-pressed',String((l==='PT')===pt));
 b.addEventListener('click',function(){try{localStorage.setItem('vdpLang',l.toLowerCase())}catch(_){}if((l==='PT')!==pt)location.href=(l==='PT'?ptp:en)+location.search+location.hash;});});
 try{localStorage.setItem('vdpLang',pt?'pt':'en')}catch(_){}})();</script>'''

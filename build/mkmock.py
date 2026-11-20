@@ -7,7 +7,7 @@ def terms(f):
     for m in re.finditer(r'<section class="sense"><h2>(nose|mouth)</h2>(.*?)</section>',t,re.S):
         out[m.group(1)]=re.findall(r'<figcaption>([^<]*)</figcaption>',m.group(2))
     return out
-w22=terms('wine-white-2022.html'); r22=terms('wine-red-2022.html')
+w22=terms('qdvdp-3m12m-2022-white.html'); r22=terms('qdvdp-3m12m-2022-red.html')
 seen={}
 for t,k in TERM.items(): seen.setdefault(k,[]).append(t)
 sheet=lambda c:''.join(f'<figure class="ti">{icon(v[0],c)}<figcaption>{" / ".join(v)}</figcaption></figure>' for k,v in seen.items())

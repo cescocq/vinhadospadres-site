@@ -28,7 +28,7 @@ PAGES={
  'wines.html':('recognition.html','recognition'),
  'recognition.html':('contact.html','get in touch'),
 }
-NL_ON={'code.html','wines.html','contact.html','wine-white-2022.html','wine-red-2022.html','wine-white-2023.html','wine-red-2023.html'}
+NL_ON={'code.html','wines.html','contact.html','qdvdp-3m12m-2022-white.html','qdvdp-3m12m-2022-red.html','qdvdp-3m3m-2023-white.html','qdvdp-3m3m4m-2023-red.html'}
 import glob
 for f in sorted(set(PAGES)|NL_ON):
     h=rd(f)

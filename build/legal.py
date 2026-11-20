@@ -94,7 +94,7 @@ for f in glob.glob(S+'*.html'):
     i=h.rfind('</body>'); h=h[:i]+AG_JS+h[i:]
     open(f,'w').write(h)
 # ---------- sitemap + robots ----------
-NAMES=['index','history','wines','wine-white-2022','wine-red-2022','wine-white-2023','wine-red-2023','code','recognition','contact','privacy']
+NAMES=['index','history','wines','qdvdp-3m12m-2022-white','qdvdp-3m12m-2022-red','qdvdp-3m3m-2023-white','qdvdp-3m3m4m-2023-red','code','recognition','contact','privacy']
 def u(n,pt): return SITE+('/' if n=='index' and not pt else ('/index-pt' if n=='index' else f'/{n}{"-pt" if pt else ""}'))
 xs=['<?xml version="1.0" encoding="UTF-8"?>','<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">']
 for n in NAMES:

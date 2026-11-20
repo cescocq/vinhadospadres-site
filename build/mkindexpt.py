@@ -12,7 +12,7 @@ def head(desc,url,locale):
             f'<meta property="og:type" content="website"><meta property="og:site_name" content="Vinha dos Padres"><meta property="og:locale" content="{locale}">'
             f'<meta property="og:title" content="Vinha dos Padres"><meta property="og:description" content="{desc}"><meta property="og:url" content="{url}">')
 JS='''<script id="estlang">(function(){
-var forcePT=/-pt\\.html$/.test(location.pathname);var pref=null;try{pref=localStorage.getItem('vdpLang')}catch(_){}
+var forcePT=/-pt(\\.html)?$/.test(location.pathname);var pref=null;try{pref=localStorage.getItem('vdpLang')}catch(_){}
 function cur(){var b=document.querySelector('button[data-lang][aria-pressed="true"]');return b?b.dataset.lang:'en';}
 function setL(l){var b=document.querySelector('button[data-lang="'+l+'"]');if(b&&cur()!==l)b.click();}
 document.querySelectorAll('button[data-lang]').forEach(function(b){b.addEventListener('click',function(){try{localStorage.setItem('vdpLang',b.dataset.lang)}catch(_){}});});

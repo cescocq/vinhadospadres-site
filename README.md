@@ -17,4 +17,4 @@ Deployed as a Cloudflare Worker with static assets (see `wrangler.jsonc`, which 
 2. Run `build/build.sh` to regenerate the `-pt` pages, sitemap, canonicals and footers.
 3. Commit and push to `main`. Cloudflare publishes automatically.
 
-URLs: English pages are `/<name>`, Portuguese pages `/<name>-pt` (home: `/` and `/index-pt`).
+URLs: English pages are `/<name>`, Portuguese pages `/<name>-pt` (home: `/` and `/index-pt`). Wine pages use the label abbreviation, e.g. Quinta da Vinha dos Padres 2022 white 3M12M = `/qdvdp-3m12m-2022-white`.
