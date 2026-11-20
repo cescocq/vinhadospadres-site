@@ -6,16 +6,21 @@ logo=re.search(r'<svg[^>]*viewBox="0 0 327.75 47.65".*?</svg>',src,re.S).group(0
 fonts=''.join(re.findall(r'@font-face\{[^}]*\}',src)[:2])
 WINES=[  # year, code, colour
  (2022,'3M12M','white'),(2022,'3M12M','red'),
- (2023,'3M3M','white'),(2023,'3M3M4M','red'),
- (2024,'8M8M','white'),(2024,'8M8M','red')]
-SOON=[2025]
+ (2023,'3M3M','white'),(2023,'3M3M4M','red')]
+SOON=[2024,2025]
+# Technical sheets live in Google Drive: (PT file id, EN file id). Single source of truth for the whole site.
+DRIVE={(2022,'white'):('1TvKC__8R4bnKBQ2Opn4eQcbVTOVESNr9','1XTu2jIP-2QjerL7LrFdbFTJGNL1rA58G'),
+       (2022,'red'):('1uTANde9F5EglLWwQqo0KqSJfKKp2QWry','1JIc3mabXtK97p1K7KeWP5gz-0MbzQOoF'),
+       (2023,'white'):('1NdFjLVR-S5cJwAHuXJQWXpNFjBn0m1We','1wf0Gg1kcCpu-pVIkmcpKRqwvxQvcP3zZ'),
+       (2023,'red'):('13ntR6pBt8l1IVArfieYRNwXW7l8KV6tf','1E-1vWhJYiBPHSR7Roix5cKXYncK1aWGf')}
+def drive(i): return f'https://drive.google.com/file/d/{i}/view'
 PTC={'white':'branco','red':'tinto'}; AC={'white':'#275FAC','red':'#C76653'}
 def pdf(y,c,col,l): return f'pdf/QDVDP{c}_{y}_{l}_{col.upper()}_TS.pdf'
 missing=[]
 def link(y,c,col,l):
-    p=pdf(y,c,col,l)
-    if os.path.exists(S+p): return f'<a href="{p}" target="_blank" rel="noopener">{l}</a>'
-    missing.append(p); return f'<span class="na" title="em breve / coming soon">{l}</span>'
+    ids=DRIVE.get((y,col))
+    if ids: return f'<a href="{drive(ids[0] if l=="PT" else ids[1])}" target="_blank" rel="noopener">{l}</a>'
+    missing.append((y,col,l)); return f'<span class="na" title="em breve / coming soon">{l}</span>'
 cols=''
 for y in sorted({w[0] for w in WINES}|set(SOON)):
     ws=[w for w in WINES if w[0]==y]
@@ -41,4 +46,10 @@ footer{{margin-top:48px;font-size:14px;color:#6b625b}}footer a{{color:inherit}}
 <footer>© Vinha dos Padres, Lda. · <a href="/">vinhadospadres.com</a></footer>
 </main></body></html>'''
 open(S+'wineinfo.html','w').write(html)
-print('missing PDFs:'); [print(' ',m) for m in missing]
+print('missing sheets:',missing)
+# PT wine pages: swap the EN sheet link for the PT one
+import glob
+for (y,col),(pt,en) in DRIVE.items():
+    for f in glob.glob(S+f'qdvdp-*-{y}-{col}-pt.html'):
+        h=open(f).read(); h2=h.replace(drive(en),drive(pt))
+        if h2!=h: open(f,'w').write(h2)

@@ -194,4 +194,5 @@ PT={
 '› Quinta da Vinha dos Padres 2022 white 3M12M':'› Quinta da Vinha dos Padres 2022 branco 3M12M',
 '› Quinta da Vinha dos Padres 2023 red 3M3M4M':'› Quinta da Vinha dos Padres 2023 tinto 3M3M4M',
 '› Quinta da Vinha dos Padres 2023 white 3M3M':'› Quinta da Vinha dos Padres 2023 branco 3M3M',
+'technical sheet ↗':'ficha técnica ↗',
 }
