@@ -4,13 +4,13 @@ Static site for www.vinhadospadres.com, maintained by Francesco and Claude.
 
 | Folder | Contents |
 |---|---|
-| `site/` | The published website (HTML, data, images, fonts, PDFs). Cloudflare Pages serves this folder as is. |
+| `site/` | The published website (HTML, data, images, fonts, PDFs). Cloudflare serves this folder as is. |
 | `build/` | Python scripts that generate the Portuguese pages, SEO tags, legal pages, sitemap and age gate from the English pages. |
 
-## Cloudflare Pages settings
-- Framework preset: None
+## Cloudflare settings
+Deployed as a Cloudflare Worker with static assets (see `wrangler.jsonc`, which serves the `site/` folder).
 - Build command: (leave empty)
-- Build output directory: `site`
+- Deploy command: `npx wrangler deploy`
 
 ## Updating
 1. Edit the English pages in `site/`.
