@@ -464,6 +464,10 @@ body.phone #welcome{left:12px;right:12px;max-width:none;bottom:auto;top:calc(70p
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.vinhadospadres.com/og-image.jpg">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Winery","@id":"https://www.vinhadospadres.com/#winery","name":"Vinha dos Padres","legalName":"Vinha dos Padres, Lda.","url":"https://www.vinhadospadres.com/","logo":"https://www.vinhadospadres.com/logo-est.svg","image":"https://www.vinhadospadres.com/og-image.jpg","foundingDate":"1795","description":"Propriedade de vinho de talha em altitude, com vinhas centenárias em vaso na Serra de São Mamede, DOC Alentejo Portalegre.","address":{"@type":"PostalAddress","addressLocality":"Reguengo","addressRegion":"Portalegre","addressCountry":"PT"}}</script>
+<script id="bleedjs">(function(){try{const q=new URLSearchParams(location.search).get('bleed');if(q==='0')localStorage.setItem('vdpBleed','0');if(q==='1')localStorage.removeItem('vdpBleed');
+if(localStorage.getItem('vdpBleed')!=='0'&&matchMedia('(max-width:699px)').matches){const d=document.documentElement;d.classList.add('bleed');
+const B=140,fix=()=>{if(Math.abs(scrollY-B)>0.5)scrollTo(0,B)};addEventListener('load',()=>{fix();setTimeout(fix,300);setTimeout(fix,1200)});addEventListener('scroll',fix,{passive:true});addEventListener('resize',()=>setTimeout(fix,50));}}catch(e){}})();</script>
+<style id="bleedcss">html.bleed{--bl:140px}html.bleed body{padding-top:var(--bl);box-sizing:content-box}html.bleed #app{overflow:visible;clip-path:inset(calc(-1 * var(--bl)) 0 0 0)}html.bleed #map{overflow:visible}</style>
 </head>
 <body><div id="ageGate" role="dialog" aria-modal="true" aria-labelledby="agt" hidden><div class="b"><h2 id="agt" class="lg" aria-label="Bem-vindo à Vinha dos Padres"><svg  data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 327.75 47.65">
   <defs>
@@ -1864,44 +1868,5 @@ if(document.readyState==='complete')go();else addEventListener('load',go);
 })();</script><script id="agjs">(function(){var G=document.getElementById('ageGate'),ok=false;try{ok=localStorage.getItem('vdpAge')==='1'}catch(_){}
 if(/privacy|404|wineinfo/.test(location.pathname)||ok)return;G.hidden=false;document.getElementById('agY').focus();
 document.getElementById('agY').onclick=function(){try{localStorage.setItem('vdpAge','1')}catch(_){}G.hidden=true;};
-document.getElementById('agN').onclick=function(){G.classList.add('denied');};})();</script><script>['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});</script><script id="sbtint">/* iOS Safari tints the status bar with the body colour: match it to the map under the top edge */
-(function(){
- const land=[230,222,208];
- const rgb=s=>{s=String(s).trim(); const h=s.match(/^#([0-9a-f]{6})$/i); if(h) return [0,2,4].map(i=>parseInt(h[1].substr(i,2),16)); const m=s.match(/[\d.]+/g);return m&&m.length>=3?m.slice(0,4).map(Number):null};
- function colorAt(x,y){
-  const st=document.getElementById('sbpick')||document.head.appendChild(Object.assign(document.createElement('style'),{id:'sbpick'})); st.textContent='#map *{pointer-events:visiblePainted!important}'; const els=document.elementsFromPoint(x,y); st.textContent='';
-  const layers=[]; let base=null;
-  for(const el of els){
-   if(el.closest&&(el.closest('#top')||el.closest('#crumbs'))) continue;
-   if(el.tagName==='HTML'||el.tagName==='BODY') break;
-   const cs=getComputedStyle(el);
-   if(el instanceof SVGElement && /^(text|tspan|g|svg)$/.test(el.tagName)) continue;
-   if(el instanceof SVGElement){
-    let f=cs.fill; if(!f||f==='none') continue;
-    const u=f.match(/url\("?#([^")]+)/);
-    if(u){const r=document.querySelector('#'+u[1]+' rect'); f=r?(r.getAttribute('fill')||getComputedStyle(r).fill):null; if(!f) continue;}
-    const c=rgb(f); if(!c) continue;
-    let a=parseFloat(cs.fillOpacity||1)*(c.length>3?c[3]:1), n=el; while(n&&n.tagName!=='svg'){a*=parseFloat(getComputedStyle(n).opacity||1); n=n.parentNode;}
-    if(a<0.02) continue;
-    if(a>0.98){ base=c.slice(0,3); break; }
-    layers.push([c.slice(0,3),a]);
-   } else {
-    const bg=rgb(cs.backgroundColor); if(bg&&(bg.length<4||bg[3]>=0.9)){ base=bg.slice(0,3); break; }
-   }
-  }
-  if(!base) base=rgb(getComputedStyle(document.documentElement).getPropertyValue('--sea'))||land;
-  if(String(base).indexOf('NaN')>=0) base=land;
-  let col=base; for(let k=layers.length-1;k>=0;k--){ const [c,a]=layers[k]; col=col.map((v,i)=>v*(1-a)+c[i]*a); }
-  return col.map(Math.round);
- }
- let last='';
- function tint(){
-  if(!document.body.classList.contains('phone')&&!document.body.classList.contains('sheet')){ if(last){document.documentElement.style.backgroundColor=document.body.style.backgroundColor='';last='';} return; }
-  const c=colorAt(innerWidth/2,1); const v=c?`rgb(${c.join(',')})`:'';
-  if(v!==last){ last=v; document.documentElement.style.backgroundColor=document.body.style.backgroundColor=v; }
- }
- setInterval(tint,350); addEventListener('load',tint);
-})();
-</script>
-</body>
+document.getElementById('agN').onclick=function(){G.classList.add('denied');};})();</script><script>['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});</script></body>
 </html>
