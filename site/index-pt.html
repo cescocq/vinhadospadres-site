@@ -415,7 +415,7 @@ body.phone .tlogo{width:170px} body.phone.zoomed .tlogo{width:135px} .sitesheet 
 #terrLbl .lbl.peak{transform:translate(-6.5px,-50%);padding-left:19px}
 #terrLbl .lbl.reg{font-size:18px;letter-spacing:.06em;white-space:normal;width:max-content;max-width:190px;line-height:1.15}#terrLbl .lbl.reg.l{text-align:right}#terrLbl .lbl.reg.b{transform:translate(-50%,26px);text-align:center}#terrLbl .lbl.reg::before{display:none}#terrLbl .lbl.reg.r{transform:translate(18px,-50%)}#terrLbl .lbl.reg.l{transform:translate(calc(-100% - 18px),-50%)}
 #terrLbl .edge{position:absolute;right:90px;bottom:64px;font-family:var(--serif-i);font-style:italic;letter-spacing:.06em;font-size:15px;color:#231F20;text-shadow:0 0 4px var(--halo),0 0 8px var(--halo)}
-#axo.terr #datum,#axo.terr #datum-tip,#axo.terr #toggle-side,#axo.terr #table-tip,#axo.terr .statbar{display:none}
+#axo.terr #relief,#axo.terr #relief-tip,#axo.terr #datum,#axo.terr #datum-tip,#axo.terr #toggle-side,#axo.terr #table-tip,#axo.terr .statbar{display:none}
 .tlg{display:flex;flex-direction:column;gap:6px;margin:6px 0 2px}.tlg div{display:flex;align-items:center;gap:10px;font-size:15px}
 .tlg i{flex:none;width:30px;height:14px;border-radius:3px;border:1px solid rgba(35,31,32,.3)}.tlg i.ln{height:0;border:0;border-top:1.3px solid #231F20;border-radius:0}.tlg i.ln.d{border-top-style:dashed}
 .tlg small{color:var(--muted)}
@@ -432,6 +432,10 @@ body.phone .tlogo{width:170px} body.phone.zoomed .tlogo{width:135px} .sitesheet 
 /* phones: pinches anywhere over the map zoom the map, never the page */
 #map,#labels,#marker{touch-action:none}
 @media (hover:none){#marker{pointer-events:none}#marker .dot,#marker .hint{pointer-events:auto}}
+
+body:not(.sheet) #axo.terr .side{right:22px}
+body:not(.sheet) #axo.terr .ctrl{top:auto;bottom:calc(52px + env(safe-area-inset-bottom,0px));right:22px;transform:none}
+.tstats.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 </style>
 <style id="wlcss">#welcome{position:fixed;left:24px;top:calc(96px + env(safe-area-inset-top,0px));z-index:60;max-width:380px;background:#EDE6DA;border:1px solid rgba(35,31,32,.18);border-radius:18px;padding:20px 22px 18px;box-shadow:0 14px 40px rgba(0,0,0,.16);font-family:var(--serif);color:#231F20}
 #welcome[hidden]{display:none}#welcome h2{font-family:var(--serif);font-weight:600;font-style:italic;font-size:26px;margin:0 0 6px;line-height:1.1}#welcome p{margin:0 0 12px;font-size:15.5px;line-height:1.4;color:#4a433f}
@@ -1755,7 +1759,7 @@ function terrUI(){
   document.querySelectorAll('#relief [data-ex]').forEach(b=>b.onclick=async()=>{ ex=+b.dataset.ex; await buildTerroir(); terrUI(); world.scale.y=1; });
   const pi=lang==='pt'?3:2;
   sideC.innerHTML=`<div class="p-h"><div><h2>${t('terrH')}</h2></div></div><p style="margin:6px 0 0;font-size:16px;line-height:1.5">${t('terrP')}</p>
-  <div class="tstats"><div><span>${t('terrVines')}</span><b>497–566 m</b></div><div><span>${t('terrSummit')}</span><b>1,025 m</b></div><div><span>${t('terrDist')}</span><b>3.4 km</b></div></div>
+  <div class="tstats two"><div><span>${t('terrVines')}</span><b>497–566 m</b></div><div><span>${t('terrSummit')}</span><b>1,025 m</b></div></div>
   <h3>${t('terrGeo')}</h3><div class="tlg">${GEO_U.map(u=>`<div><i style="background:${u[1]}"></i>${u[pi]}</div>`).join('')}
   <div><i class="ln d"></i>${t('terrDoc')}</div><div><i class="ln"></i>${t('terrPark')}</div></div>
   <button class="gowines" id="terrGoV" style="margin-top:12px">${t('terrGo')}</button>
@@ -1764,7 +1768,7 @@ function terrUI(){
 }
 
 /* ---------------- Terroir 2D layer: geology on the map, on from the 10 km scale down ---------------- */
-var terrOn=false, terrAvail=false, gGeo=null, geoPaths=null;
+var terrOn=false, terrPref=true, terrAvail=false, gGeo=null, geoPaths=null;
 var GEO_COL=Object.fromEntries(GEO_U.map(u=>[u[0],u[1]]).concat([['urra','#F5D7D9'],['water','#8EC8EC']]));
 async function terrSet(on){
   terrOn=!!on;
@@ -1777,16 +1781,16 @@ async function terrSet(on){
   if(gGeo) gGeo.style('display',terrOn?null:'none');
   render(); legend(); terrCtl();
 }
-function terrScale(best){ const av = best<=10000; if(av!==terrAvail){ terrAvail=av; if(!av && terrOn){ terrOn=false; if(gGeo) gGeo.style('display','none'); legend(); } terrCtl(); } }
+function terrScale(best){ const av = best<=10000; if(av!==terrAvail){ terrAvail=av; const want=av&&terrPref; if(want!==terrOn) setTimeout(()=>terrSet(terrAvail&&terrPref),0); else terrCtl(); } }
 function terrCtl(){
   const el=document.getElementById('terrCtl'); if(!el) return;
   el.hidden = !terrAvail || inAxo;
-  el.querySelector('.tsw').setAttribute('aria-checked',String(terrOn));
+  el.querySelector('.tsw').setAttribute('aria-checked',String(terrPref));
   el.querySelector('.tsw span').textContent=t('terroir');
   el.querySelector('.v3d').textContent=t('terr3dv');
-  el.classList.toggle('on',terrOn);
+  el.classList.toggle('on',terrPref);
 }
-document.querySelector('#terrCtl .tsw').onclick=()=>terrSet(!terrOn);
+document.querySelector('#terrCtl .tsw').onclick=()=>{ terrPref=!terrPref; terrSet(terrPref&&terrAvail); };
 document.querySelector('#terrCtl .v3d').onclick=()=>enterTerroir();
 const loader=document.getElementById('loader');
 loader.querySelector('.lg').innerHTML=D.logo;
