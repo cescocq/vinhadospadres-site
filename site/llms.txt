@@ -1,0 +1,29 @@
+# Vinha dos Padres
+
+> Vinha dos Padres is an altitude amphora (talha) wine estate in Reguengo, Portalegre, in the Serra de São Mamede Natural Park, Alto Alentejo, Portugal (DOC Alentejo Portalegre, est. 1795). Six vineyard properties of centenary bush vines are made into wine in centenary clay amphoras (talhas). Its first vintage, Quinta da Vinha dos Padres 2022 red 3M12M, was ranked #32 with 94 points in James Suckling's Top 100 Wines of Portugal 2025 — no amphora (talha) wine in Portugal scored or ranked higher.
+
+The site is bilingual: English pages are at the paths below; Portuguese versions add the suffix `-pt` (the Portuguese homepage is `/index-pt`).
+
+## Estate
+
+- [Home and estate map](https://www.vinhadospadres.com/): the six vineyard properties on an interactive map, with 3D parcels, harvest and climate data
+- [History](https://www.vinhadospadres.com/history): from the Jesuits' first vow in Paris in 1534 to the vineyard in Reguengo today
+- [The code](https://www.vinhadospadres.com/code): how to read the code on every label — months of skin maceration and total ageing in amphora (M = months), plus any ageing in another vessel
+
+## Wines
+
+- [All wines](https://www.vinhadospadres.com/wines)
+- [Quinta da Vinha dos Padres 2022 red 3M12M](https://www.vinhadospadres.com/qdvdp-3m12m-2022-red)
+- [Quinta da Vinha dos Padres 2022 white 3M12M](https://www.vinhadospadres.com/qdvdp-3m12m-2022-white)
+- [Quinta da Vinha dos Padres 2023 red 3M3M4M](https://www.vinhadospadres.com/qdvdp-3m3m4m-2023-red)
+- [Quinta da Vinha dos Padres 2023 white 3M3M](https://www.vinhadospadres.com/qdvdp-3m3m-2023-white)
+
+## Recognition and contact
+
+- [Recognition](https://www.vinhadospadres.com/recognition): reviews, awards and press features
+- [Contact](https://www.vinhadospadres.com/contact): contact form and mailing-list sign-up
+
+## Optional
+
+- [Privacy policy](https://www.vinhadospadres.com/privacy)
+- [Sitemap](https://www.vinhadospadres.com/sitemap.xml)

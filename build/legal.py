@@ -47,7 +47,7 @@ page(base,'Page not found · Vinha dos Padres','Page not found.',B404,'404',Fals
 FAV='''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#E6DED0"/><g fill="#C56552" transform="translate(8.6 10.2) scale(0.88)">
 <rect x="0" y="14.05" width="9.9" height="13.72" rx=".9"/><rect x="10.86" y="6.86" width="9.9" height="27.43" rx=".9"/><rect x="21.73" y="0" width="9.9" height="13.72" rx=".9"/>
 <rect x="21.73" y="27.43" width="9.9" height="13.72" rx=".9"/><rect x="32.59" y="6.86" width="9.9" height="27.43" rx=".9"/><rect x="43.46" y="14.05" width="9.9" height="13.72" rx=".9"/></g></svg>'''
-open(S+'favicon.svg','w').write(FAV)
+# favicon.svg retired Nov 2026: VDP mark favicons (favicon.ico/-32/-192, apple-touch-icon) are static files in site/
 # ---------- age gate + footer on every page ----------
 AG_CSS='''<style id="agcss">#ageGate{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:rgba(230,222,208,.97);font-family:var(--serif);color:#231F20;padding:20px}
 #ageGate[hidden]{display:none}#ageGate .b{max-width:440px;text-align:center}#ageGate h2{font-family:var(--serif);font-weight:600;font-style:italic;font-size:30px;margin:14px 0 8px}
@@ -68,7 +68,7 @@ document.getElementById('agN').onclick=function(){G.classList.add('denied');};})
 def foot(pt):
     if pt: return '<footer class="sfoot"><span>© Vinha dos Padres, Lda. 2026</span><a href="privacy-pt.html">Política de privacidade</a><span>Beba com moderação · 18+</span><a href="contact-pt.html">Contacto</a></footer>'
     return '<footer class="sfoot"><span>© Vinha dos Padres, Lda. 2026</span><a href="privacy.html">Privacy policy</a><span>Please drink responsibly · 18+</span><a href="contact.html">Contact</a></footer>'
-FAVL='<link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon-32.png" sizes="32x32"><link rel="apple-touch-icon" href="apple-touch-icon.png">'
+FAVL='<link rel="icon" href="favicon.ico" sizes="48x48"><link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32"><link rel="icon" type="image/png" href="favicon-192x192.png" sizes="192x192"><link rel="apple-touch-icon" href="apple-touch-icon.png">'
 for f in [g for g in glob.glob(S+'*.html') if not g.endswith('wineinfo.html')]:
     fn=os.path.basename(f); pt=fn.endswith('-pt.html'); h=open(f).read()
     h=re.sub(r'<link rel="(icon|apple-touch-icon|shortcut icon)"[^>]*>','',h)

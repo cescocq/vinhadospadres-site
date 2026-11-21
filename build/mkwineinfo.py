@@ -28,7 +28,7 @@ for y in sorted({w[0] for w in WINES}|set(SOON)):
     cols+=f'<section><h2>{y}</h2><ul>{rows}</ul></section>'
 html=f'''<!DOCTYPE html><html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Fichas técnicas e declarações nutricionais · Vinha dos Padres</title><meta name="robots" content="noindex">
-<link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="icon" href="favicon.ico" sizes="48x48"><link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32"><link rel="icon" type="image/png" href="favicon-192x192.png" sizes="192x192">
 <style>{fonts}:root{{--serif:'Arno Pro',Georgia,serif}}*{{box-sizing:border-box}}
 body{{margin:0;background:#E6DED0;color:#231F20;font-family:var(--serif);font-style:italic}}
 main{{max-width:1080px;margin:0 auto;padding:40px 28px 60px}}
