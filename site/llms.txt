@@ -6,7 +6,7 @@ The site is bilingual: English pages are at the paths below; Portuguese versions
 
 ## Estate
 
-- [Home and estate map](https://www.vinhadospadres.com/): the six vineyard properties on an interactive map, with 3D parcels, harvest and climate data
+- [Estate & terroir](https://www.vinhadospadres.com/): the six vineyard properties on an interactive map, with 3D parcels, harvest and climate data, and a terroir layer showing the geology of the Serra de São Mamede and the Portalegre DOC in 2D and 3D
 - [History](https://www.vinhadospadres.com/history): from the Jesuits' first vow in Paris in 1534 to the vineyard in Reguengo today
 - [The code](https://www.vinhadospadres.com/code): how to read the code on every label — months of skin maceration and total ageing in amphora (M = months), plus any ageing in another vessel
 
