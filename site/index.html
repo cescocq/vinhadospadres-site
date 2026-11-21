@@ -426,7 +426,7 @@ body.phone .tlogo{width:170px} body.phone.zoomed .tlogo{width:135px} .sitesheet 
 #terrCtl .tsw i{position:relative;width:30px;height:17px;border-radius:999px;background:rgba(35,31,32,.18);transition:background .2s}
 #terrCtl .tsw i::after{content:"";position:absolute;left:2px;top:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s}
 #terrCtl.on .tsw i{background:var(--gold,#C76653)}#terrCtl.on .tsw i::after{transform:translateX(13px)}
-#terrCtl .v3d{border-left:1px solid var(--hair);border-radius:0 999px 999px 0;padding-left:12px}#terrCtl .v3d:hover,#terrCtl .tsw:hover{background:rgba(35,31,32,.05)}body.sheet #terrCtl{right:12px;bottom:calc(var(--sheet-h,0px) + 12px + env(safe-area-inset-bottom,0px));padding:3px;gap:0;transition:bottom .28s ease}body.sheet #terrCtl button{font-size:13.5px;padding:6px 9px;gap:6px}body.sheet #terrCtl .tsw i{width:26px;height:15px}body.sheet #terrCtl .tsw i::after{width:11px;height:11px}body.sheet #terrCtl.on .tsw i::after{transform:translateX(11px)}body.sheet #terrCtl .v3d{padding-left:9px}body.sheet-up #terrCtl{opacity:0;pointer-events:none}
+#terrCtl .v3d{border-left:1px solid var(--hair);border-radius:0 999px 999px 0;padding-left:12px}#terrCtl .v3d:hover,#terrCtl .tsw:hover{background:rgba(35,31,32,.05)}body.sheet #terrCtl{right:12px;bottom:calc(var(--sheet-h,0px) + 12px + env(safe-area-inset-bottom,0px));padding:3px;gap:0;transition:bottom .28s ease}body.sheet #terrCtl button{font-size:13.5px;padding:6px 9px;gap:6px}body.sheet #terrCtl .tsw i{width:26px;height:15px}body.sheet #terrCtl .tsw i::after{width:11px;height:11px}body.sheet #terrCtl.on .tsw i::after{transform:translateX(11px)}body.sheet #terrCtl .v3d{padding-left:9px}body.sheet-up #terrCtl{opacity:0;pointer-events:none}body.sheet .lgrow{height:28px}body.sheet #terrCtl{height:42px;box-sizing:border-box}body.sheet #terrCtl button{height:100%;padding-top:0;padding-bottom:0}
 #g-geo path{stroke:#231F20;stroke-opacity:.35;stroke-width:.6;fill-opacity:.62;vector-effect:non-scaling-stroke}
 
 /* phones: pinches anywhere over the map zoom the map, never the page */
@@ -1864,5 +1864,44 @@ if(document.readyState==='complete')go();else addEventListener('load',go);
 })();</script><script id="agjs">(function(){var G=document.getElementById('ageGate'),ok=false;try{ok=localStorage.getItem('vdpAge')==='1'}catch(_){}
 if(/privacy|404|wineinfo/.test(location.pathname)||ok)return;G.hidden=false;document.getElementById('agY').focus();
 document.getElementById('agY').onclick=function(){try{localStorage.setItem('vdpAge','1')}catch(_){}G.hidden=true;};
-document.getElementById('agN').onclick=function(){G.classList.add('denied');};})();</script><script>['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});</script></body>
+document.getElementById('agN').onclick=function(){G.classList.add('denied');};})();</script><script>['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});</script><script id="sbtint">/* iOS Safari tints the status bar with the body colour: match it to the map under the top edge */
+(function(){
+ const land=[230,222,208];
+ const rgb=s=>{s=String(s).trim(); const h=s.match(/^#([0-9a-f]{6})$/i); if(h) return [0,2,4].map(i=>parseInt(h[1].substr(i,2),16)); const m=s.match(/[\d.]+/g);return m&&m.length>=3?m.slice(0,4).map(Number):null};
+ function colorAt(x,y){
+  const st=document.getElementById('sbpick')||document.head.appendChild(Object.assign(document.createElement('style'),{id:'sbpick'})); st.textContent='#map *{pointer-events:visiblePainted!important}'; const els=document.elementsFromPoint(x,y); st.textContent='';
+  const layers=[]; let base=null;
+  for(const el of els){
+   if(el.closest&&(el.closest('#top')||el.closest('#crumbs'))) continue;
+   if(el.tagName==='HTML'||el.tagName==='BODY') break;
+   const cs=getComputedStyle(el);
+   if(el instanceof SVGElement && /^(text|tspan|g|svg)$/.test(el.tagName)) continue;
+   if(el instanceof SVGElement){
+    let f=cs.fill; if(!f||f==='none') continue;
+    const u=f.match(/url\("?#([^")]+)/);
+    if(u){const r=document.querySelector('#'+u[1]+' rect'); f=r?(r.getAttribute('fill')||getComputedStyle(r).fill):null; if(!f) continue;}
+    const c=rgb(f); if(!c) continue;
+    let a=parseFloat(cs.fillOpacity||1)*(c.length>3?c[3]:1), n=el; while(n&&n.tagName!=='svg'){a*=parseFloat(getComputedStyle(n).opacity||1); n=n.parentNode;}
+    if(a<0.02) continue;
+    if(a>0.98){ base=c.slice(0,3); break; }
+    layers.push([c.slice(0,3),a]);
+   } else {
+    const bg=rgb(cs.backgroundColor); if(bg&&(bg.length<4||bg[3]>=0.9)){ base=bg.slice(0,3); break; }
+   }
+  }
+  if(!base) base=rgb(getComputedStyle(document.documentElement).getPropertyValue('--sea'))||land;
+  if(String(base).indexOf('NaN')>=0) base=land;
+  let col=base; for(let k=layers.length-1;k>=0;k--){ const [c,a]=layers[k]; col=col.map((v,i)=>v*(1-a)+c[i]*a); }
+  return col.map(Math.round);
+ }
+ let last='';
+ function tint(){
+  if(!document.body.classList.contains('phone')&&!document.body.classList.contains('sheet')){ if(last){document.documentElement.style.backgroundColor=document.body.style.backgroundColor='';last='';} return; }
+  const c=colorAt(innerWidth/2,1); const v=c?`rgb(${c.join(',')})`:'';
+  if(v!==last){ last=v; document.documentElement.style.backgroundColor=document.body.style.backgroundColor=v; }
+ }
+ setInterval(tint,350); addEventListener('load',tint);
+})();
+</script>
+</body>
 </html>
