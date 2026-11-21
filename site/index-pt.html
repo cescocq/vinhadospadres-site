@@ -2,7 +2,7 @@
 <html lang="pt-PT">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Vinha dos Padres | Vinhas centenárias e vinho de talha, Serra de São Mamede</title><link rel="icon" href="favicon.ico" sizes="48x48"><link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32"><link rel="icon" type="image/png" href="favicon-192x192.png" sizes="192x192"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="description" content="Vinhas velhas centenárias em altitude na Serra de São Mamede, vinificadas em talhas centenárias. Clique numa propriedade no mapa para a explorar em 3D."><link rel="alternate" hreflang="en" href="https://www.vinhadospadres.com/"><link rel="alternate" hreflang="pt-PT" href="https://www.vinhadospadres.com/index-pt"><link rel="alternate" hreflang="x-default" href="https://www.vinhadospadres.com/"><link rel="canonical" href="https://www.vinhadospadres.com/index-pt"><meta property="og:type" content="website"><meta property="og:site_name" content="Vinha dos Padres"><meta property="og:locale" content="pt_PT"><meta property="og:title" content="Vinha dos Padres"><meta property="og:description" content="Vinhas velhas centenárias em altitude na Serra de São Mamede, vinificadas em talhas centenárias. Clique numa propriedade no mapa para a explorar em 3D."><meta property="og:url" content="https://www.vinhadospadres.com/index-pt"><link rel="preload" href="fonts/arno-pro-italic-bold.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/arno-pro-italic-regular.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 @font-face{font-family:'Arno Pro';font-style:italic;font-weight:300 500;font-display:swap;src:url(fonts/arno-pro-italic-regular.woff2) format('woff2')}
@@ -428,6 +428,10 @@ body.phone .tlogo{width:170px} body.phone.zoomed .tlogo{width:135px} .sitesheet 
 #terrCtl.on .tsw i{background:var(--gold,#C76653)}#terrCtl.on .tsw i::after{transform:translateX(13px)}
 #terrCtl .v3d{border-left:1px solid var(--hair);border-radius:0 999px 999px 0;padding-left:12px}#terrCtl .v3d:hover,#terrCtl .tsw:hover{background:rgba(35,31,32,.05)}
 #g-geo path{stroke:#231F20;stroke-opacity:.35;stroke-width:.6;fill-opacity:.62;vector-effect:non-scaling-stroke}
+
+/* phones: pinches anywhere over the map zoom the map, never the page */
+#map,#labels,#marker{touch-action:none}
+@media (hover:none){#marker{pointer-events:none}#marker .dot,#marker .hint{pointer-events:auto}}
 </style>
 <style id="wlcss">#welcome{position:fixed;left:24px;top:calc(96px + env(safe-area-inset-top,0px));z-index:60;max-width:380px;background:#EDE6DA;border:1px solid rgba(35,31,32,.18);border-radius:18px;padding:20px 22px 18px;box-shadow:0 14px 40px rgba(0,0,0,.16);font-family:var(--serif);color:#231F20}
 #welcome[hidden]{display:none}#welcome h2{font-family:var(--serif);font-weight:600;font-style:italic;font-size:26px;margin:0 0 6px;line-height:1.1}#welcome p{margin:0 0 12px;font-size:15.5px;line-height:1.4;color:#4a433f}
@@ -1856,5 +1860,5 @@ if(document.readyState==='complete')go();else addEventListener('load',go);
 })();</script><script id="agjs">(function(){var G=document.getElementById('ageGate'),ok=false;try{ok=localStorage.getItem('vdpAge')==='1'}catch(_){}
 if(/privacy|404|wineinfo/.test(location.pathname)||ok)return;G.hidden=false;document.getElementById('agY').focus();
 document.getElementById('agY').onclick=function(){try{localStorage.setItem('vdpAge','1')}catch(_){}G.hidden=true;};
-document.getElementById('agN').onclick=function(){G.classList.add('denied');};})();</script></body>
+document.getElementById('agN').onclick=function(){G.classList.add('denied');};})();</script><script>['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});</script></body>
 </html>
