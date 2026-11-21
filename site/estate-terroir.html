@@ -1667,11 +1667,23 @@ async function buildTerroir(){
   const elev=(x,zz)=>el(lonc+x/mx, latc-zz/my);
   const w=(l1-l0)*mx, h=(b1-b0)*my, maxDim=Math.max(w,h), zmin=110, EX=ex*1.5, off=maxDim*0.022, Y=e=>(e-zmin)*EX+off;
   scene=new THREE.Scene(); const grp=new THREE.Group();
-  // top: terrain grid, cut to the outline by the texture alpha
-  const sx=Math.round(T.w/2), sz=Math.round(T.h/2), tg=new THREE.PlaneGeometry(w,h,sx,sz); tg.rotateX(-Math.PI/2);
-  const pos=tg.attributes.position; for(let i=0;i<pos.count;i++) pos.setY(i,Y(elev(pos.getX(i),pos.getZ(i)))); tg.computeVertexNormals();
-  const topMat=new THREE.MeshStandardMaterial({map:TERRX.tex,color:0xc4c0b8,alphaTest:0.5,roughness:0.95,metalness:0,side:THREE.DoubleSide});
-  const top=new THREE.Mesh(tg,topMat); top.castShadow=true; top.receiveShadow=true; top.customDepthMaterial=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking,map:TERRX.tex,alphaTest:0.5}); grp.add(top);
+  // top: DEM grid cells fully inside the outline + exact clipped triangles along the edge (vector edge, no alpha cut)
+  if(!TERRX.cells){ const cb=atob(T.cells), cu=new Uint8Array(cb.length); for(let i=0;i<cb.length;i++) cu[i]=cb.charCodeAt(i); TERRX.cells=cu; }
+  const cu=TERRX.cells, CW=T.w-1, uvOf=(lon,lat)=>[(lon-l0)/(l1-l0), (lat-b0)/(b1-b0)];
+  const posA=[], uvA=[], idxA=[], vid=new Int32Array(T.w*T.h).fill(-1);
+  const gv=(r,c)=>{ const k=r*T.w+c; if(vid[k]>=0) return vid[k]; const lon=T.lon0+c*T.d, lat=T.lat0-r*T.d, q=toL([lon,lat]); posA.push(q[0],Y(z[k]),q[1]); const u=uvOf(lon,lat); uvA.push(u[0],u[1]); return vid[k]=posA.length/3-1; };
+  for(let r=0;r<T.h-1;r++) for(let c=0;c<CW;c++){ const bit=r*CW+c; if(!(cu[bit>>3]&(128>>(bit&7)))) continue;
+    const a=gv(r,c), b=gv(r,c+1), cc=gv(r+1,c), dd=gv(r+1,c+1); idxA.push(a,cc,b, b,cc,dd); }
+  const bt=T.btri; for(let i=0;i<bt.length;i+=2){ const lon=bt[i], lat=bt[i+1], q=toL([lon,lat]); posA.push(q[0],Y(el(lon,lat)),q[1]); const u=uvOf(lon,lat); uvA.push(u[0],u[1]); idxA.push(posA.length/3-1); }
+  const tg=new THREE.BufferGeometry(); tg.setAttribute('position',new THREE.Float32BufferAttribute(posA,3)); tg.setAttribute('uv',new THREE.Float32BufferAttribute(uvA,2)); tg.setIndex(idxA); tg.computeVertexNormals();
+  const topMat=new THREE.MeshStandardMaterial({map:TERRX.tex,color:0xc4c0b8,roughness:0.95,metalness:0,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:2,polygonOffsetUnits:2});
+  const top=new THREE.Mesh(tg,topMat); top.castShadow=true; top.receiveShadow=true; grp.add(top);
+  // vector lines draped on the terrain: geology contacts, park (solid), DOC (dashed)
+  const drape=(ring,step)=>{ const out=[]; for(let i=0;i<ring.length-1;i++){ const a=ring[i],b=ring[i+1],dl=Math.hypot((b[0]-a[0])*mx,(b[1]-a[1])*my),n=Math.max(1,Math.ceil(dl/step)); for(let j=0;j<n;j++){ const lon=a[0]+(b[0]-a[0])*j/n, lat=a[1]+(b[1]-a[1])*j/n, q=toL([lon,lat]); out.push(new THREE.Vector3(q[0],Y(el(lon,lat))+8,q[1])); } } const e=ring[ring.length-1], q=toL(e); out.push(new THREE.Vector3(q[0],Y(el(e[0],e[1]))+8,q[1])); return out; };
+  const contactMat=new THREE.LineBasicMaterial({color:0x231F20,transparent:true,opacity:.35});
+  T.geol.forEach(r=>grp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(drape(r,60)),contactMat)));
+  grp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(drape(T.park,45)),new THREE.LineBasicMaterial({color:0x231F20})));
+  { const dl=new THREE.Line(new THREE.BufferGeometry().setFromPoints(drape(T.doc,45)),new THREE.LineDashedMaterial({color:0x231F20,dashSize:420,gapSize:330})); dl.computeLineDistances(); grp.add(dl); }
   // soil walls + outline, base
   const ring=T.outline.map(toL), dense=[]; for(let i=0;i<ring.length-1;i++){ const a=ring[i],b=ring[i+1],n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/90)); for(let j=0;j<n;j++) dense.push([a[0]+(b[0]-a[0])*j/n,a[1]+(b[1]-a[1])*j/n]); } dense.push(dense[0]);
   const wp=[],wu=[],lp=[]; let s=0; const ytop=Y(1030);
