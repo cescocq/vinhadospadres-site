@@ -16,7 +16,6 @@ T={  # page -> (title or None to keep, description or None to keep)
  'recognition-pt':(None,"Críticas, prémios e imprensa sobre a Vinha dos Padres, incluindo o 32.º lugar com 94 pontos no Top 100 Wines of Portugal 2025 de James Suckling."),
  'contact':(None,"Get in touch with Vinha dos Padres in Reguengo, Portalegre, Serra de São Mamede, or sign up for news and new releases."),
  'contact-pt':(None,"Contacte a Vinha dos Padres no Reguengo, Portalegre, Serra de São Mamede, ou subscreva as novidades e os novos lançamentos."),
- 'estate-terroir':("Estate terroir · Vinha dos Padres",None),
 }
 ICONS=('<link rel="icon" href="favicon.ico" sizes="48x48">'
        '<link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">'
