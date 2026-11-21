@@ -413,6 +413,7 @@ body.phone .tlogo{width:170px} body.phone.zoomed .tlogo{width:135px} .sitesheet 
 #terrLbl .lbl{pointer-events:none;font-size:15px}#terrLbl .lbl.go{pointer-events:auto;cursor:pointer}
 #terrLbl .lbl.peak::before{content:"";position:absolute;left:0;top:50%;margin-top:-6px;border-left:6.5px solid transparent;border-right:6.5px solid transparent;border-bottom:11px solid #231F20}
 #terrLbl .lbl.peak{transform:translate(-6.5px,-50%);padding-left:19px}
+#terrLbl .lbl.reg{font-size:18px;letter-spacing:.06em;white-space:normal;width:max-content;max-width:190px;line-height:1.15}#terrLbl .lbl.reg.l{text-align:right}#terrLbl .lbl.reg.b{transform:translate(-50%,26px);text-align:center}#terrLbl .lbl.reg::before{display:none}#terrLbl .lbl.reg.r{transform:translate(18px,-50%)}#terrLbl .lbl.reg.l{transform:translate(calc(-100% - 18px),-50%)}
 #terrLbl .edge{position:absolute;right:90px;bottom:64px;font-family:var(--serif-i);font-style:italic;letter-spacing:.06em;font-size:15px;color:#231F20;text-shadow:0 0 4px var(--halo),0 0 8px var(--halo)}
 #axo.terr #datum,#axo.terr #datum-tip,#axo.terr #toggle-side,#axo.terr #table-tip,#axo.terr .statbar{display:none}
 .tlg{display:flex;flex-direction:column;gap:6px;margin:6px 0 2px}.tlg div{display:flex;align-items:center;gap:10px;font-size:15px}
@@ -1723,11 +1724,12 @@ async function buildTerroir(){
   const P=[ {k:'summit',ll:[-7.3594,39.3131],cls:'peak',txt:()=> 'São Mamede · 1,025 m'},
     {k:'portalegre',ll:[-7.42917,39.29537],cls:'cityL',txt:()=>'Portalegre'},
     {k:'reguengo',ll:[-7.39276,39.29817],cls:'cityL',txt:()=>'Reguengo',dy:-14},
-    {k:'vdp',ll:[-7.3904,39.2921],cls:'cityR go',txt:()=>'Vinha dos Padres',dy:12}];
+    {k:'vdp',ll:[-7.3904,39.2921],cls:'cityR go',txt:()=>'Vinha dos Padres · 497–566 m',dy:12}];
+  { const pk=T.park.filter(c=>c[1]>39.38&&c[1]<39.47).reduce((a,c)=>c[0]>a[0]?c:a,[-99,0]), dc=T.doc.reduce((a,c)=>c[1]<a[1]?c:a,[0,99]);
+    P.push({k:'park',ll:pk,cls:'reg r',txt:()=>t('terrPark')},{k:'doc',ll:dc,cls:'reg b',txt:()=>t('terrDoc')}); }
   const L=document.getElementById('terrLbl'); L.innerHTML='';
   P.forEach(p=>{ const d=document.createElement('div'); d.className='lbl '+p.cls; d.textContent=p.txt(); L.appendChild(d); p.el=d; const q=toL(p.ll); p.v=new THREE.Vector3(q[0],Y(el(p.ll[0],p.ll[1]))+20,q[1]);
     if(p.k==='vdp') d.onclick=()=>{ terrGo='vdp'; exitAxo('vdp'); }; });
-  L.insertAdjacentHTML('beforeend','<div class="edge">Badajoz, '+(lang==='pt'?'Espanha':'Spain')+' · 57 km ↘</div>');
   TERRX.lbl=P; TERRX.dim={w,h,md};
 }
 const _tv=new THREE.Vector3();
