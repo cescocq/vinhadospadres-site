@@ -468,7 +468,14 @@ body.phone #welcome{left:12px;right:12px;max-width:none;bottom:auto;top:calc(70p
 if(localStorage.getItem('vdpBleed')!=='0'&&matchMedia('(max-width:699px)').matches){const d=document.documentElement;d.classList.add('bleed');
 const B=140,fix=()=>{if(Math.abs(scrollY-B)>0.5)scrollTo(0,B)};addEventListener('load',()=>{fix();setTimeout(fix,300);setTimeout(fix,1200)});addEventListener('scroll',fix,{passive:true});addEventListener('resize',()=>setTimeout(fix,50));}}catch(e){}})();</script>
 <style id="bleedcss">html.bleed{--bl:140px}html.bleed body{padding-top:var(--bl);box-sizing:content-box}html.bleed #app{overflow:visible;clip-path:inset(calc(-1 * var(--bl)) 0 0 0)}html.bleed #map{overflow:visible}</style>
-</head>
+<style id="xseccss">#xsec{display:none;position:absolute;left:22px;bottom:22px;z-index:3;background:rgba(237,231,220,.94);border:1px solid rgba(35,31,32,.12);border-radius:16px;box-shadow:0 10px 30px rgba(35,31,32,.10);padding:12px 16px 10px;pointer-events:auto;font-family:var(--serif,'Arno Pro',Georgia,serif);font-style:italic;color:#231F20}
+body:not(.sheet) #axo.terr.on #xsec.on{display:block}
+#xsec .xh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:14px;margin:0 2px 2px}
+#xsec .xh b{font-size:15px}#xsec .xh span{color:rgba(35,31,32,.55);font-size:12.5px}
+#xsec svg{display:block;overflow:visible}
+#xsec .xl{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;margin:4px 2px 0}
+#xsec .xl i{display:inline-block;width:18px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+</style></head>
 <body><div id="ageGate" role="dialog" aria-modal="true" aria-labelledby="agt" hidden><div class="b"><h2 id="agt" class="lg" aria-label="Welcome to Vinha dos Padres"><svg  data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 327.75 47.65">
   <defs>
     <style>
@@ -625,7 +632,7 @@ const B=140,fix=()=>{if(Math.abs(scrollY-B)>0.5)scrollTo(0,B)};addEventListener(
     <div class="pill"><h2></h2><div class="sub"></div></div>
     <div class="grid-note"></div>
     <div class="statbar"></div>
-    <aside class="side"></aside>
+    <aside class="side"></aside><div id="xsec" aria-label="Cross-section"></div>
     <div class="ctrl">
       <button class="cbtn" id="compass" aria-label="Reset view to north">
         <svg width="44" height="44" viewBox="-22 -22 44 44"><circle r="20" fill="none" stroke="rgba(35,31,32,.35)"/>
@@ -1533,9 +1540,9 @@ function frame(){
   controls.minDistance=sph.radius*0.25; controls.maxDistance=dist*1.12; camera.far=dist*10; camera.updateProjectionMatrix(); controls.update();
 }
 function viewOff(){ if(!camera) return; const side=axo.querySelector('.side'); const open=side && !side.classList.contains('min');
-  const o=(open && W>1100)? Math.min(300,(side.offsetWidth+70)/2):0; const oy=(open && isSheet)? Math.round(Math.min(sheetH(side),H*0.6)/2 - (isPhone?50:30)) : 0;
+  const o=(open && W>1100)? Math.min(300,(side.offsetWidth+70)/2):0; let oy=(open && isSheet)? Math.round(Math.min(sheetH(side),H*0.6)/2 - (isPhone?50:30)) : 0; if(TERR && !isSheet && typeof XSEC!=='undefined') oy+=Math.round((xsecH()+22)/2);
   camera.setViewOffset(W,H,o,oy,W,H); camera.updateProjectionMatrix(); }
-function resizeGL(){ if(!renderer) return; renderer.setSize(W,H,false); camera.aspect=W/H; viewOff(); }
+function resizeGL(){ if(!renderer) return; renderer.setSize(W,H,false); camera.aspect=W/H; if(TERR) drawXsec(); viewOff(); }
 let tgtTween=null;
 function loop(now){
   if(!loopOn) return; requestAnimationFrame(loop);
@@ -1668,12 +1675,13 @@ async function enterTerroir(){
   terrGo=null; terrFrom=(level==='vdp')?'vdp':'pg';
   initGL(); hideTip(); armed=null; showLoader(true);
   if(typeof TERR_D==='undefined') await loadJS('data/terroir.js');
+  if(typeof XSEC==='undefined') await loadJS('data/xsec.js');
   const ol={type:'Polygon',coordinates:[TERR_D.outline]};
   await fly(fitK(ol,isSheet?{l:20,r:20,t:110,b:SHEET_PEEK_3D+20}:{l:120,r:440,t:120,b:90}), 900);
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
   inAxo=true; TERR=true; P3=null; panel.classList.remove('on'); axo.classList.add('terr');
   setSheet(axo.querySelector('.side'),'peek');
-  await buildTerroir(); terrUI(); resizeGL(); terrFrame();
+  await buildTerroir(); terrUI(); drawXsec(); resizeGL(); terrFrame();
   rise=0; riseStart=performance.now(); world.scale.y=0.002;
   axo.classList.add('on'); document.body.classList.add('axo-on'); axo.setAttribute('aria-hidden','false'); loopOn=true; requestAnimationFrame(loop); crumbs(); terrCtl();
   requestAnimationFrame(()=>requestAnimationFrame(()=>showLoader(false)));
@@ -1706,6 +1714,7 @@ async function buildTerroir(){
   const drape=(ring,step)=>{ const out=[]; for(let i=0;i<ring.length-1;i++){ const a=ring[i],b=ring[i+1],dl=Math.hypot((b[0]-a[0])*mx,(b[1]-a[1])*my),n=Math.max(1,Math.ceil(dl/step)); for(let j=0;j<n;j++){ const lon=a[0]+(b[0]-a[0])*j/n, lat=a[1]+(b[1]-a[1])*j/n, q=toL([lon,lat]); out.push(new THREE.Vector3(q[0],Y(el(lon,lat))+8,q[1])); } } const e=ring[ring.length-1], q=toL(e); out.push(new THREE.Vector3(q[0],Y(el(e[0],e[1]))+8,q[1])); return out; };
   const contactMat=new THREE.LineBasicMaterial({color:0x231F20,transparent:true,opacity:.35});
   T.geol.forEach(r=>grp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(drape(r,60)),contactMat)));
+  if(typeof XSEC!=='undefined'){ const olP=[[T.outline.map(toL)]], pts=drape(XSEC.path,40), runs=[]; let cur=[]; pts.forEach(v=>{ if(pip(v.x,v.z,olP)) cur.push(v); else if(cur.length){ runs.push(cur); cur=[]; } }); if(cur.length) runs.push(cur); runs.forEach(r=>{ if(r.length>1){ r.forEach(v=>v.y+=14); grp.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(r),r.length*3,90,6,false),new THREE.MeshBasicMaterial({color:new THREE.Color(0xB04F3D).convertSRGBToLinear()}))); } }); }
   grp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(drape(T.park,45)),new THREE.LineBasicMaterial({color:0x231F20})));
   { const dl=new THREE.Line(new THREE.BufferGeometry().setFromPoints(drape(T.doc,45)),new THREE.LineDashedMaterial({color:0x231F20,dashSize:420,gapSize:330})); dl.computeLineDistances(); grp.add(dl); }
   // soil walls + outline, base
@@ -1747,6 +1756,52 @@ const _tv=new THREE.Vector3();
 function terrLabels(){ if(!TERRX||!TERRX.lbl) return; const s=world.scale.y;
   TERRX.lbl.forEach(p=>{ _tv.set(p.v.x,p.v.y*s,p.v.z).project(camera); const vis=_tv.z<1 && Math.abs(_tv.x)<1.05 && Math.abs(_tv.y)<1.05;
     p.el.style.display=vis?'':'none'; if(vis){ p.el.style.left=((_tv.x+1)/2*W)+'px'; p.el.style.top=((1-_tv.y)/2*H+(p.dy||0))+'px'; p.el.style.opacity=Math.min(1,rise*1.2); } }); }
+
+/* ---- Terroir cross-section (bottom card) ---- */
+var XSEC_V=(new URLSearchParams(location.search).get('xsec')||'a').toLowerCase();
+const XS_COL={portalegre:'#E289B7',silurian:'#BFCDB1',ordovician:'#707762',devonian:'#CE7200',None:'#D9D2C4'};
+const XS_TXT={en:{title:'Cross-section',route:'Portalegre · Vinha dos Padres · São Mamede',hx:'heights ×{e}',sw:'south-west',ne:'north-east',
+  portalegre:'Portalegre granite',silurian:'Silurian quartzites and black shales',ordovician:'Ordovician quartzites and slates',devonian:'Devonian quartzites and slates',None:'outside the park',
+  dPo:'451 m',dVdp:'545 m · Portalegre granite',dSm:'1,025 m · Devonian quartzites',sea:'sea level',depth:'below the surface band: not to scale'},
+ pt:{title:'Corte',route:'Portalegre · Vinha dos Padres · São Mamede',hx:'altitudes ×{e}',sw:'sudoeste',ne:'nordeste',
+  portalegre:'Granito de Portalegre',silurian:'Quartzitos e xistos negros do Silúrico',ordovician:'Quartzitos e xistos do Ordovícico',devonian:'Quartzitos e xistos do Devónico',None:'fora do parque',
+  dPo:'451 m',dVdp:'545 m · granito de Portalegre',dSm:'1025 m · quartzitos do Devónico',sea:'nível do mar',depth:'abaixo da faixa: sem escala'}};
+var XS_LASTH=0; function xsecH(){ return XS_LASTH||(XSEC_V==='b'?330:270); }
+function drawXsec(){
+  const box=document.getElementById('xsec'); if(!box||typeof XSEC==='undefined') return;
+  if(isSheet||!TERR){ box.classList.remove('on'); return; }
+  const L=XS_TXT[lang==='pt'?'pt':'en'], X=XSEC, side=axo.querySelector('.side');
+  const right=(side&&!side.classList.contains('min'))? side.offsetWidth+22+16 : 22;
+  const cw=Math.max(420,W-22-right); box.style.width=cw+'px'; box.style.right='auto';
+  const mL=46,mR=10,mT=52,mB=24, pw=cw-32-mL-mR, legendH=22, headH=22;
+  const B=XSEC_V==='b', band=170, zTop=1080, zBot=B?0:Math.min(...X.prof.map(p=>p[1]))-band, EXG=B?2:3;
+  const ph=Math.round(EXG*(zTop-zBot)*pw/(X.total*1000)), ch=ph+24+headH+legendH+mT+mB; XS_LASTH=ch;
+  const sx=d=>mL+d/X.total*pw, sy=z=>mT+(zTop-z)/(zTop-zBot)*ph;
+  const exag=EXG;
+  let g='';
+  const grid=B?[0,200,400,600,800,1000]:[400,600,800,1000];
+  grid.forEach(z=>{ g+=`<line x1="${mL}" x2="${mL+pw}" y1="${sy(z)}" y2="${sy(z)}" stroke="rgba(35,31,32,${z===0?.35:.12})"/><text x="${mL-6}" y="${sy(z)+4}" text-anchor="end" font-size="11.5" fill="rgba(35,31,32,.6)">${z===0?'0':z} m</text>`; });
+  const P=X.prof; let i=0;
+  if(B){ // neutral mass from surface band down to sea level
+    const top=P.map(p=>`${sx(p[0]).toFixed(1)},${(sy(p[1]-band)).toFixed(1)}`).join(' ');
+    g+=`<polygon points="${top} ${sx(P[P.length-1][0]).toFixed(1)},${sy(0)} ${sx(P[0][0]).toFixed(1)},${sy(0)}" fill="url(#xsDeep)"/>`; }
+  while(i<P.length-1){ let j=i; while(j<P.length-1&&String(P[j+1][2])===String(P[i][2])) j++;
+    const seg=P.slice(i,Math.min(j+2,P.length)), c=XS_COL[String(P[i][2])]||XS_COL.None;
+    const top=seg.map(p=>`${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(' '), bot=seg.slice().reverse().map(p=>`${sx(p[0]).toFixed(1)},${sy(p[1]-band).toFixed(1)}`).join(' ');
+    g+=`<polygon points="${top} ${bot}" fill="${c}"/>`; i=j+1; }
+  g+=`<polyline points="${P.map(p=>`${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(' ')}" fill="none" stroke="#231F20" stroke-width="1.8" stroke-linejoin="round"/>`;
+  const mk=(key,name,sub,col)=>{ const d=X.marks[key], z=P.reduce((a,p)=>Math.abs(p[0]-d)<Math.abs(a[0]-d)?p:a)[1], x=sx(d), y=sy(z);
+    return `<line x1="${x}" y1="${y-7}" x2="${x}" y2="${y-30}" stroke="${col}" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="5" fill="${col}" stroke="#fff" stroke-width="1.6"/><text x="${x}" y="${y-46}" text-anchor="middle" font-size="14.5" font-weight="700" fill="${col}">${name}</text><text x="${x}" y="${y-33}" text-anchor="middle" font-size="11.5" fill="#231F20">${sub}</text>`; };
+  g+=mk('Portalegre','Portalegre',L.dPo,'#231F20')+mk('Vinha dos Padres','Vinha dos Padres',L.dVdp,'#B04F3D')+mk('São Mamede','São Mamede',L.dSm,'#231F20');
+  for(let k=0;k<=X.total;k+=2) g+=`<text x="${sx(k)}" y="${mT+ph+16}" text-anchor="middle" font-size="11" fill="rgba(35,31,32,.55)">${k} km</text>`;
+  g+=`<text x="${mL}" y="${mT+ph+16}" font-size="11" fill="rgba(35,31,32,.55)" dx="-${mL-4}">${''}</text>`;
+  const defs=`<defs><pattern id="xsDeep" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#DDD5C7"/><line x1="0" y1="0" x2="0" y2="7" stroke="rgba(35,31,32,.10)" stroke-width="1"/></pattern></defs>`;
+  const units=['portalegre','silurian','ordovician','devonian','None'];
+  box.innerHTML=`<div class="xh"><b>${L.title} · ${L.route}</b><span>${L.sw} → ${L.ne} · ${L.hx.replace('{e}',exag)}${B?' · '+L.depth:''}</span></div>
+   <svg width="${cw-32}" height="${ch-24-headH-legendH}" viewBox="0 0 ${cw-32} ${ch-24-headH-legendH}">${defs}${g}</svg>
+   <div class="xl">${units.map(u=>`<span><i style="background:${XS_COL[u]}"></i>${L[u]}</span>`).join('')}</div>`;
+  box.classList.add('on');
+}
 function terrFrame(){
   const box=new THREE.Box3().setFromObject(world), sph=box.getBoundingSphere(new THREE.Sphere());
   const vf=camera.fov*Math.PI/360, hf=Math.atan(Math.tan(vf)*camera.aspect), dist=sph.radius/Math.sin(Math.min(vf,hf))*(isSheet?1.0:1.0), az=0.25, pol=0.9;
