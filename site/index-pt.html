@@ -1778,7 +1778,7 @@ function drawXsec(){
   const L=XS_TXT[lang==='pt'?'pt':'en'], X=XSEC, side=axo.querySelector('.side');
   const cw=side?side.offsetWidth:470; box.style.width=cw+'px';
   const mL=40,mR=6,mT=52,mB=20, pw=cw-32-mL-mR, legendH=0, headH=26, footH=84;
-  const B=XSEC_V==='b', band=150, zTop=1060, zBot=B?0:Math.min(...X.prof.map(p=>p[1]))-band, EXG=B?2:4;
+  const B=XSEC_V==='b', band=150, zTop=1060, zBot=B?0:Math.min(...X.prof.map(p=>p[1]))-band, EXG=4;
   const fixedH=24+headH+legendH+mT+mB+footH; let ph=Math.round(EXG*(zTop-zBot)*pw/(X.total*1000));
   if(side){ side.style.maxHeight='none'; const st=side.getBoundingClientRect().top-axo.getBoundingClientRect().top, avail=H-st-side.scrollHeight-22-14-fixedH; ph=Math.max(64,Math.min(ph,Math.floor(avail))); }
   const ch=ph+fixedH; XS_LASTH=ch;
