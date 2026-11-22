@@ -1776,7 +1776,7 @@ function drawXsec(){
   if(isSheet||!TERR){ box.classList.remove('on'); return; }
   const L=XS_TXT[lang==='pt'?'pt':'en'], X=XSEC, side=axo.querySelector('.side');
   const cw=side?side.offsetWidth:470; box.style.width=cw+'px';
-  const mL=40,mR=6,mT=52,mB=20, pw=cw-32-mL-mR, legendH=0, headH=26, footH=30;
+  const mL=40,mR=6,mT=52,mB=20, pw=cw-32-mL-mR, legendH=0, headH=26, footH=0;
   const B=XSEC_V==='b', band=150, zTop=1060, zBot=B?0:Math.min(...X.prof.map(p=>p[1]))-band, EXG=4;
   const fixedH=24+headH+legendH+mT+mB+footH; let ph=Math.round(EXG*(zTop-zBot)*pw/(X.total*1000));
   if(side){ side.style.maxHeight='none'; const st=side.getBoundingClientRect().top-axo.getBoundingClientRect().top, avail=H-st-side.scrollHeight-22-14-fixedH; ph=Math.max(64,Math.min(ph,Math.floor(avail))); }
@@ -1806,9 +1806,9 @@ function drawXsec(){
   g+=`<text x="${mL}" y="${mT+ph+16}" font-size="11" fill="rgba(35,31,32,.55)" dx="-${mL-4}">${''}</text>`;
   const defs=`<defs><pattern id="xsDeep" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#DDD5C7"/><line x1="0" y1="0" x2="0" y2="7" stroke="rgba(35,31,32,.10)" stroke-width="1"/></pattern></defs>`;
   const units=['portalegre','silurian','ordovician','devonian','None'];
-  box.innerHTML=`<div class="xh"><b>${L.title}</b><span>${L.hx.replace('{e}',exag)}</span></div>
+  box.innerHTML=`<div class="xh"><b>${L.title}</b></div>
    <svg width="${cw-32}" height="${ph+mT+mB}" viewBox="0 0 ${cw-32} ${ph+mT+mB}">${defs}${g}</svg>
-   <div class="foot fn">${t('terrSrc').split(' · ')[0]}</div>`;
+   `;
   if(side){ const top=side.getBoundingClientRect().top-axo.getBoundingClientRect().top; side.style.maxHeight=Math.max(160,H-top-ch-22-14)+'px'; box.style.top=(top+side.offsetHeight+14)+'px'; box.style.bottom='22px'; box.style.height='auto'; }
   box.classList.add('on');
 }
