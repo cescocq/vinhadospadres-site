@@ -468,12 +468,17 @@ body.phone #welcome{left:12px;right:12px;max-width:none;bottom:auto;top:calc(70p
 if(localStorage.getItem('vdpBleed')!=='0'&&matchMedia('(max-width:699px)').matches){const d=document.documentElement;d.classList.add('bleed');
 const B=140,fix=()=>{if(Math.abs(scrollY-B)>0.5)scrollTo(0,B)};addEventListener('load',()=>{fix();setTimeout(fix,300);setTimeout(fix,1200)});addEventListener('scroll',fix,{passive:true});addEventListener('resize',()=>setTimeout(fix,50));}}catch(e){}})();</script>
 <style id="bleedcss">html.bleed{--bl:140px}html.bleed body{padding-top:var(--bl);box-sizing:content-box}html.bleed #app{overflow:visible;clip-path:inset(calc(-1 * var(--bl)) 0 0 0)}html.bleed #map{overflow:visible}</style>
-<style id="xseccss">#xsec{display:none;position:absolute;left:22px;bottom:22px;z-index:3;background:rgba(237,231,220,.94);border:1px solid rgba(35,31,32,.12);border-radius:16px;box-shadow:0 10px 30px rgba(35,31,32,.10);padding:12px 16px 10px;pointer-events:auto;font-family:var(--serif,'Arno Pro',Georgia,serif);font-style:italic;color:#231F20}
+<style id="xseccss">#xsec{display:none;position:absolute;right:22px;bottom:22px;z-index:3;background:rgba(237,231,220,.94);border:1px solid rgba(35,31,32,.12);border-radius:16px;box-shadow:0 10px 30px rgba(35,31,32,.10);padding:12px 16px 10px;pointer-events:auto;font-family:var(--serif,'Arno Pro',Georgia,serif);font-style:italic;color:#231F20}
 body:not(.sheet) #axo.terr.on #xsec.on{display:block}
-#xsec .xh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:14px;margin:0 2px 2px}
+#xsec .xh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 2px 0}#xsec .xh b{font-size:19px}#xsec .xh span{font-size:12px}
 #xsec .xh b{font-size:15px}#xsec .xh span{color:rgba(35,31,32,.55);font-size:12.5px}
 #xsec svg{display:block;overflow:visible}
-#xsec .xl{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;margin:4px 2px 0}
+#xsec .xl{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;margin:2px 2px 0;color:rgba(35,31,32,.7)}#xsec .xrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px}#xsec .gowines{margin:0}#xsec .xl{margin:0}#xsec .foot{margin-top:8px;font-size:12px;color:rgba(35,31,32,.55)}
+body:not(.sheet) #axo.terr .side{overflow:auto}
+body:not(.sheet) #axo.terr .tstats{display:none}
+body:not(.sheet) #axo.terr .tlg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 12px;font-size:13px;line-height:1.25}
+body:not(.sheet) #axo.terr .help{right:calc(22px + 470px + 14px)}
+body:not(.sheet) #axo.terr .ctrl{right:calc(22px + 470px + 14px)!important;bottom:22px!important}
 #xsec .xl i{display:inline-block;width:18px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 </style></head>
 <body><div id="ageGate" role="dialog" aria-modal="true" aria-labelledby="agt" hidden><div class="b"><h2 id="agt" class="lg" aria-label="Welcome to Vinha dos Padres"><svg  data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 327.75 47.65">
@@ -1540,7 +1545,7 @@ function frame(){
   controls.minDistance=sph.radius*0.25; controls.maxDistance=dist*1.12; camera.far=dist*10; camera.updateProjectionMatrix(); controls.update();
 }
 function viewOff(){ if(!camera) return; const side=axo.querySelector('.side'); const open=side && !side.classList.contains('min');
-  const o=(open && W>1100)? Math.min(300,(side.offsetWidth+70)/2):0; let oy=(open && isSheet)? Math.round(Math.min(sheetH(side),H*0.6)/2 - (isPhone?50:30)) : 0; if(TERR && !isSheet && typeof XSEC!=='undefined') oy+=Math.round((xsecH()+22)/2);
+  const o=(open && W>1100)? Math.min(300,(side.offsetWidth+70)/2):0; let oy=(open && isSheet)? Math.round(Math.min(sheetH(side),H*0.6)/2 - (isPhone?50:30)) : 0;
   camera.setViewOffset(W,H,o,oy,W,H); camera.updateProjectionMatrix(); }
 function resizeGL(){ if(!renderer) return; renderer.setSize(W,H,false); camera.aspect=W/H; if(TERR) drawXsec(); viewOff(); }
 let tgtTween=null;
@@ -1762,25 +1767,26 @@ var XSEC_V=(new URLSearchParams(location.search).get('xsec')||'a').toLowerCase()
 const XS_COL={portalegre:'#E289B7',silurian:'#BFCDB1',ordovician:'#707762',devonian:'#CE7200',None:'#D9D2C4'};
 const XS_TXT={en:{title:'Cross-section',route:'Portalegre · Vinha dos Padres · São Mamede',hx:'heights ×{e}',sw:'south-west',ne:'north-east',
   portalegre:'Portalegre granite',silurian:'Silurian quartzites and black shales',ordovician:'Ordovician quartzites and slates',devonian:'Devonian quartzites and slates',None:'outside the park',
-  dPo:'451 m',dVdp:'545 m · Portalegre granite',dSm:'1,025 m · Devonian quartzites',sea:'sea level',depth:'below the surface band: not to scale'},
+  dPo:'451 m',dVdp:'545 m',dSm:'1,025 m',sea:'sea level',depth:'below the surface band: not to scale'},
  pt:{title:'Corte',route:'Portalegre · Vinha dos Padres · São Mamede',hx:'altitudes ×{e}',sw:'sudoeste',ne:'nordeste',
   portalegre:'Granito de Portalegre',silurian:'Quartzitos e xistos negros do Silúrico',ordovician:'Quartzitos e xistos do Ordovícico',devonian:'Quartzitos e xistos do Devónico',None:'fora do parque',
-  dPo:'451 m',dVdp:'545 m · granito de Portalegre',dSm:'1025 m · quartzitos do Devónico',sea:'nível do mar',depth:'abaixo da faixa: sem escala'}};
+  dPo:'451 m',dVdp:'545 m',dSm:'1025 m',sea:'nível do mar',depth:'abaixo da faixa: sem escala'}};
 var XS_LASTH=0; function xsecH(){ return XS_LASTH||(XSEC_V==='b'?330:270); }
 function drawXsec(){
   const box=document.getElementById('xsec'); if(!box||typeof XSEC==='undefined') return;
   if(isSheet||!TERR){ box.classList.remove('on'); return; }
   const L=XS_TXT[lang==='pt'?'pt':'en'], X=XSEC, side=axo.querySelector('.side');
-  const right=(side&&!side.classList.contains('min'))? side.offsetWidth+22+16 : 22;
-  const cw=Math.max(420,W-22-right); box.style.width=cw+'px'; box.style.right='auto';
-  const mL=46,mR=10,mT=52,mB=24, pw=cw-32-mL-mR, legendH=22, headH=22;
-  const B=XSEC_V==='b', band=170, zTop=1080, zBot=B?0:Math.min(...X.prof.map(p=>p[1]))-band, EXG=B?2:3;
-  const ph=Math.round(EXG*(zTop-zBot)*pw/(X.total*1000)), ch=ph+24+headH+legendH+mT+mB; XS_LASTH=ch;
+  const cw=side?side.offsetWidth:470; box.style.width=cw+'px';
+  const mL=40,mR=6,mT=52,mB=20, pw=cw-32-mL-mR, legendH=0, headH=26, footH=84;
+  const B=XSEC_V==='b', band=150, zTop=1060, zBot=B?0:Math.min(...X.prof.map(p=>p[1]))-band, EXG=B?2:4;
+  const fixedH=24+headH+legendH+mT+mB+footH; let ph=Math.round(EXG*(zTop-zBot)*pw/(X.total*1000));
+  if(side){ side.style.maxHeight='none'; const st=side.getBoundingClientRect().top-axo.getBoundingClientRect().top, avail=H-st-side.scrollHeight-22-14-fixedH; ph=Math.max(64,Math.min(ph,Math.floor(avail))); }
+  const ch=ph+fixedH; XS_LASTH=ch;
   const sx=d=>mL+d/X.total*pw, sy=z=>mT+(zTop-z)/(zTop-zBot)*ph;
-  const exag=EXG;
+  const exag=(Math.round(ph/(zTop-zBot)/(pw/(X.total*1000))*2)/2).toString();
   let g='';
   const grid=B?[0,200,400,600,800,1000]:[400,600,800,1000];
-  grid.forEach(z=>{ g+=`<line x1="${mL}" x2="${mL+pw}" y1="${sy(z)}" y2="${sy(z)}" stroke="rgba(35,31,32,${z===0?.35:.12})"/><text x="${mL-6}" y="${sy(z)+4}" text-anchor="end" font-size="11.5" fill="rgba(35,31,32,.6)">${z===0?'0':z} m</text>`; });
+  grid.forEach(z=>{ g+=`<line x1="${mL}" x2="${mL+pw}" y1="${sy(z)}" y2="${sy(z)}" stroke="rgba(35,31,32,${z===0?.35:.12})"/><text x="${mL-6}" y="${sy(z)+4}" text-anchor="end" font-size="10.5" fill="rgba(35,31,32,.6)">${z===0?'0':z} m</text>`; });
   const P=X.prof; let i=0;
   if(B){ // neutral mass from surface band down to sea level
     const top=P.map(p=>`${sx(p[0]).toFixed(1)},${(sy(p[1]-band)).toFixed(1)}`).join(' ');
@@ -1790,16 +1796,18 @@ function drawXsec(){
     const top=seg.map(p=>`${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(' '), bot=seg.slice().reverse().map(p=>`${sx(p[0]).toFixed(1)},${sy(p[1]-band).toFixed(1)}`).join(' ');
     g+=`<polygon points="${top} ${bot}" fill="${c}"/>`; i=j+1; }
   g+=`<polyline points="${P.map(p=>`${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(' ')}" fill="none" stroke="#231F20" stroke-width="1.8" stroke-linejoin="round"/>`;
-  const mk=(key,name,sub,col)=>{ const d=X.marks[key], z=P.reduce((a,p)=>Math.abs(p[0]-d)<Math.abs(a[0]-d)?p:a)[1], x=sx(d), y=sy(z);
-    return `<line x1="${x}" y1="${y-7}" x2="${x}" y2="${y-30}" stroke="${col}" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="5" fill="${col}" stroke="#fff" stroke-width="1.6"/><text x="${x}" y="${y-46}" text-anchor="middle" font-size="14.5" font-weight="700" fill="${col}">${name}</text><text x="${x}" y="${y-33}" text-anchor="middle" font-size="11.5" fill="#231F20">${sub}</text>`; };
+  const mk=(key,name,sub,col)=>{ const d=X.marks[key], z=P.reduce((a,p)=>Math.abs(p[0]-d)<Math.abs(a[0]-d)?p:a)[1], x=sx(d), y=sy(z), an=key==='Portalegre'?'start':'middle', tx=key==='Portalegre'?x-6:x;
+    return `<line x1="${x}" y1="${y-7}" x2="${x}" y2="${y-30}" stroke="${col}" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="5" fill="${col}" stroke="#fff" stroke-width="1.6"/><text x="${tx}" y="${y-46}" text-anchor="${an}" font-size="13.5" font-weight="700" fill="${col}">${name}</text><text x="${tx}" y="${y-33}" text-anchor="${an}" font-size="10.5" fill="#231F20">${sub}</text>`; };
   g+=mk('Portalegre','Portalegre',L.dPo,'#231F20')+mk('Vinha dos Padres','Vinha dos Padres',L.dVdp,'#B04F3D')+mk('São Mamede','São Mamede',L.dSm,'#231F20');
   for(let k=0;k<=X.total;k+=2) g+=`<text x="${sx(k)}" y="${mT+ph+16}" text-anchor="middle" font-size="11" fill="rgba(35,31,32,.55)">${k} km</text>`;
   g+=`<text x="${mL}" y="${mT+ph+16}" font-size="11" fill="rgba(35,31,32,.55)" dx="-${mL-4}">${''}</text>`;
   const defs=`<defs><pattern id="xsDeep" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#DDD5C7"/><line x1="0" y1="0" x2="0" y2="7" stroke="rgba(35,31,32,.10)" stroke-width="1"/></pattern></defs>`;
   const units=['portalegre','silurian','ordovician','devonian','None'];
-  box.innerHTML=`<div class="xh"><b>${L.title} · ${L.route}</b><span>${L.sw} → ${L.ne} · ${L.hx.replace('{e}',exag)}${B?' · '+L.depth:''}</span></div>
-   <svg width="${cw-32}" height="${ch-24-headH-legendH}" viewBox="0 0 ${cw-32} ${ch-24-headH-legendH}">${defs}${g}</svg>
-   <div class="xl">${units.map(u=>`<span><i style="background:${XS_COL[u]}"></i>${L[u]}</span>`).join('')}</div>`;
+  box.innerHTML=`<div class="xh"><b>${L.title}</b><span>${L.sw} → ${L.ne} · ${L.hx.replace('{e}',exag)}</span></div>
+   <svg width="${cw-32}" height="${ph+mT+mB}" viewBox="0 0 ${cw-32} ${ph+mT+mB}">${defs}${g}</svg>
+   <div class="xrow"><button class="gowines" id="terrGoV">${t('terrGo')}</button><div class="xl"><span><i style="background:${XS_COL.None}"></i>${L.None}</span></div></div><div class="foot fn">${t('terrSrc')}</div>`;
+  box.querySelector('#terrGoV').onclick=()=>{ terrGo='vdp'; exitAxo('vdp'); };
+  if(side){ const top=side.getBoundingClientRect().top-axo.getBoundingClientRect().top; side.style.maxHeight=Math.max(160,H-top-ch-22-14)+'px'; box.style.top=(top+side.offsetHeight+14)+'px'; box.style.bottom='auto'; }
   box.classList.add('on');
 }
 function terrFrame(){
@@ -1819,10 +1827,10 @@ function terrUI(){
   sideC.innerHTML=`<div class="p-h"><div><h2>${t('terrH')}</h2></div></div><p style="margin:6px 0 0;font-size:16px;line-height:1.5">${t('terrP')}</p>
   <div class="tstats two"><div><span>${t('terrVines')}</span><b>497–566 m</b></div><div><span>${t('terrSummit')}</span><b>1,025 m</b></div></div>
   <h3>${t('terrGeo')}</h3><div class="tlg">${GEO_U.map(u=>`<div><i style="background:${u[1]}"></i>${u[pi]}</div>`).join('')}
-  <div><i class="ln d"></i>${t('terrDoc')}</div><div><i class="ln"></i>${t('terrPark')}</div></div>
+  <div><i class="ln d"></i>${t('terrDoc')}</div><div><i class="ln"></i>${t('terrPark')}</div></div>`+(isSheet?`
   <button class="gowines" id="terrGoV" style="margin-top:12px">${t('terrGo')}</button>
-  <div class="foot fn" style="margin-top:10px">${t('terrSrc')}</div>`;
-  sideC.querySelector('#terrGoV').onclick=()=>{ terrGo='vdp'; exitAxo('vdp'); };
+  <div class="foot fn" style="margin-top:10px">${t('terrSrc')}</div>`:'');
+  if(isSheet) sideC.querySelector('#terrGoV').onclick=()=>{ terrGo='vdp'; exitAxo('vdp'); };
 }
 
 /* ---------------- Terroir 2D layer: geology on the map, on from the 10 km scale down ---------------- */
@@ -1855,7 +1863,7 @@ loader.querySelector('.lg').innerHTML=D.logo;
 function showLoader(on){ loader.querySelector('.msg').textContent=t('loading'); loader.classList.toggle('on',on); }
 function exitAxo(to='vdp'){
   if(!inAxo) return;
-  if(TERR){ to=terrGo||terrFrom; terrGo=null; TERR=null; axo.classList.remove('terr'); document.getElementById('terrLbl').innerHTML=''; setTimeout(terrCtl,50); }
+  if(TERR){ const sd=axo.querySelector('.side'); if(sd) sd.style.maxHeight=''; to=terrGo||terrFrom; terrGo=null; TERR=null; axo.classList.remove('terr'); document.getElementById('terrLbl').innerHTML=''; setTimeout(terrCtl,50); }
   inAxo=false; axo.classList.remove('on'); document.body.classList.remove('axo-on'); axo.setAttribute('aria-hidden','true'); hideTip();
   setTimeout(()=>{ loopOn=false; },650);
   const target = ['pt','al','pg','vdp'].includes(to) ? to : 'vdp';
