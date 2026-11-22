@@ -468,7 +468,7 @@ body.phone #welcome{left:12px;right:12px;max-width:none;bottom:auto;top:calc(70p
 if(localStorage.getItem('vdpBleed')!=='0'&&matchMedia('(max-width:699px)').matches){const d=document.documentElement;d.classList.add('bleed');
 const B=140,fix=()=>{if(Math.abs(scrollY-B)>0.5)scrollTo(0,B)};addEventListener('load',()=>{fix();setTimeout(fix,300);setTimeout(fix,1200)});addEventListener('scroll',fix,{passive:true});addEventListener('resize',()=>setTimeout(fix,50));}}catch(e){}})();</script>
 <style id="bleedcss">html.bleed{--bl:140px}html.bleed body{padding-top:var(--bl);box-sizing:content-box}html.bleed #app{overflow:visible;clip-path:inset(calc(-1 * var(--bl)) 0 0 0)}html.bleed #map{overflow:visible}</style>
-<style id="xseccss">#xsec{display:none;flex-direction:column;position:absolute;right:22px;bottom:22px;box-sizing:border-box;z-index:3;background:rgba(237,231,220,.94);border:1px solid rgba(35,31,32,.12);border-radius:16px;box-shadow:0 10px 30px rgba(35,31,32,.10);padding:12px 16px 10px;pointer-events:auto;font-family:var(--serif,'Arno Pro',Georgia,serif);font-style:italic;color:#231F20}
+<style id="xseccss">#terrLbl .lbl.vdpl{transform:translate(-50%,-6px);display:flex;flex-direction:column;align-items:center;gap:2px}#terrLbl .lbl.vdpl::before{display:none}#terrLbl .vdpl .lg{display:block;width:140px}#terrLbl .vdpl .lg svg{display:block;width:100%;height:auto;filter:drop-shadow(0 2px 6px rgba(0,0,0,.55))}#terrLbl .vdpl .est{font-size:10px;margin:1px 0 0}#terrLbl .vdpl .rng{font-size:13px;white-space:nowrap;color:#231F20;text-shadow:0 0 4px var(--halo,#E6DED0),0 0 8px var(--halo,#E6DED0)}#terrLbl .vdpl .dt{width:11px;height:11px;border-radius:50%;background:var(--gold,#C76653);border:2px solid #231F20;margin-bottom:4px}#xsec{display:none;flex-direction:column;position:absolute;right:22px;bottom:22px;box-sizing:border-box;z-index:3;background:rgba(237,231,220,.94);border:1px solid rgba(35,31,32,.12);border-radius:16px;box-shadow:0 10px 30px rgba(35,31,32,.10);padding:12px 16px 10px;pointer-events:auto;font-family:var(--serif,'Arno Pro',Georgia,serif);font-style:italic;color:#231F20}
 body:not(.sheet) #axo.terr.on #xsec.on{display:flex}#xsec svg{margin:auto 0}
 #xsec .xh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 2px 0}#xsec .xh b{font-size:19px}#xsec .xh span{font-size:12px}
 #xsec .xh b{font-size:15px}#xsec .xh span{color:rgba(35,31,32,.55);font-size:12.5px}
@@ -1719,7 +1719,6 @@ async function buildTerroir(){
   const drape=(ring,step)=>{ const out=[]; for(let i=0;i<ring.length-1;i++){ const a=ring[i],b=ring[i+1],dl=Math.hypot((b[0]-a[0])*mx,(b[1]-a[1])*my),n=Math.max(1,Math.ceil(dl/step)); for(let j=0;j<n;j++){ const lon=a[0]+(b[0]-a[0])*j/n, lat=a[1]+(b[1]-a[1])*j/n, q=toL([lon,lat]); out.push(new THREE.Vector3(q[0],Y(el(lon,lat))+8,q[1])); } } const e=ring[ring.length-1], q=toL(e); out.push(new THREE.Vector3(q[0],Y(el(e[0],e[1]))+8,q[1])); return out; };
   const contactMat=new THREE.LineBasicMaterial({color:0x231F20,transparent:true,opacity:.35});
   T.geol.forEach(r=>grp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(drape(r,60)),contactMat)));
-  if(typeof XSEC!=='undefined'){ const olP=[[T.outline.map(toL)]], pts=drape(XSEC.path,40), runs=[]; let cur=[]; pts.forEach(v=>{ if(pip(v.x,v.z,olP)) cur.push(v); else if(cur.length){ runs.push(cur); cur=[]; } }); if(cur.length) runs.push(cur); runs.forEach(r=>{ if(r.length>1){ r.forEach(v=>v.y+=14); grp.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(r),r.length*3,90,6,false),new THREE.MeshBasicMaterial({color:new THREE.Color(0xB04F3D).convertSRGBToLinear()}))); } }); }
   grp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(drape(T.park,45)),new THREE.LineBasicMaterial({color:0x231F20})));
   { const dl=new THREE.Line(new THREE.BufferGeometry().setFromPoints(drape(T.doc,45)),new THREE.LineDashedMaterial({color:0x231F20,dashSize:420,gapSize:330})); dl.computeLineDistances(); grp.add(dl); }
   // soil walls + outline, base
@@ -1749,11 +1748,11 @@ async function buildTerroir(){
   const P=[ {k:'summit',ll:[-7.3594,39.3131],cls:'peak',txt:()=> 'São Mamede · 1,025 m'},
     {k:'portalegre',ll:[-7.42917,39.29537],cls:'cityL',txt:()=>'Portalegre'},
     {k:'reguengo',ll:[-7.39276,39.29817],cls:'cityL',txt:()=>'Reguengo',dy:-14},
-    {k:'vdp',ll:[-7.3904,39.2921],cls:'cityR go',txt:()=>'Vinha dos Padres · 497–566 m',dy:12}];
+    {k:'vdp',ll:[-7.3904,39.2921],cls:'vdpl go',txt:()=>'Vinha dos Padres · 497–566 m',html:()=>`<span class="dt"></span><span class="lg" role="img" aria-label="Vinha dos Padres">${D.logo}<span class="est">Est. 1795</span></span><span class="rng">497–566 m</span>`,dy:0}];
   { const pk=T.park.filter(c=>c[1]>39.38&&c[1]<39.47).reduce((a,c)=>c[0]>a[0]?c:a,[-99,0]), dc=T.doc.reduce((a,c)=>c[1]<a[1]?c:a,[0,99]);
     P.push({k:'park',ll:pk,cls:'reg r',txt:()=>t('terrPark')},{k:'doc',ll:dc,cls:'reg b',txt:()=>t('terrDoc')}); }
   const L=document.getElementById('terrLbl'); L.innerHTML='';
-  P.forEach(p=>{ const d=document.createElement('div'); d.className='lbl '+p.cls; d.textContent=p.txt(); L.appendChild(d); p.el=d; const q=toL(p.ll); p.v=new THREE.Vector3(q[0],Y(el(p.ll[0],p.ll[1]))+20,q[1]);
+  P.forEach(p=>{ const d=document.createElement('div'); d.className='lbl '+p.cls; if(p.html) d.innerHTML=p.html(); else d.textContent=p.txt(); L.appendChild(d); p.el=d; const q=toL(p.ll); p.v=new THREE.Vector3(q[0],Y(el(p.ll[0],p.ll[1]))+20,q[1]);
     if(p.k==='vdp') d.onclick=()=>{ terrGo='vdp'; exitAxo('vdp'); }; });
   TERRX.lbl=P; TERRX.dim={w,h,md};
 }
@@ -1777,7 +1776,7 @@ function drawXsec(){
   if(isSheet||!TERR){ box.classList.remove('on'); return; }
   const L=XS_TXT[lang==='pt'?'pt':'en'], X=XSEC, side=axo.querySelector('.side');
   const cw=side?side.offsetWidth:470; box.style.width=cw+'px';
-  const mL=40,mR=6,mT=52,mB=20, pw=cw-32-mL-mR, legendH=0, headH=26, footH=84;
+  const mL=40,mR=6,mT=52,mB=20, pw=cw-32-mL-mR, legendH=0, headH=26, footH=30;
   const B=XSEC_V==='b', band=150, zTop=1060, zBot=B?0:Math.min(...X.prof.map(p=>p[1]))-band, EXG=4;
   const fixedH=24+headH+legendH+mT+mB+footH; let ph=Math.round(EXG*(zTop-zBot)*pw/(X.total*1000));
   if(side){ side.style.maxHeight='none'; const st=side.getBoundingClientRect().top-axo.getBoundingClientRect().top, avail=H-st-side.scrollHeight-22-14-fixedH; ph=Math.max(64,Math.min(ph,Math.floor(avail))); }
@@ -1799,15 +1798,17 @@ function drawXsec(){
   g+=`<polyline points="${P.map(p=>`${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(' ')}" fill="none" stroke="#231F20" stroke-width="1.8" stroke-linejoin="round"/>`;
   const mk=(key,name,sub,col)=>{ const d=X.marks[key], z=P.reduce((a,p)=>Math.abs(p[0]-d)<Math.abs(a[0]-d)?p:a)[1], x=sx(d), y=sy(z), an=key==='Portalegre'?'start':'middle', tx=key==='Portalegre'?x-6:x;
     return `<line x1="${x}" y1="${y-7}" x2="${x}" y2="${y-30}" stroke="${col}" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="5" fill="${col}" stroke="#fff" stroke-width="1.6"/><text x="${tx}" y="${y-46}" text-anchor="${an}" font-size="13.5" font-weight="700" fill="${col}">${name}</text><text x="${tx}" y="${y-33}" text-anchor="${an}" font-size="10.5" fill="#231F20">${sub}</text>`; };
-  g+=mk('Portalegre','Portalegre',L.dPo,'#231F20')+mk('Vinha dos Padres','Vinha dos Padres',L.dVdp,'#B04F3D')+mk('São Mamede','São Mamede',L.dSm,'#231F20');
+  const vlogo=(()=>{ const d=X.marks['Vinha dos Padres'], z=P.reduce((a,p)=>Math.abs(p[0]-d)<Math.abs(a[0]-d)?p:a)[1], x=sx(d), y=sy(z), lw=124, lh=lw*47.65/327.75;
+    const svg=(typeof D!=='undefined'&&D.logo)? D.logo.replace('<svg',`<svg x="${x-lw/2}" y="${y-62}" width="${lw}" height="${lh}" style="overflow:visible;filter:drop-shadow(0 1.5px 4px rgba(0,0,0,.55))"`) : '';
+    return `<line x1="${x}" y1="${y-7}" x2="${x}" y2="${y-30}" stroke="#B04F3D" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="5" fill="#B04F3D" stroke="#fff" stroke-width="1.6"/>${svg}<text x="${x}" y="${y-33}" text-anchor="middle" font-size="10.5" fill="#231F20">${L.dVdp}</text>`; })();
+  g+=mk('Portalegre','Portalegre',L.dPo,'#231F20')+vlogo+mk('São Mamede','São Mamede',L.dSm,'#231F20');
   for(let k=0;k<=X.total;k+=2) g+=`<text x="${sx(k)}" y="${mT+ph+16}" text-anchor="middle" font-size="11" fill="rgba(35,31,32,.55)">${k} km</text>`;
   g+=`<text x="${mL}" y="${mT+ph+16}" font-size="11" fill="rgba(35,31,32,.55)" dx="-${mL-4}">${''}</text>`;
   const defs=`<defs><pattern id="xsDeep" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#DDD5C7"/><line x1="0" y1="0" x2="0" y2="7" stroke="rgba(35,31,32,.10)" stroke-width="1"/></pattern></defs>`;
   const units=['portalegre','silurian','ordovician','devonian','None'];
-  box.innerHTML=`<div class="xh"><b>${L.title}</b><span>${L.sw} → ${L.ne} · ${L.hx.replace('{e}',exag)}</span></div>
+  box.innerHTML=`<div class="xh"><b>${L.title}</b><span>${L.hx.replace('{e}',exag)}</span></div>
    <svg width="${cw-32}" height="${ph+mT+mB}" viewBox="0 0 ${cw-32} ${ph+mT+mB}">${defs}${g}</svg>
-   <div class="xrow"><button class="gowines" id="terrGoV">${t('terrGo')}</button><div class="xl"><span><i style="background:${XS_COL.None}"></i>${L.None}</span></div></div><div class="foot fn">${t('terrSrc')}</div>`;
-  box.querySelector('#terrGoV').onclick=()=>{ terrGo='vdp'; exitAxo('vdp'); };
+   <div class="foot fn">${t('terrSrc').split(' · ')[0]}</div>`;
   if(side){ const top=side.getBoundingClientRect().top-axo.getBoundingClientRect().top; side.style.maxHeight=Math.max(160,H-top-ch-22-14)+'px'; box.style.top=(top+side.offsetHeight+14)+'px'; box.style.bottom='22px'; box.style.height='auto'; }
   box.classList.add('on');
 }
