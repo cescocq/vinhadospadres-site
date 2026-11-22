@@ -1763,14 +1763,14 @@ function terrLabels(){ if(!TERRX||!TERRX.lbl) return; const s=world.scale.y;
     p.el.style.display=vis?'':'none'; if(vis){ p.el.style.left=((_tv.x+1)/2*W)+'px'; p.el.style.top=((1-_tv.y)/2*H+(p.dy||0))+'px'; p.el.style.opacity=Math.min(1,rise*1.2); } }); }
 
 /* ---- Terroir cross-section (bottom card) ---- */
-var XSEC_V=(new URLSearchParams(location.search).get('xsec')||'a').toLowerCase();
+var XSEC_V='b';
 const XS_COL={portalegre:'#E289B7',silurian:'#BFCDB1',ordovician:'#707762',devonian:'#CE7200',None:'#D9D2C4'};
 const XS_TXT={en:{title:'Cross-section',route:'Portalegre · Vinha dos Padres · São Mamede',hx:'heights ×{e}',sw:'south-west',ne:'north-east',
   portalegre:'Portalegre granite',silurian:'Silurian quartzites and black shales',ordovician:'Ordovician quartzites and slates',devonian:'Devonian quartzites and slates',None:'outside the park',
-  dPo:'451 m',dVdp:'545 m',dSm:'1,025 m',sea:'sea level',depth:'below the surface band: not to scale'},
+  dPo:'451 m',dVdp:'497–566 m',dSm:'1,025 m',sea:'sea level',depth:'below the surface band: not to scale'},
  pt:{title:'Corte',route:'Portalegre · Vinha dos Padres · São Mamede',hx:'altitudes ×{e}',sw:'sudoeste',ne:'nordeste',
   portalegre:'Granito de Portalegre',silurian:'Quartzitos e xistos negros do Silúrico',ordovician:'Quartzitos e xistos do Ordovícico',devonian:'Quartzitos e xistos do Devónico',None:'fora do parque',
-  dPo:'451 m',dVdp:'545 m',dSm:'1025 m',sea:'nível do mar',depth:'abaixo da faixa: sem escala'}};
+  dPo:'451 m',dVdp:'497–566 m',dSm:'1025 m',sea:'nível do mar',depth:'abaixo da faixa: sem escala'}};
 var XS_LASTH=0; function xsecH(){ return XS_LASTH||(XSEC_V==='b'?330:270); }
 function drawXsec(){
   const box=document.getElementById('xsec'); if(!box||typeof XSEC==='undefined') return;
