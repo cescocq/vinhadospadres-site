@@ -1681,8 +1681,7 @@ async function enterTerroir(){
 async function buildTerroir(){
   const T=TERR_D;
   if(!TERRX){
-    const bin=atob(T.zb64), u8=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i);
-    const z=new Int16Array(u8.buffer); const tex=await new THREE.TextureLoader().loadAsync('img/terroir.webp'); tex.encoding=THREE.sRGBEncoding; tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+    const z=T.z; const tex=await new THREE.TextureLoader().loadAsync('img/terroir.webp'); tex.encoding=THREE.sRGBEncoding; tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
     TERRX={z,tex};
   }
   const z=TERRX.z, [l0,b0,l1,b1]=T.bbox, lonc=(l0+l1)/2, latc=(b0+b1)/2, mx=111320*Math.cos(latc*Math.PI/180), my=110574;
