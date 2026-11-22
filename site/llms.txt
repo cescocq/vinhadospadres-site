@@ -8,6 +8,7 @@ The site is bilingual: English pages are at the paths below; Portuguese versions
 
 - [Estate & terroir](https://www.vinhadospadres.com/): the six vineyard properties on an interactive map, with 3D parcels, harvest and climate data, and a terroir layer showing the geology of the Serra de São Mamede and the Portalegre DOC in 2D and 3D
 - [History](https://www.vinhadospadres.com/history): from the Jesuits' first vow in Paris in 1534 to the vineyard in Reguengo today
+- [Amphora (talha) wine](https://www.vinhadospadres.com/amphora-wine): what amphora (talha) wine is, how Vinha dos Padres makes it in historic Campo Maior talhas (destemmed, sealed by flor, covered with cloth, no olive oil), and why it works outside the Vinho de Talha DOC rules
 - [The code](https://www.vinhadospadres.com/code): how to read the code on every label — months of skin maceration and total ageing in amphora (M = months), plus any ageing in another vessel
 
 ## Wines
@@ -26,4 +27,5 @@ The site is bilingual: English pages are at the paths below; Portuguese versions
 ## Optional
 
 - [Privacy policy](https://www.vinhadospadres.com/privacy)
+- [Full text of all pages](https://www.vinhadospadres.com/llms-full.txt)
 - [Sitemap](https://www.vinhadospadres.com/sitemap.xml)

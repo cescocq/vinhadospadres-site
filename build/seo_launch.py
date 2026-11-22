@@ -15,6 +15,7 @@ T={  # page -> (title or None to keep, description or None to keep)
  'recognition':(None,"Reviews, awards and press for Vinha dos Padres, including #32 with 94 points in James Suckling's Top 100 Wines of Portugal 2025."),
  'recognition-pt':(None,"Críticas, prémios e imprensa sobre a Vinha dos Padres, incluindo o 32.º lugar com 94 pontos no Top 100 Wines of Portugal 2025 de James Suckling."),
  'contact':(None,"Get in touch with Vinha dos Padres in Reguengo, Portalegre, Serra de São Mamede, or sign up for news and new releases."),
+ 'amphora-wine':(None,None),
  'contact-pt':(None,"Contacte a Vinha dos Padres no Reguengo, Portalegre, Serra de São Mamede, ou subscreva as novidades e os novos lançamentos."),
 }
 ICONS=('<link rel="icon" href="favicon.ico" sizes="48x48">'
@@ -48,6 +49,20 @@ for f in sorted(glob.glob(f'{SITE}/*.html')):
             h=setmeta(h,'property',k,v)
         h=setmeta(h,'name','twitter:card','summary_large_image')
         h=setmeta(h,'name','twitter:image',BASE+'/og-image.jpg')
+
+    # Amphora guide: footer link + contextual links (idempotent)
+    if page not in ('amphora-wine','amphora-wine-pt'):
+        ah,at=('amphora-wine-pt.html','Vinho de talha') if lang=='pt' else ('amphora-wine.html','Amphora wine')
+        if '<footer class="sfoot">' in h and f'href="{ah}"' not in h.split('<footer class="sfoot">',1)[1]:
+            h=re.sub(r'(<footer class="sfoot">.*?<a href="privacy(?:-pt)?\.html">[^<]*</a>)',lambda m:m.group(1)+f'<a href="{ah}">{at}</a>',h,count=1,flags=re.S)
+    CTX={'code':(' Vinha dos Padres is at the forefront of scientifically investigating the use of old amphoras and their winemaking qualities.</p>',' <a class="wl" href="amphora-wine.html">What is amphora (talha) wine? →</a>'),
+         'code-pt':(' A Vinha dos Padres está na vanguarda da investigação científica sobre o uso de ânforas antigas e as suas qualidades enológicas.</p>',' <a class="wl" href="amphora-wine-pt.html">O que é o vinho de talha? →</a>'),
+         'history':("a tradition practised in Portugal's Alentejo region for more than 2,000 years.</p></details>",' <a class="wl" href="amphora-wine.html">Read our guide to amphora wine →</a>'),
+         'history-pt':('uma tradição praticada no Alentejo há mais de 2000 anos.</p></details>',' <a class="wl" href="amphora-wine-pt.html">Leia o nosso guia do vinho de talha →</a>')}
+    if page in CTX:
+        a,lnk=CTX[page]; key=lnk.split('href="')[1].split('"')[0]
+        if a in h and lnk not in h:
+            h=h.replace(a,a.replace('</p>',lnk+'</p>',1),1)
     if page in ('index','index-pt') and '"@type":"Winery"' not in h:
         h=h.replace('</head>',LD%(BASE,BASE,BASE,BASE,LDD[lang])+'\n</head>',1)
     open(f,'w',encoding='utf-8').write(h)
