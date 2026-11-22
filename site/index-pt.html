@@ -1745,10 +1745,10 @@ async function buildTerroir(){
       vertexShader:'varying vec2 vP; void main(){ vP=position.xz; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
       fragmentShader:'uniform vec2 uC; uniform vec2 uH; uniform float uG; uniform vec3 uCol; varying vec2 vP; void main(){ vec2 q=max(abs(vP-uC)-uH,0.0); float d=length(q); float a=0.6*(1.0-smoothstep(1.0*uG,4.0*uG,d)); if(a<0.004) discard; gl_FragColor=vec4(uCol,a); }'});
     const grid=new THREE.LineSegments(gg,gm); grid.position.y=1; scene.add(grid); }
-  const P=[ {k:'summit',ll:[-7.3594,39.3131],cls:'peak',txt:()=> 'São Mamede · 1,025 m'},
+  const P=[ {k:'summit',ll:[-7.3594,39.3131],cls:'peak',txt:()=> lang==='pt'?'Pico de São Mamede · 1025 m':'São Mamede Peak · 1,025 m'},
     {k:'portalegre',ll:[-7.42917,39.29537],cls:'cityL',txt:()=>'Portalegre'},
     {k:'reguengo',ll:[-7.39276,39.29817],cls:'cityL',txt:()=>'Reguengo',dy:-14},
-    {k:'vdp',ll:[-7.3904,39.2921],cls:'vdpl go',txt:()=>'Vinha dos Padres · 497–566 m',html:()=>`<span class="dt"></span><span class="lg" role="img" aria-label="Vinha dos Padres">${D.logo}<span class="est">Est. 1795</span></span><span class="rng">497–566 m</span>`,dy:0}];
+    {k:'vdp',ll:[-7.3904,39.2921],cls:'vdpl go',txt:()=>'Vinha dos Padres · 497–566 m',html:()=>`<span class="dt"></span><span class="lg" role="img" aria-label="Vinha dos Padres">${D.logo}</span><span class="rng">497–566 m</span>`,dy:0}];
   { const pk=T.park.filter(c=>c[1]>39.38&&c[1]<39.47).reduce((a,c)=>c[0]>a[0]?c:a,[-99,0]), dc=T.doc.reduce((a,c)=>c[1]<a[1]?c:a,[0,99]);
     P.push({k:'park',ll:pk,cls:'reg r',txt:()=>t('terrPark')},{k:'doc',ll:dc,cls:'reg b',txt:()=>t('terrDoc')}); }
   const L=document.getElementById('terrLbl'); L.innerHTML='';
@@ -1801,7 +1801,7 @@ function drawXsec(){
   const vlogo=(()=>{ const d=X.marks['Vinha dos Padres'], z=P.reduce((a,p)=>Math.abs(p[0]-d)<Math.abs(a[0]-d)?p:a)[1], x=sx(d), y=sy(z), lw=124, lh=lw*47.65/327.75;
     const svg=(typeof D!=='undefined'&&D.logo)? D.logo.replace('<svg',`<svg x="${x-lw/2}" y="${y-62}" width="${lw}" height="${lh}" style="overflow:visible;filter:drop-shadow(0 1.5px 4px rgba(0,0,0,.55))"`) : '';
     return `<line x1="${x}" y1="${y-7}" x2="${x}" y2="${y-30}" stroke="#B04F3D" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="5" fill="#B04F3D" stroke="#fff" stroke-width="1.6"/>${svg}<text x="${x}" y="${y-33}" text-anchor="middle" font-size="10.5" fill="#231F20">${L.dVdp}</text>`; })();
-  g+=mk('Portalegre','Portalegre',L.dPo,'#231F20')+vlogo+mk('São Mamede','São Mamede',L.dSm,'#231F20');
+  g+=mk('Portalegre','Portalegre',L.dPo,'#231F20')+vlogo+mk('São Mamede',lang==='pt'?'Pico de São Mamede':'São Mamede Peak',L.dSm,'#231F20');
   for(let k=0;k<=X.total;k+=2) g+=`<text x="${sx(k)}" y="${mT+ph+16}" text-anchor="middle" font-size="11" fill="rgba(35,31,32,.55)">${k} km</text>`;
   g+=`<text x="${mL}" y="${mT+ph+16}" font-size="11" fill="rgba(35,31,32,.55)" dx="-${mL-4}">${''}</text>`;
   const defs=`<defs><pattern id="xsDeep" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#DDD5C7"/><line x1="0" y1="0" x2="0" y2="7" stroke="rgba(35,31,32,.10)" stroke-width="1"/></pattern></defs>`;
