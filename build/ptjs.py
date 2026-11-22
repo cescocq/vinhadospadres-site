@@ -17,7 +17,7 @@ HJ={
 '2025 · Caldeiras':'2025 · Caldeiras','2026 · Fialha and Vinha da Broa':'2026 · Fialha e Vinha da Broa',
 'António Trindade Crespo makes Quinta da Vinha dos Padres red and white.':'António Trindade Crespo faz o Quinta da Vinha dos Padres tinto e branco.',
 'Both leave Rome together: Rodrigues by sea, Xavier overland through France and Madrid.':'Ambos partem de Roma: Rodrigues por mar, Xavier por terra através de França e Madrid.',
-'College 1551':'Colégio 1551','College of the Holy Spirit; university from 1559.':'Colégio do Espírito Santo; universidade desde 1559.','First modern vintage, made in talhas at ~600 m.':'Primeira colheita moderna, feita em talhas a ~600 m.',
+'College 1551':'Colégio 1551','College of the Holy Spirit; university from 1559.':'Colégio do Espírito Santo; universidade desde 1559.','First modern vintage, made in talhas at 497–566 m.':'Primeira colheita moderna, feita em talhas a 497–566 m.',
 'Formula 1539':'Fórmula 1539','Formula of the Institute (1539); papal approval, 27 September 1540.':'Fórmula do Instituto (1539); aprovação papal, 27 de setembro de 1540.',
 'Lisbon':'Lisboa','Montmartre · 15 Aug 1534':'Montmartre · 15 ago 1534','Only the centenary vines that survive today remain.':'Restam apenas as vinhas centenárias que hoje sobrevivem.',
 'Papal bull 27 Sep 1540':'Bula papal 27 set 1540','Portalegre DOC':'DOC Portalegre','Reguengo parish under Jesuit cultivation.':'Freguesia do Reguengo cultivada pelos Jesuítas.',
