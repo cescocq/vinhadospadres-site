@@ -468,8 +468,8 @@ body.phone #welcome{left:12px;right:12px;max-width:none;bottom:auto;top:calc(70p
 if(localStorage.getItem('vdpBleed')!=='0'&&matchMedia('(max-width:699px)').matches){const d=document.documentElement;d.classList.add('bleed');
 const B=140,fix=()=>{if(Math.abs(scrollY-B)>0.5)scrollTo(0,B)};addEventListener('load',()=>{fix();setTimeout(fix,300);setTimeout(fix,1200)});addEventListener('scroll',fix,{passive:true});addEventListener('resize',()=>setTimeout(fix,50));}}catch(e){}})();</script>
 <style id="bleedcss">html.bleed{--bl:140px}html.bleed body{padding-top:var(--bl);box-sizing:content-box}html.bleed #app{overflow:visible;clip-path:inset(calc(-1 * var(--bl)) 0 0 0)}html.bleed #map{overflow:visible}</style>
-<style id="xseccss">#xsec{display:none;position:absolute;right:22px;bottom:22px;z-index:3;background:rgba(237,231,220,.94);border:1px solid rgba(35,31,32,.12);border-radius:16px;box-shadow:0 10px 30px rgba(35,31,32,.10);padding:12px 16px 10px;pointer-events:auto;font-family:var(--serif,'Arno Pro',Georgia,serif);font-style:italic;color:#231F20}
-body:not(.sheet) #axo.terr.on #xsec.on{display:block}
+<style id="xseccss">#xsec{display:none;flex-direction:column;position:absolute;right:22px;bottom:22px;box-sizing:border-box;z-index:3;background:rgba(237,231,220,.94);border:1px solid rgba(35,31,32,.12);border-radius:16px;box-shadow:0 10px 30px rgba(35,31,32,.10);padding:12px 16px 10px;pointer-events:auto;font-family:var(--serif,'Arno Pro',Georgia,serif);font-style:italic;color:#231F20}
+body:not(.sheet) #axo.terr.on #xsec.on{display:flex}#xsec svg{margin:auto 0}
 #xsec .xh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 2px 0}#xsec .xh b{font-size:19px}#xsec .xh span{font-size:12px}
 #xsec .xh b{font-size:15px}#xsec .xh span{color:rgba(35,31,32,.55);font-size:12.5px}
 #xsec svg{display:block;overflow:visible}
@@ -477,8 +477,8 @@ body:not(.sheet) #axo.terr.on #xsec.on{display:block}
 body:not(.sheet) #axo.terr .side{overflow:auto}
 body:not(.sheet) #axo.terr .tstats{display:none}
 body:not(.sheet) #axo.terr .tlg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 12px;font-size:13px;line-height:1.25}
-body:not(.sheet) #axo.terr .help{right:calc(22px + 470px + 14px)}
-body:not(.sheet) #axo.terr .ctrl{right:calc(22px + 470px + 14px)!important;bottom:22px!important}
+body:not(.sheet) #axo.terr .help{right:auto;left:84px;text-align:left;bottom:36px}
+body:not(.sheet) #axo.terr .ctrl{right:auto!important;left:22px!important;bottom:22px!important}
 #xsec .xl i{display:inline-block;width:18px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 </style></head>
 <body><div id="ageGate" role="dialog" aria-modal="true" aria-labelledby="agt" hidden><div class="b"><h2 id="agt" class="lg" aria-label="Bem-vindo à Vinha dos Padres"><svg  data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 327.75 47.65">
@@ -1781,6 +1781,7 @@ function drawXsec(){
   const B=XSEC_V==='b', band=150, zTop=1060, zBot=B?0:Math.min(...X.prof.map(p=>p[1]))-band, EXG=4;
   const fixedH=24+headH+legendH+mT+mB+footH; let ph=Math.round(EXG*(zTop-zBot)*pw/(X.total*1000));
   if(side){ side.style.maxHeight='none'; const st=side.getBoundingClientRect().top-axo.getBoundingClientRect().top, avail=H-st-side.scrollHeight-22-14-fixedH; ph=Math.max(64,Math.min(ph,Math.floor(avail))); }
+  if(side){ const st=side.getBoundingClientRect().top-axo.getBoundingClientRect().top, sh=Math.min(side.scrollHeight,H-st-22-14-fixedH-64); ph=Math.max(ph,Math.min(Math.round(6*(zTop-zBot)*pw/(X.total*1000)),Math.floor(H-st-sh-14-22-fixedH))); }
   const ch=ph+fixedH; XS_LASTH=ch;
   const sx=d=>mL+d/X.total*pw, sy=z=>mT+(zTop-z)/(zTop-zBot)*ph;
   const exag=(Math.round(ph/(zTop-zBot)/(pw/(X.total*1000))*2)/2).toString();
@@ -1807,7 +1808,7 @@ function drawXsec(){
    <svg width="${cw-32}" height="${ph+mT+mB}" viewBox="0 0 ${cw-32} ${ph+mT+mB}">${defs}${g}</svg>
    <div class="xrow"><button class="gowines" id="terrGoV">${t('terrGo')}</button><div class="xl"><span><i style="background:${XS_COL.None}"></i>${L.None}</span></div></div><div class="foot fn">${t('terrSrc')}</div>`;
   box.querySelector('#terrGoV').onclick=()=>{ terrGo='vdp'; exitAxo('vdp'); };
-  if(side){ const top=side.getBoundingClientRect().top-axo.getBoundingClientRect().top; side.style.maxHeight=Math.max(160,H-top-ch-22-14)+'px'; box.style.top=(top+side.offsetHeight+14)+'px'; box.style.bottom='auto'; }
+  if(side){ const top=side.getBoundingClientRect().top-axo.getBoundingClientRect().top; side.style.maxHeight=Math.max(160,H-top-ch-22-14)+'px'; box.style.top=(top+side.offsetHeight+14)+'px'; box.style.bottom='22px'; box.style.height='auto'; }
   box.classList.add('on');
 }
 function terrFrame(){
