@@ -2,9 +2,9 @@
 
 > Vinha dos Padres is an altitude amphora (talha) wine estate in Reguengo, Portalegre, in the Serra de São Mamede Natural Park, Alto Alentejo, Portugal (DOC Alentejo Portalegre, est. 1795). Six vineyard properties of centenary bush vines are made into wine in centenary clay amphoras (talhas). Its first vintage, Quinta da Vinha dos Padres 2022 red 3M12M, was ranked #32 with 94 points in James Suckling's Top 100 Wines of Portugal 2025 — no amphora (talha) wine in Portugal scored or ranked higher.
 
-The site is bilingual: English pages are at the paths below; Portuguese versions add the suffix `-pt` (the Portuguese homepage is `/index-pt`).
+The site is in English; a Portuguese version is coming soon.
 
-This file contains the full text of the English pages. Portuguese versions add the suffix `-pt` to each address.
+This file contains the full text of the English pages. A Portuguese version is coming soon.
 
 
 ---

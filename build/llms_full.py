@@ -15,7 +15,8 @@ def text(f):
     s=re.sub(r'[ \t]+',' ',s); s=re.sub(r'\n\s*\n\s*\n+','\n\n',s)
     return '\n'.join(l.strip() for l in s.splitlines() if not (len(l.strip())>15 and ' ' not in l.strip())).strip()
 intro=open('site/llms.txt',encoding='utf-8').read().split('\n## ')[0].strip()
-out=[intro,'\nThis file contains the full text of the English pages. Portuguese versions add the suffix `-pt` to each address.\n']
+ptnote='A Portuguese version is coming soon.' if 'coming soon' in intro else 'Portuguese versions add the suffix `-pt` to each address.'
+out=[intro,'\nThis file contains the full text of the English pages. '+ptnote+'\n']
 for p in PAGES:
     out.append(f'\n---\n\nSource: {B}{p if p!="index" else ""}\n\n'+text(p))
 open('site/llms-full.txt','w',encoding='utf-8').write('\n'.join(out)+'\n')
