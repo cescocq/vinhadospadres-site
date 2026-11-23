@@ -67,3 +67,4 @@ for f in sorted(glob.glob(f'{SITE}/*.html')):
         h=h.replace('</head>',LD%(BASE,BASE,BASE,BASE,LDD[lang])+'\n</head>',1)
     open(f,'w',encoding='utf-8').write(h)
 print('done')
+import runpy as _rp, os; _rp.run_path(os.path.join(os.path.dirname(os.path.abspath(__file__)),'consent.py'))
