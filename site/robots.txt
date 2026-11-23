@@ -1,7 +1,2 @@
-# Vinha dos Padres welcomes search engines and AI assistants.
-# Content signals (https://contentsignals.org): search, AI answers and AI training are all allowed.
 User-agent: *
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
-Allow: /
-
-Sitemap: https://www.vinhadospadres.com/sitemap.xml
+Disallow: /
